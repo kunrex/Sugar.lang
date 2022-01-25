@@ -1,0 +1,112 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Tokens\Keywords\Subtypes\" />
+    <None Remove="Tokens\Keywords\Subtypes\Types\" />
+    <None Remove="Tokens\Keywords\Subtypes\Conditions\" />
+    <None Remove="Tokens\Keywords\Subtypes\Loops\" />
+    <None Remove="Tokens\Keywords\Subtypes\ControlStatements\" />
+    <None Remove="Parsing\Nodes\Types\" />
+    <None Remove="Parsing\Nodes\Types\Enums\" />
+    <None Remove="Parsing\Nodes\Types\Subtypes\" />
+    <None Remove="Tokens\Operators\Binary\" />
+    <None Remove="Tokens\Operators\Unary\" />
+    <None Remove="Parsing\Nodes\Expressions\Arithmetic\" />
+    <None Remove="Parsing\Nodes\Expressions\Associativity\" />
+    <None Remove="Parsing\Nodes\Functions\Calling\" />
+    <None Remove="Parsing\Nodes\Functions\Calling\Structure\" />
+    <None Remove="Parsing\Nodes\Values\" />
+    <None Remove="Parsing\Nodes\CtrlStatements\" />
+    <None Remove="Tokens\Operators\Assignment\" />
+    <None Remove="Parsing\Nodes\Functions\Declarations\" />
+    <None Remove="Parsing\Parser\" />
+    <None Remove="Parsing\Nodes\Loops\" />
+    <None Remove="Parsing\Nodes\Conditions\IfConditions\" />
+    <None Remove="Parsing\Nodes\Conditions\SwitchConditions\" />
+    <None Remove="Parsing\Nodes\Statements\" />
+    <None Remove="Parsing\Nodes\Entities\" />
+    <None Remove="Parsing\Nodes\Entities\Enums\" />
+    <None Remove="Tokens\Keywords\Subtypes\Entities\" />
+    <None Remove="Parsing\Nodes\Functions\Properties\" />
+    <None Remove="Parsing\Nodes\Functions\Properties\Accessors\" />
+    <None Remove="Exceptions\" />
+    <None Remove="Parsing\Parser\Enums\" />
+    <None Remove="Parsing\Nodes\Expressions\Lambdas\" />
+    <None Remove="Parsing\Parser\Structure\" />
+    <None Remove="Parsing\Nodes\Enums\" />
+    <None Remove="Tokens\Keywords\Subtypes\Describers\" />
+    <None Remove="Parsing\Nodes\Describers\" />
+    <None Remove="Parsing\Nodes\NodeGroups\" />
+    <None Remove="Parsing\Nodes\Statements\VariableCreation\" />
+    <None Remove="Parsing\Nodes\Interfaces\" />
+    <None Remove="Parsing\Nodes\Interfaces\Creation\" />
+    <None Remove="Parsing\Nodes\Interfaces\Expressions\" />
+    <None Remove="Parsing\Nodes\Functions\Declarations\Structure\" />
+    <None Remove="Parsing\Nodes\Values\Generics\" />
+    <None Remove="Parsing\Nodes\Values\Generics\Declarations\" />
+    <None Remove="Parsing\Nodes\UDDataTypes\Inheritance\" />
+    <None Remove="Parsing\Nodes\Functions\Declarations\OperatorOverloading\" />
+    <None Remove="Tokens\Keywords\Subtypes\Function\" />
+    <None Remove="Tokens\Constants\Numeric\" />
+    <None Remove="Tokens\Constants\Numeric\Integral\" />
+    <None Remove="Tokens\Constants\Numeric\Real\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tokens\Keywords\Subtypes\" />
+    <Folder Include="Tokens\Keywords\Subtypes\Types\" />
+    <Folder Include="Tokens\Keywords\Subtypes\Conditions\" />
+    <Folder Include="Tokens\Keywords\Subtypes\Loops\" />
+    <Folder Include="Tokens\Keywords\Subtypes\ControlStatements\" />
+    <Folder Include="Parsing\Nodes\Types\" />
+    <Folder Include="Parsing\Nodes\Types\Enums\" />
+    <Folder Include="Parsing\Nodes\Types\Subtypes\" />
+    <Folder Include="Tokens\Operators\Binary\" />
+    <Folder Include="Tokens\Operators\Unary\" />
+    <Folder Include="Parsing\Nodes\Expressions\Operative\" />
+    <Folder Include="Parsing\Nodes\Expressions\Associative\" />
+    <Folder Include="Parsing\Nodes\Functions\Calling\" />
+    <Folder Include="Parsing\Nodes\Functions\Calling\Structure\" />
+    <Folder Include="Parsing\Nodes\Values\" />
+    <Folder Include="Parsing\Nodes\CtrlStatements\" />
+    <Folder Include="Tokens\Operators\Assignment\" />
+    <Folder Include="Parsing\Nodes\Functions\Declarations\" />
+    <Folder Include="Parsing\Parser\" />
+    <Folder Include="Parsing\Nodes\Loops\" />
+    <Folder Include="Parsing\Nodes\Conditions\IfConditions\" />
+    <Folder Include="Parsing\Nodes\Conditions\SwitchConditions\" />
+    <Folder Include="Parsing\Nodes\Statements\" />
+    <Folder Include="Parsing\Nodes\Entities\" />
+    <Folder Include="Parsing\Nodes\Entities\Enums\" />
+    <Folder Include="Tokens\Keywords\Subtypes\Entities\" />
+    <Folder Include="Parsing\Nodes\Functions\Properties\" />
+    <Folder Include="Parsing\Nodes\Functions\Properties\Accessors\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Parsing\Parser\Enums\" />
+    <Folder Include="Parsing\Nodes\Expressions\Lambdas\" />
+    <Folder Include="Parsing\Parser\Structure\" />
+    <Folder Include="Parsing\Nodes\Enums\" />
+    <Folder Include="Tokens\Keywords\Subtypes\Describers\" />
+    <Folder Include="Parsing\Nodes\Describers\" />
+    <Folder Include="Parsing\Nodes\NodeGroups\" />
+    <Folder Include="Parsing\Nodes\Statements\VariableCreation\" />
+    <Folder Include="Parsing\Nodes\Interfaces\" />
+    <Folder Include="Parsing\Nodes\Interfaces\Creation\" />
+    <Folder Include="Parsing\Nodes\Interfaces\Expressions\" />
+    <Folder Include="Parsing\Nodes\Functions\Declarations\Structure\" />
+    <Folder Include="Parsing\Nodes\Values\Generics\" />
+    <Folder Include="Parsing\Nodes\Values\Generics\Declarations\" />
+    <Folder Include="Parsing\Nodes\UDDataTypes\Inheritance\" />
+    <Folder Include="Parsing\Nodes\Functions\Declarations\OperatorOverloading\" />
+    <Folder Include="Tokens\Keywords\Subtypes\Functions\" />
+    <Folder Include="Tokens\Constants\Numeric\" />
+    <Folder Include="Tokens\Constants\Numeric\Integral\" />
+    <Folder Include="Tokens\Constants\Numeric\Real\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />
+  </ItemGroup>
+</Project>
