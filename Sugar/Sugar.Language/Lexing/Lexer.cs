@@ -534,33 +534,27 @@ namespace Sugar.Language.Lexing
             {
                 var valueToString = value.ToString();
 
-                if (FindKeyWord(valueToString, out var token))
-                    return token;
-                else
-                    return new Identifier(valueToString, index);
+                var token = FindKeyWord(valueToString);
+                return token == null ? new Identifier(valueToString, index) : token;
             }
         }
 
-        private bool FindKeyWord(string _value, out Token token)
+        private Token FindKeyWord(string _value)
         {
-            token = null;
             foreach(var keyword in Keyword.Keywords)
                 if(keyword.Value == _value)
-                {
-                    token = keyword.Clone(index);
-                    return true;
-                }
+                    return keyword.Clone(index);
 
-            if(BinaryOperator.AsCastOperator.Value == _value)
-                token = BinaryOperator.AsCastOperator.Clone(index);
+            if (BinaryOperator.AsCastOperator.Value == _value)
+                return BinaryOperator.AsCastOperator.Clone(index);
             else if (BoolConstant.True.Value == _value)
-                token = BoolConstant.True.Clone(index);
+                return BoolConstant.True.Clone(index);
             else if (BoolConstant.False.Value == _value)
-                token = BoolConstant.False.Clone(index);
+                return BoolConstant.False.Clone(index);
             else if (NullConstant.Null.Value == _value)
-                token = NullConstant.Null.Clone(index);
+                return NullConstant.Null.Clone(index);
 
-            return token != null;
+            return null;
         }
     }
 }

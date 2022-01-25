@@ -146,10 +146,16 @@ namespace Sugar.Language.Parsing.Parser
             if (seperators.Length == 0)
                 return;
 
-            var current = Current;
-            foreach (var seperator in seperators)
-                if (seperator == current)
-                    return;
+            Token current;
+            if (index < tokens.Count)
+            {
+                current = Current;
+                foreach (var seperator in seperators)
+                    if (seperator == current)
+                        return;
+            }
+            else
+                current = Final;
 
             throw new TokenExpectedException(current, $"{string.Join(", ", seperators.Select(x => x.Value))}", current.Index);
         }
