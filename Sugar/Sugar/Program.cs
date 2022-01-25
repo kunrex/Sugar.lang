@@ -8,8 +8,8 @@ namespace Sugar
     internal static class Program
     {
         static void Main(string[] args)
-        { 
-            var source = "int: x = true ? -10 : 10;";
+        {
+            var source = "int: x = 10;";
             new Compiler(source).Compile();
 
             Console.ReadKey();

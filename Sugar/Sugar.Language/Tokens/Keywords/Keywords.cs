@@ -47,6 +47,7 @@ namespace Sugar.Language.Tokens.Keywords
             DescriberKeyword.In, DescriberKeyword.Out,
 
             FunctionKeyword.Operator, FunctionKeyword.Explicit, FunctionKeyword.Implicit, FunctionKeyword.Void, FunctionKeyword.Constructor,
+            FunctionKeyword.Indexer
         };
     }
 }

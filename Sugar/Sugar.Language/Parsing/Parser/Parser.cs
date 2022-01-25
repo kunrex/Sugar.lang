@@ -427,6 +427,8 @@ namespace Sugar.Language.Parsing.Parser
 
             if (MatchToken(FunctionKeyword.Operator, current))
                 return ParseOperatorOverload(describer);
+            else if (MatchToken(FunctionKeyword.Indexer, current))
+                return ParseIndexerDeclaration(describer);
             else if (MatchToken(FunctionKeyword.Void, current, false, true))
                 return ParseFunctionDeclaration(describer, new VoidNode());
             else if (MatchToken(FunctionKeyword.Constructor, current, false, true))
@@ -1687,6 +1689,29 @@ namespace Sugar.Language.Parsing.Parser
                 toReturn = new ExplicitCastDeclarationNode(describer, returnType, arguments, body);
             else
                 toReturn = new ImplicitCastDeclarationNode(describer, returnType, arguments, body);
+
+            if (generic != null)
+                toReturn.AddChild(generic);
+
+            return toReturn;
+        }
+
+        private Node ParseIndexerDeclaration(Node describer)
+        {
+            ForceMatchCurrent(FunctionKeyword.Indexer, true);
+            ForceMatchCurrentType(TokenType.Identifier | TokenType.Keyword, false);
+            var returnType = ParseType(Seperator.OpenBracket);
+
+            var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
+
+            Node generic = null;
+            if (MatchToken(BinaryOperator.LesserThan, LookAhead(), false, true))
+                generic = ParseGenericDeclaration();
+
+            index++;
+            var body = ParseBlock(ParseScopeType.Scope | ParseScopeType.LambdaExpression);
+
+            Node toReturn = new IndexerDeclarationNode(describer, returnType, arguments, body);
 
             if (generic != null)
                 toReturn.AddChild(generic);

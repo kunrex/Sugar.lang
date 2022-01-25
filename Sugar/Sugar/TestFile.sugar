@@ -1,1 +1,3 @@
-﻿
+﻿indexer object(int: index) => arrayVariable[index];
+
+int Invert(int: i) : int => -i;

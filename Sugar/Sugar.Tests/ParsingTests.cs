@@ -436,5 +436,16 @@ namespace Sugar.Tests
 
             Assert.AreEqual(true, result);
         }
+
+        [TestMethod]
+        public void IndexerDeclarations()
+        {
+            string source = "indexer object(int: index) => arrayVariable[index];";
+
+            var compiler = new Compiler(source);
+            var result = compiler.Compile();
+
+            Assert.AreEqual(true, result);
+        }
     }
 }

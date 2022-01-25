@@ -14,6 +14,6 @@ namespace Sugar.Language.Parsing.Nodes.Values
           
         }
 
-        public override string ToString() => $"Variable Node [Value: {Value}]";
+        public override string ToString() => $"Identifier Node [Value: {Value}]";
     }
 }

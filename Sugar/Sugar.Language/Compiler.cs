@@ -33,8 +33,8 @@ namespace Sugar.Language
                 Lexer lexer = new Lexer(sourceCode);
                 Tokens = lexer.Lex();
 
-                Console.WriteLine("\n_____Lexed_____");
-                Console.WriteLine(string.Join('\n', Tokens.Select(x => $"[{x.Type}, {x.Value}]")));
+                /*Console.WriteLine("\n_____Lexed_____");
+                Console.WriteLine(string.Join('\n', Tokens.Select(x => $"[{x.Type}, {x.Value}]")));*/
 
                 SyntaxTree = new Parser(Tokens).Parse();
 
