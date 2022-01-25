@@ -9,7 +9,7 @@ namespace Sugar
     {
         static void Main(string[] args)
         { 
-            var source = "print(\"hello world!\")";
+            var source = "int: x = true ? -10 : 10;";
             new Compiler(source).Compile();
 
             Console.ReadKey();

@@ -13,6 +13,7 @@ namespace Sugar.Language.Tokens.Operators.Unary
         public static readonly UnaryOperator DecrementPrefix = new UnaryOperator("--", 3, OperatorType.Decrement, false, 1);
 
         public static readonly UnaryOperator Not = new UnaryOperator("!", 4, OperatorType.Not, false, 2);
-        public static readonly UnaryOperator BitwiseNot = new UnaryOperator("~", 5, OperatorType.BitwiseNot, false, 2);
+        public static readonly UnaryOperator Minus = new UnaryOperator("-", 5, OperatorType.Minus, false, 2);
+        public static readonly UnaryOperator BitwiseNot = new UnaryOperator("~", 6, OperatorType.BitwiseNot, false, 2);
     }
 }

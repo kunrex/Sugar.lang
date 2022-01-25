@@ -14,6 +14,7 @@ namespace Sugar.Language.Tokens.Enums
         Decrement,
 
         Not,
+        Minus,
         Assignment,
 
         Equals,

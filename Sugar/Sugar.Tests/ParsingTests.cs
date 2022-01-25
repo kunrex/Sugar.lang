@@ -425,5 +425,16 @@ namespace Sugar.Tests
 
             Assert.AreEqual(true, result);
         }
+
+        [TestMethod]
+        public void ExtensionMethods()
+        {
+            string source = "int Invert(int: i) : int => i * -1;";
+
+            var compiler = new Compiler(source);
+            var result = compiler.Compile();
+
+            Assert.AreEqual(true, result);
+        }
     }
 }

@@ -731,6 +731,13 @@ namespace Sugar.Language.Parsing.Parser
                         MatchType(expected, current, true);
 
                         asOperator = (Operator)current;
+
+                        if (asOperator == BinaryOperator.GreaterThan && LookAhead() == BinaryOperator.GreaterThan)
+                        {
+                            asOperator = BinaryOperator.RightShift;
+                            index++;
+                        }
+
                         while (stack.Count > 0)
                         {
                             var top = stack[stack.Count - 1];
@@ -745,12 +752,7 @@ namespace Sugar.Language.Parsing.Parser
                             stack.RemoveAt(stack.Count - 1);
                         }
 
-                        if (asOperator == BinaryOperator.GreaterThan && LookAhead() == BinaryOperator.GreaterThan)
-                        {
-                            stack.Add(BinaryOperator.RightShift);
-                            index++;
-                        }
-                        else if (asOperator == BinaryOperator.AsCastOperator)
+                        if (asOperator == BinaryOperator.AsCastOperator)
                         {
                             stack.Add(asOperator);
                             expected = TokenType.Identifier | TokenType.Keyword;
@@ -1509,7 +1511,7 @@ namespace Sugar.Language.Parsing.Parser
 
             Node ParseAccessorBody(ParseScopeType lambdaType)
             {
-                var body = ParseBlock(lambdaType | ParseScopeType.Scope);
+                var body = TryMatchCurrent(Seperator.Semicolon) ? new EmptyNode() : ParseBlock(lambdaType | ParseScopeType.Scope);
 
                 index++;
                 return body;
@@ -1607,6 +1609,15 @@ namespace Sugar.Language.Parsing.Parser
                 generic = ParseGenericDeclaration();
 
             index++;
+            Node extensionTypeNode = null;
+            if (TryMatchCurrent(Seperator.Colon, true))
+            {
+                if (returnType.Type == TypeNodeEnum.Constructor)
+                    throw new TokenExpectedException(tokens[index - 1], Seperator.FlowerOpenBracket, tokens[index - 1].Index);
+
+                extensionTypeNode = ParseType(Seperator.FlowerOpenBracket, Seperator.Lambda);
+            }
+
             var type = returnType.Type == TypeNodeEnum.Constructor || returnType.Type == TypeNodeEnum.Void ? ParseScopeType.LambdaStatement : ParseScopeType.LambdaExpression;
             var body = ParseBlock(ParseScopeType.Scope | type);
 
@@ -1614,7 +1625,12 @@ namespace Sugar.Language.Parsing.Parser
             if (returnType.Type == TypeNodeEnum.Constructor)
                 toReturn = new ConstructorDeclarationNode(describer, returnType, arguments, body);
             else
-                toReturn = new FunctionDeclarationNode(describer, returnType, name, arguments, body);
+            {
+                if(extensionTypeNode == null)
+                    toReturn = new FunctionDeclarationNode(describer, returnType, name, arguments, body);
+                else
+                    toReturn = new ExtensionFunctionDeclarationNode(describer, returnType, name, arguments, body, extensionTypeNode);
+            }
 
             if (generic != null)
                 toReturn.AddChild(generic);

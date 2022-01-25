@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using Sugar.Language.Tokens;
 using Sugar.Language.Exceptions;
+using Sugar.Language.Tokens.Enums;
 using Sugar.Language.Tokens.Keywords;
 using Sugar.Language.Tokens.Constants;
 using Sugar.Language.Tokens.Seperators;
@@ -202,10 +203,61 @@ namespace Sugar.Language.Lexing
                             AddAssignment(BinaryOperator.Subtraction);
                             index++;
                         }
-                        else if (next.HasValue && char.IsNumber(next.Value))
-                            Tokens.Add(ReadNumber());
                         else
-                            CloneToken(BinaryOperator.Subtraction);
+                        {
+                            var prev = Tokens.Count == 0 ? null : Tokens[Tokens.Count - 1];
+                            
+                            if (next.HasValue && char.IsNumber(next.Value))
+                            {
+                                if (prev == null)
+                                {
+                                    Tokens.Add(ReadNumber());
+                                    break;
+                                }
+
+                                switch (prev.Type)
+                                {
+                                    case TokenType.Constant:
+                                    case TokenType.Identifier:
+                                        CloneToken(BinaryOperator.Subtraction);
+                                        break;
+                                    case TokenType.Seperator:
+                                        if (prev == Seperator.CloseBracket || prev == Seperator.BoxCloseBracket)
+                                            CloneToken(BinaryOperator.Subtraction);
+                                        else
+                                            Tokens.Add(ReadNumber());
+                                        break;
+                                    default:
+                                        Tokens.Add(ReadNumber());
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                if (prev == null)
+                                {
+                                    CloneToken(UnaryOperator.Minus);
+                                    break;
+                                }
+
+                                switch (prev.Type)
+                                {
+                                    case TokenType.Constant:
+                                    case TokenType.Identifier:
+                                        CloneToken(BinaryOperator.Subtraction);
+                                        break;
+                                    case TokenType.Seperator:
+                                        if (prev == Seperator.CloseBracket || prev == Seperator.BoxCloseBracket)
+                                            CloneToken(BinaryOperator.Subtraction);
+                                        else
+                                            CloneToken(UnaryOperator.Minus);
+                                        break;
+                                    default:
+                                        CloneToken(UnaryOperator.Minus);
+                                        break;
+                                }
+                            }
+                        }
                         break;
                     case '*':
                         if (LookAhead() == '=')
