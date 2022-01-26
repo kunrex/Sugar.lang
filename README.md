@@ -5,11 +5,9 @@ Sugar is a programming language I created a while back. Its object oriented, wri
 
 ### Features that have been implemented: 
 `Variables`, `Primitives`, `Arrays`, `Functions`, `Output and Input`, `Generics`, `Constructors`, `Indexers`, `Ternary`, `Casting`, `Conditions (if, switch)`, `Loops (for, while, do while)`, `User Defined Data Types`, `Properties`, `Exceptions`, `Import`, `Describers`,
-`Operator and Cast Overloading`
+`Operator and Cast Overloading`, `Extension Methods`
 
 *Note: At the current stage "implemented" means they are parsed successfully.*
-### Planned Features 
-`Extension Methods`
 
 ## Basic Syntax
 
