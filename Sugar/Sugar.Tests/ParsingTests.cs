@@ -218,6 +218,17 @@ namespace Sugar.Tests
         }
 
         [TestMethod]
+        public void ForeachLoop()
+        {
+            string source = "foreach(var: x in array) print(x);";
+
+            var compiler = new Compiler(source);
+            var result = compiler.Compile();
+
+            Assert.AreEqual(true, result);
+        }
+
+        [TestMethod]
         public void IfConditions()
         {
             string source = "if(true) print(true); else if(true && false) print(\"somethings wrong\"); else print(false);";

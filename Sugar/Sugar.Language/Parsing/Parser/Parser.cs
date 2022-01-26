@@ -184,7 +184,7 @@ namespace Sugar.Language.Parsing.Parser
                 case TokenType.Keyword:
                     return ParseKeyword(breakOutSeperators);
                 case TokenType.Identifier:
-                    return ParseVariable(breakOutSeperators);
+                    return ParseIdentifier(breakOutSeperators);
                 case TokenType.UnaryOperator:
                     var unaryOperator = Current as Operator;
                     index++;
@@ -394,9 +394,10 @@ namespace Sugar.Language.Parsing.Parser
                             return ParseForLoop();
                         else if (keyword == LoopKeyword.While)
                             return ParseWhileLoop();
-                        else if (keyword == LoopKeyword.Do)
+                        else if (keyword == LoopKeyword.Foreach)
+                            return ParseForeachLoop();
+                        else 
                             return ParseDoWhileLoop();
-                        break;
                     case KeywordType.Condition:
                         if (keyword == ConditionKeyword.If)
                             return ParseIfCondition();
@@ -437,7 +438,7 @@ namespace Sugar.Language.Parsing.Parser
                 return ParseConversionOverload(describer);
         }
 
-        private Node ParseVariable(Seperator[] breakOutSeperators)
+        private Node ParseIdentifier(Seperator[] breakOutSeperators)
         {
             var variable = ParseEntity(false);
             var node = variable;
@@ -1062,6 +1063,24 @@ namespace Sugar.Language.Parsing.Parser
             return output[0];
         }
 
+        private Node ParseVariable(params Seperator[] breakOutSeperators)
+        {
+            var token = Current;
+            var entity = ParseEntity(false, breakOutSeperators);
+
+            var node = entity;
+            while (true)
+                if (node.NodeType == NodeType.Dot)
+                    node = ((DotExpression)node).RHS;
+                else
+                    break;
+
+            if (node.NodeType != NodeType.Variable)
+                throw new TokenExpectedException(TokenType.Identifier, token.Index);
+
+            return entity;
+        }
+
         private TypeNode ParseType(params Seperator[] breakOutSeperators)
         {
             if (TryMatchCurrent(Keyword.Var, true))
@@ -1293,6 +1312,27 @@ namespace Sugar.Language.Parsing.Parser
 
                 throw new TokenExpectedException(finalBreakOut, Final.Index);
             }
+        }
+
+        private Node ParseForeachLoop()
+        {
+            ForceMatchCurrent(LoopKeyword.Foreach, true);
+            ForceMatchCurrent(Seperator.OpenBracket, true);
+
+            var type = ParseType(Seperator.Colon);
+            ForceMatchCurrent(Seperator.Colon, true);
+
+            ForceMatchCurrentType(TokenType.Identifier);
+            var variable = new IdentifierNode((Identifier)Current);
+            index++;
+
+            ForceMatchCurrent(DescriberKeyword.In, true);
+            var array = ParseVariable(Seperator.CloseBracket);
+            index++;
+
+            var body = ParseBlock(ParseScopeType.Scope | ParseScopeType.SingleLine);
+
+            return new ForeachLoopNode(new DeclarationNode(new DescriberNode(), type, variable), array, body);
         }
 
         private Node ParseWhileLoop()

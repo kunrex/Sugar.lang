@@ -23,6 +23,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         For,
         While,
         DoWhile,
+        Foreach,
 
         Get,
         Set,

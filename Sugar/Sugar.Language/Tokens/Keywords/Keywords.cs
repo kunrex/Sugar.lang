@@ -38,7 +38,7 @@ namespace Sugar.Language.Tokens.Keywords
 
             ConditionKeyword.If, ConditionKeyword.Else, ConditionKeyword.Switch, ConditionKeyword.Case,
 
-            LoopKeyword.For, LoopKeyword.While, LoopKeyword.Do,
+            LoopKeyword.For, LoopKeyword.While, LoopKeyword.Do, LoopKeyword.Foreach,
 
             ControlKeyword.Return, ControlKeyword.Continue, ControlKeyword.Break,
 
