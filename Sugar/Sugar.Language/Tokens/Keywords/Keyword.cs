@@ -7,6 +7,8 @@ namespace Sugar.Language.Tokens.Keywords
     internal partial class Keyword : Token
     {
         public override TokenType Type => TokenType.Keyword;
+        public override int SubType => (int)KeywordType;
+
         public virtual KeywordType KeywordType => KeywordType.General;
 
         protected override byte TypeID { get => 2; }

@@ -14,6 +14,8 @@ namespace Sugar.Language.Tokens.Operators
         protected override byte TypeID { get => 4; }
         protected abstract byte OperatorTypeId { get; }
 
+        public override int SubType => (int)OperatorType;
+
         protected Operator(string _value, byte _id, OperatorType _operatorType, bool _leftAssociative, int _precedence) : base(_value, _id)
         {
             OperatorType = _operatorType;

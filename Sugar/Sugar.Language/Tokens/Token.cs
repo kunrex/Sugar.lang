@@ -8,13 +8,14 @@ namespace Sugar.Language.Tokens
     internal abstract class Token
     {
         public int Index { get; protected set; }
-
-        public abstract TokenType Type { get; }
         public string Value { get; protected set; }
 
-        protected ushort Id { get; set; }
+        public abstract TokenType Type { get; }
+        public abstract int SubType { get; }
+
         public ushort UniqueID { get => Id; }
 
+        protected ushort Id { get; set; }
         protected abstract byte TypeID { get; }
 
         public Token(string _value, byte _id)
@@ -62,9 +63,6 @@ namespace Sugar.Language.Tokens
 
             if (ReferenceEquals(this, obj))
                 return true;
-
-            if (GetType() != obj.GetType())
-                return false;
 
             return UniqueID == obj.UniqueID;
         }

@@ -6,6 +6,8 @@ namespace Sugar.Language.Tokens.Constants
     internal abstract class Constant : Token
     {
         public override TokenType Type { get => TokenType.Constant; }
+        public override int SubType => (int)ConstantType;
+
         public abstract ConstantType ConstantType { get; }
 
         protected override byte TypeID { get => 1; }
