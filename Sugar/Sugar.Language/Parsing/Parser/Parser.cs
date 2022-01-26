@@ -1625,7 +1625,7 @@ namespace Sugar.Language.Parsing.Parser
             ForceMatchCurrent(Keyword.Print, true);
             ForceMatchCurrent(Seperator.OpenBracket, true);
 
-            var argument = ParseExpression(false, false, Seperator.CloseBracket);
+            var argument = new FunctionCallArgumentNode(ParseExpression(false, false, Seperator.CloseBracket));
             return new PrintNode(new FunctionCallArgumentsNode(argument));
         }
 
@@ -1634,7 +1634,7 @@ namespace Sugar.Language.Parsing.Parser
             ForceMatchCurrent(Keyword.Input, true);
             ForceMatchCurrent(Seperator.OpenBracket, true);
 
-            var argument = ParseExpression(true, false, Seperator.CloseBracket);
+            var argument = new FunctionCallArgumentNode(ParseExpression(true, false, Seperator.CloseBracket));
             return argument.NodeType == NodeType.Empty ? new InputNode(new FunctionCallArgumentsNode()) : new InputNode(new FunctionCallArgumentsNode(argument));
         }
 
