@@ -9,7 +9,7 @@ namespace Sugar
     {
         static void Main(string[] args)
         {
-            var source = "foreach(var: x in array) \n    print(x);";
+            var source = "void T()<T : int; Y : string> : string { }";
             new Compiler(source).Compile();
 
             Console.ReadKey();
