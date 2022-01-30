@@ -1,8 +1,11 @@
-# Sugar.lang
+<p align="center">
+  <img src="sugar.png" width="700"/>
+</p>
+
+# Sugar.Lang
+
 Sugar is a programming language I created a while back. Its object oriented, written in c#, (will) compiles to CIL.
-
-## Features
-
+  
 ### Features that have been implemented: 
 `Variables`, `Primitives`, `Arrays`, `Functions`, `Output and Input`, `Generics`, `Constructors`, `Indexers`, `Ternary`, `Casting`, `Conditions (if, switch)`, `Loops (for, while, do while, foreach)`, `User Defined Data Types`, `Properties`, `Exceptions`, `Import`, `Describers`,
 `Operator and Cast Overloading`, `Extension Methods`
