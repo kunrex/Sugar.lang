@@ -54,6 +54,8 @@
     <None Remove="Tokens\Constants\Numeric\" />
     <None Remove="Tokens\Constants\Numeric\Integral\" />
     <None Remove="Tokens\Constants\Numeric\Real\" />
+    <None Remove="Parsing\Nodes\TryCatchFinally\" />
+    <None Remove="Parsing\Nodes\TryCatchFinally\Blocks\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -105,6 +107,8 @@
     <Folder Include="Tokens\Constants\Numeric\" />
     <Folder Include="Tokens\Constants\Numeric\Integral\" />
     <Folder Include="Tokens\Constants\Numeric\Real\" />
+    <Folder Include="Parsing\Nodes\TryCatchFinally\" />
+    <Folder Include="Parsing\Nodes\TryCatchFinally\Blocks\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

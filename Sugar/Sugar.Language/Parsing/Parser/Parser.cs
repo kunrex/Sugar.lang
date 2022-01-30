@@ -35,12 +35,14 @@ using Sugar.Language.Parsing.Nodes.UDDataTypes;
 using Sugar.Language.Parsing.Nodes.Types.Enums;
 using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 using Sugar.Language.Parsing.Nodes.CtrlStatements;
+using Sugar.Language.Parsing.Nodes.TryCatchFinally;
 using Sugar.Language.Parsing.Nodes.Values.Generics;
 using Sugar.Language.Parsing.Nodes.Functions.Calling;
 using Sugar.Language.Parsing.Nodes.UDDataTypes.Enums;
 using Sugar.Language.Parsing.Nodes.Expressions.Lambdas;
 using Sugar.Language.Parsing.Nodes.Functions.Properties;
 using Sugar.Language.Parsing.Nodes.Expressions.Operative;
+using Sugar.Language.Parsing.Nodes.TryCatchFinally.Blocks;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations;
 using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 using Sugar.Language.Parsing.Nodes.UDDataTypes.Inheritance;
@@ -351,6 +353,11 @@ namespace Sugar.Language.Parsing.Parser
                 toReturn = new ThrowExceptionNode(ParseExpression(false, false, SeperatorType.Semicolon));
             else if (MatchToken(Keyword.Import, current))
                 toReturn = ParseImportStatement();
+            else if (MatchToken(Keyword.Try, current))
+            {
+               
+                return ParseTryCatchBlock();
+            }
             else if (MatchToken(Keyword.Print, current))
             {
                 toReturn = ParsePrintCall();
@@ -368,15 +375,14 @@ namespace Sugar.Language.Parsing.Parser
             }
             else
             {
-                var keyword = current as Keyword;
-                switch (keyword.KeywordType)
+                switch ((KeywordType)current.SubType)
                 {
                     case KeywordType.ControlStatement:
-                        if (keyword == ControlKeyword.Return)
+                        if (current == ControlKeyword.Return)
                             toReturn = ParseReturn();
                         else
                         {
-                            if (keyword == ControlKeyword.Break)
+                            if (current == ControlKeyword.Break)
                                 toReturn = new BreakNode();
                             else
                                 toReturn = new ContinueNode();
@@ -385,23 +391,23 @@ namespace Sugar.Language.Parsing.Parser
                         }
                         break;
                     case KeywordType.Loop:
-                        if (keyword == LoopKeyword.For)
+                        if (current == LoopKeyword.For)
                             return ParseForLoop();
-                        else if (keyword == LoopKeyword.While)
+                        else if (current == LoopKeyword.While)
                             return ParseWhileLoop();
-                        else if (keyword == LoopKeyword.Foreach)
+                        else if (current == LoopKeyword.Foreach)
                             return ParseForeachLoop();
-                        else 
+                        else
                             return ParseDoWhileLoop();
                     case KeywordType.Condition:
-                        if (keyword == ConditionKeyword.If)
+                        if (current == ConditionKeyword.If)
                             return ParseIfCondition();
-                        else if (keyword == ConditionKeyword.Switch)
+                        else if (current == ConditionKeyword.Switch)
                             return ParseSwitchCase();
 
-                        throw new InvalidTokenException(keyword, keyword.Index);
+                        throw new InvalidTokenException(current, current.Index);
                     case KeywordType.Entity:
-                        return ParseScopedEntity(new DescriberNode(), keyword);
+                        return ParseScopedEntity(new DescriberNode(), (Keyword)current);
                     case KeywordType.Type:
                         toReturn = ParseDeclaration(new DescriberNode());
 
@@ -601,6 +607,34 @@ namespace Sugar.Language.Parsing.Parser
 
             ForceMatchCurrentType(TokenType.Identifier);
             return new ImportNode(entityType, ParseEntity(false, SeperatorType.Semicolon));
+        }
+
+        private Node ParseTryCatchBlock()
+        {
+            ForceMatchCurrent(Keyword.Try, true);
+            var tryBlock = new TryBlockNode(ParseBlock(ParseScopeType.Scope | ParseScopeType.SingleLine));
+            index++;
+
+            Node catchBlock = null, finallyBlock = null;
+            if(TryMatchCurrent(Keyword.Catch, true))
+            {
+                Node arguments;
+                if (TryMatchCurrent(Seperator.OpenBracket))
+                {
+                    arguments = new CatchBlockArgumentsNode(ParseDeclarationArguments());
+                    index++;
+                }
+                else
+                    arguments = new CatchBlockArgumentsNode();
+
+                catchBlock = new CatchBlockNode(arguments, ParseBlock(ParseScopeType.Scope | ParseScopeType.SingleLine));
+                index++;
+            }
+
+            if (TryMatchCurrent(Keyword.Finally, true))
+                finallyBlock = new FinallyBlockNode(ParseBlock(ParseScopeType.Scope | ParseScopeType.SingleLine));
+
+            return new TryCatchFinallyBlockNode(tryBlock, catchBlock, finallyBlock);
         }
 
         //Expressions and Entities

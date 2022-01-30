@@ -64,6 +64,11 @@ namespace Sugar.Language.Parsing.Nodes.Enums
 
         Import,
         Describer,
-        ThrowException
+        ThrowException,
+
+        Try,
+        Catch,
+        Finally,
+        TryCatchFinally
     }
 }

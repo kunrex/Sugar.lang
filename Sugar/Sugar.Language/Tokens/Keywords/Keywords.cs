@@ -25,9 +25,13 @@ namespace Sugar.Language.Tokens.Keywords
         public static readonly Keyword Get = new Keyword("get", 9);
         public static readonly Keyword Set = new Keyword("set", 10);
 
+        public static readonly Keyword Try = new Keyword("try", 11);
+        public static readonly Keyword Catch = new Keyword("catch", 12);
+        public static readonly Keyword Finally = new Keyword("finally", 13);
+
         public static readonly Keyword[] Keywords =
         {
-            Input, Throw, Import, Print, Create, Var, Default, When, This, Get, Set,
+            Input, Throw, Import, Print, Create, Var, Default, When, This, Get, Set, Try, Catch, Finally,
 
             TypeKeyword.Object, TypeKeyword.SByte, TypeKeyword.Byte, TypeKeyword.Short, TypeKeyword.UShort, TypeKeyword.Int,
             TypeKeyword.UInt, TypeKeyword.Long, TypeKeyword.Ulong, TypeKeyword.Float, TypeKeyword.Double, TypeKeyword.Decimal,

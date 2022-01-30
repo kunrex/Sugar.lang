@@ -458,5 +458,16 @@ namespace Sugar.Tests
 
             Assert.AreEqual(true, result);
         }
+
+        [TestMethod]
+        public void TryCatchFinally()
+        {
+            string source = "try { print(10 / 0); } catch(Exception: e) { print(e); } finally { print(\"done\"); }";
+
+            var compiler = new Compiler(source);
+            var result = compiler.Compile();
+
+            Assert.AreEqual(true, result);
+        }
     }
 }

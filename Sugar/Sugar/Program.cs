@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using Sugar.Language;
 
@@ -9,7 +8,7 @@ namespace Sugar
     {
         static void Main(string[] args)
         {
-            var source = "void T()<T : int; Y : string> : string { }";
+            var source = "";
             new Compiler(source).Compile();
 
             Console.ReadKey();
