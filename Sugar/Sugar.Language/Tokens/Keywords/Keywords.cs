@@ -48,7 +48,7 @@ namespace Sugar.Language.Tokens.Keywords
 
             DescriberKeyword.Static, DescriberKeyword.Public, DescriberKeyword.Private, DescriberKeyword.Protected, DescriberKeyword.Abstract,
             DescriberKeyword.Virtual, DescriberKeyword.Override, DescriberKeyword.Sealed, DescriberKeyword.Const, DescriberKeyword.ReadOnly,
-            DescriberKeyword.In, DescriberKeyword.Out,
+            DescriberKeyword.In, DescriberKeyword.Out, DescriberKeyword.Ref,
 
             FunctionKeyword.Operator, FunctionKeyword.Explicit, FunctionKeyword.Implicit, FunctionKeyword.Void, FunctionKeyword.Constructor,
             FunctionKeyword.Indexer

@@ -22,5 +22,6 @@ namespace Sugar.Language.Tokens.Keywords.Subtypes.Describers
 
         public static readonly DescriberKeyword In = new DescriberKeyword("in", 10, DescriberType.Function);
         public static readonly DescriberKeyword Out = new DescriberKeyword("out", 11, DescriberType.Function);
+        public static readonly DescriberKeyword Ref = new DescriberKeyword("ref", 11, DescriberType.Function);
     }
 }

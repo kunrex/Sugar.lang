@@ -1620,12 +1620,14 @@ namespace Sugar.Language.Parsing.Parser
                     {
                         describer = new DescriberNode(new DescriberKeywordNode(Current as Keyword));
                         index++;
+
+                        ForceMatchCurrent(Seperator.Colon, true);
                     }
 
-                    if(describer == null)
+                    if (describer == null)
                         arguments.Add(new FunctionCallArgumentNode(ParseExpression(false, false, SeperatorType.Comma | SeperatorType.CloseBracket)));
                     else
-                        arguments.Add(new FunctionCallArgumentNode(describer, ParseExpression(false, false, SeperatorType.Comma | SeperatorType.CloseBracket)));
+                        arguments.Add(new FunctionCallArgumentNode(describer, ParseEntity(false, SeperatorType.Comma | SeperatorType.CloseBracket)));
 
                     if (TryMatchCurrent(Seperator.CloseBracket))
                         break;
