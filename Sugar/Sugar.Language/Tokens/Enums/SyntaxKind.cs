@@ -162,6 +162,8 @@ namespace Sugar.Language.Tokens.Enums
         While = 110,
         Foreach = 111,
 
+        AsType = 112,
+
         QuestionMark = SeperatorKind.QuestionMark,
 
         OpenBracket = SeperatorKind.OpenBracket,

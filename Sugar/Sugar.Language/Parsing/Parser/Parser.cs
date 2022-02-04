@@ -199,26 +199,26 @@ namespace Sugar.Language.Parsing.Parser
         private Node ParseBlock(ParseScopeType scopeType)
         {
             var current = Current;
-            if (MatchToken(Seperator.Lambda, current, false, true))
+            switch(current.SyntaxKind)
             {
-                var type = scopeType & ParseScopeType.Lambda;
+                case SyntaxKind.Lambda:
+                    index++;
+                    var type = scopeType & ParseScopeType.Lambda;
 
-                if (type == ParseScopeType.LambdaStatement)
-                    return new LambdaStatement(ParseStatement(false, SeperatorKind.Semicolon));
-                else if (type == ParseScopeType.LambdaExpression)
-                    return new LambdaExpression(ParseExpression(false, false, SeperatorKind.Semicolon));
-                else
-                    throw new InvalidTokenException(current, current.Index);
-            }
-            else if (MatchToken(Seperator.FlowerOpenBracket, current))
-            {
-                if((scopeType & ParseScopeType.Scope) != ParseScopeType.Scope)
-                    throw new InvalidTokenException(current, current.Index);
+                    if (type == ParseScopeType.LambdaStatement)
+                        return new LambdaStatement(ParseStatement(false, SeperatorKind.Semicolon));
+                    else if (type == ParseScopeType.LambdaExpression)
+                        return new LambdaExpression(ParseExpression(false, false, SeperatorKind.Semicolon));
+                    else
+                        throw new InvalidTokenException(current, current.Index);
+                case SyntaxKind.FlowerOpenBracket:
+                    if ((scopeType & ParseScopeType.Scope) != ParseScopeType.Scope)
+                        throw new InvalidTokenException(current, current.Index);
 
-                return ParseScope();
+                    return ParseScope();
+                default:
+                    return ParseStatement(true, SeperatorKind.Semicolon);
             }
-            else
-                return ParseStatement(true, SeperatorKind.Semicolon);
         }
 
         private Node ParseScope()
@@ -647,12 +647,6 @@ namespace Sugar.Language.Parsing.Parser
         //Expressions and Entities
         private Node ParseExpression(bool readEmpty, bool readAssignment, SeperatorKind breakOutSeperators)
         {
-            if (TryMatchCurrent(Keyword.Default, true))
-            {
-                ForceMatchBreakOutSeperator(breakOutSeperators);
-                return new DefaultValueNode();
-            }
-
             var output = new List<Node>();
             var stack = new List<Token>();
             TokenType expected = TokenType.Constant | TokenType.Identifier | TokenType.Seperator | TokenType.UnaryOperator | TokenType.Keyword;
@@ -678,13 +672,18 @@ namespace Sugar.Language.Parsing.Parser
                             case SyntaxKind.Input:
                                 output.Add(ParseInputCall());
                                 break;
+                            case SyntaxKind.Default:
+                                output.Add(ParseDefault());
+                                break;
+                            case SyntaxKind.AsType:
+                                output.Add(ParseAsType());
+                                break;
                             default:
                                 if (((Keyword)current).KeywordType == KeywordType.Type)
                                 {
                                     output.Add(ParseEntity(true, SeperatorKind.Any));
                                     break;
                                 }
-
                                 throw new InvalidTokenException(current, current.Index);
                         }
 
@@ -919,11 +918,33 @@ namespace Sugar.Language.Parsing.Parser
 
         private Node ParseReturn()
         {
-            index++;
+            ForceMatchCurrent(ControlKeyword.Return, true);
+
             if (TryMatchCurrent(Seperator.Semicolon))
                 return new ReturnKeyword();
             else
                 return new ReturnKeyword(ParseExpression(false, false, SeperatorKind.Semicolon));
+        }
+
+        private Node ParseDefault()
+        {
+            ForceMatchCurrent(Keyword.Default, false);
+
+            if(MatchToken(Seperator.OpenBracket, LookAhead()))
+            {
+                index += 2;
+                return new DefaultTypeNode(ParseType(SeperatorKind.CloseBracket));
+            }
+
+            return new DefaultValueNode();
+        }
+
+        private Node ParseAsType()
+        {
+            ForceMatchCurrent(Keyword.AsType, true);
+            ForceMatchCurrent(Seperator.OpenBracket, true);
+
+            return new AsTypeNode(ParseType(SeperatorKind.CloseBracket));
         }
 
         private Node ParseExpressionList()

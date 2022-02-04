@@ -69,6 +69,8 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         Try,
         Catch,
         Finally,
-        TryCatchFinally
+        TryCatchFinally,
+
+        AsType
     }
 }
