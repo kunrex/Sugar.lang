@@ -7,21 +7,18 @@ namespace Sugar.Language.Tokens.Operators.Binary
 {
     internal sealed partial class BinaryOperator : Operator
     {
-        public override TokenType Type => TokenType.BinaryOperator;
-        protected override byte OperatorTypeId { get => 1; }
+        public override TokenType Type { get => TokenType.BinaryOperator; }
 
-        private BinaryOperator(string _value, byte _id, OperatorType _operatorType, bool _leftAssociative, int _precedence) : base(_value, _id, _operatorType, _leftAssociative, _precedence)
+        private BinaryOperator(string _value, OperatorKind _operatorType, bool _leftAssociative, int _precedence) : base(_value, _operatorType, _leftAssociative, _precedence)
         {
 
         }
 
-        private BinaryOperator(BinaryOperator other) : base(other.Value, other.Id, other.OperatorType, other.LeftAssociative, other.Precedence)
+        private BinaryOperator(string _value, SyntaxKind _syntaxKind, bool _leftAssociative, int _precedence) : base(_value, _syntaxKind, _leftAssociative, _precedence)
         {
 
         }
 
-        public override Token Clone() => new BinaryOperator(this);
-
-        public AssignmentOperator CreateAssignment(int _index) => new AssignmentOperator(this, _index);
+        public override Token Clone() => new BinaryOperator(Value, SyntaxKind, LeftAssociative, Precedence);
     }
 }

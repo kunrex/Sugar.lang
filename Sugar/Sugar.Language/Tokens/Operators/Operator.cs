@@ -9,31 +9,23 @@ namespace Sugar.Language.Tokens.Operators
     {
         public int Precedence { get; private set; }//lower the value, greater the precedance
         public bool LeftAssociative { get; protected set; }
-        public OperatorType OperatorType { get; protected set; }
+        public OperatorKind OperatorType { get; protected set; }
 
-        protected override byte TypeID { get => 4; }
-        protected abstract byte OperatorTypeId { get; }
-
-        public override int SubType => (int)OperatorType;
-
-        protected Operator(string _value, byte _id, OperatorType _operatorType, bool _leftAssociative, int _precedence) : base(_value, _id)
+        protected Operator(string _value, OperatorKind _operatorType, bool _leftAssociative, int _precedence) : base(_value, (SyntaxKind)_operatorType)
         {
             OperatorType = _operatorType;
 
-            LeftAssociative = _leftAssociative;
             Precedence = _precedence;
-
-            Id = (ushort)(TypeID * 1000 + OperatorTypeId * 100 + _id);
+            LeftAssociative = _leftAssociative;
         }
 
-        protected Operator(string _value, ushort _id, OperatorType _operatorType, bool _leftAssociative, int _precedence) : base()
+        protected Operator(string _value, SyntaxKind _syntaxKind, bool _leftAssociative, int _precedence) : base(_value, _syntaxKind)
         {
             Value = _value;
-            Id = _id;
+            SyntaxKind = _syntaxKind;
 
-            OperatorType = _operatorType;
-            LeftAssociative = _leftAssociative;
             Precedence = _precedence;
+            LeftAssociative = _leftAssociative;
         }
 
         public static Operator ConvertUnaryToPrefix(Operator _operator)

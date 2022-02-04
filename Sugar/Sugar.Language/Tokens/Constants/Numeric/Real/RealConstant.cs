@@ -9,7 +9,7 @@ namespace Sugar.Language.Tokens.Constants.Numeric.Real
         public abstract RealType RealType { get; }
         public override ConstantType ConstantType => ConstantType.Real;
 
-        public RealConstant(string _value, int _index) : base(_value, 0)
+        public RealConstant(string _value, int _index) : base(_value)
         {
             Index = _index;
         }

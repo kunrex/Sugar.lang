@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Sugar.Language.Tokens.Enums;
 
 namespace Sugar.Language.Tokens.Constants
@@ -7,7 +8,7 @@ namespace Sugar.Language.Tokens.Constants
     {
         public override ConstantType ConstantType => ConstantType.Char;
 
-        public CharacterConstant(string _value, int _index) : base(_value, 0)
+        public CharacterConstant(string _value, int _index) : base(_value)
         {
             Index = _index;
             Value = _value[0].ToString();

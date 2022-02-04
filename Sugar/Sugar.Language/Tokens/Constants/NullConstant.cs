@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Sugar.Language.Tokens.Enums;
 
 namespace Sugar.Language.Tokens.Constants
@@ -7,22 +8,13 @@ namespace Sugar.Language.Tokens.Constants
     {
         public static readonly NullConstant Null = new NullConstant("null");
 
-        public override ConstantType ConstantType => ConstantType.Null;
+        public override ConstantType ConstantType { get => ConstantType.Null; }
 
-        private NullConstant(string _value) : base(_value, 0)
+        private NullConstant(string _value) : base(_value)
         {
-
+            SyntaxKind = SyntaxKind.Null; 
         }
 
-        private NullConstant()
-        {
-
-        }
-
-        public override Token Clone() => new NullConstant()
-        {
-            Value = Value,
-            Id = Id
-        };
+        public override Token Clone() => new NullConstant(Value);
     }
 }

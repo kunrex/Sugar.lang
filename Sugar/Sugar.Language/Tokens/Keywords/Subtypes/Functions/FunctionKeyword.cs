@@ -7,20 +7,11 @@ namespace Sugar.Language.Tokens.Keywords.Subtypes.Functions
     {
         public override KeywordType KeywordType { get => KeywordType.Function; }
 
-        public FunctionKeyword(string _value, byte _id) : base(_value, _id)
+        public FunctionKeyword(string _value, SyntaxKind _syntaxKind) : base(_value, _syntaxKind)
         {
 
         }
 
-        private FunctionKeyword() : base()
-        {
-
-        }
-
-        public override Token Clone() => new FunctionKeyword()
-        {
-            Value = Value,
-            Id = Id
-        };
+        public override Token Clone() => new FunctionKeyword(Value, SyntaxKind);
     }
 }

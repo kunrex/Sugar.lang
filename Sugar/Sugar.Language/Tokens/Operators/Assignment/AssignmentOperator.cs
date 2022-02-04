@@ -7,27 +7,25 @@ namespace Sugar.Language.Tokens.Operators.Assignment
 {
     internal sealed partial class AssignmentOperator : Operator
     {
-        public override TokenType Type => TokenType.AssignmentOperator;
-        protected override byte OperatorTypeId { get => 2; }
+        public override TokenType Type { get => TokenType.AssignmentOperator; }
 
         public BinaryOperator BaseOperator { get; private set; }
 
-        public AssignmentOperator(byte _id) : base("=", _id, OperatorType.Assignment, false, 13)
-        {
-
-        }
-
-        public AssignmentOperator(BinaryOperator baseOperator, int _index) : base($"{baseOperator.Value}=", (byte)(baseOperator.UniqueID % 100), OperatorType.Assignment, false, 13)
+        private AssignmentOperator(BinaryOperator baseOperator) : base($"{baseOperator.Value}=", (OperatorKind)(baseOperator.SyntaxKind + 26), false, 13)
         {
             BaseOperator = baseOperator;
-            Index = _index;
         }
 
-        private AssignmentOperator(AssignmentOperator other) : base(other.Value, other.UniqueID, OperatorType.Assignment, false, 13)
+        private AssignmentOperator(string _value, SyntaxKind _syntaxKind) : base(_value, _syntaxKind, false, 13)
         {
 
         }
 
-        public override Token Clone() => new AssignmentOperator(this);
+        private AssignmentOperator(string _value, OperatorKind _operatorKind) : base(_value, _operatorKind, false, 13)
+        {
+
+        }
+
+        public override Token Clone() => new AssignmentOperator(Value, SyntaxKind);
     }
 }

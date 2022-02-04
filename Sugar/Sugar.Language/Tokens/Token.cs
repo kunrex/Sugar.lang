@@ -11,17 +11,12 @@ namespace Sugar.Language.Tokens
         public string Value { get; protected set; }
 
         public abstract TokenType Type { get; }
-        public abstract int SubType { get; }
+        public SyntaxKind SyntaxKind { get; protected set; }
 
-        public ushort UniqueID { get => Id; }
-
-        protected ushort Id { get; set; }
-        protected abstract byte TypeID { get; }
-
-        public Token(string _value, byte _id)
+        public Token(string _value, SyntaxKind _syntaxKind)
         {
             Value = _value;
-            Id = (ushort)(TypeID * 100 + _id);
+            SyntaxKind = _syntaxKind;
         }
 
         protected Token()
@@ -33,7 +28,7 @@ namespace Sugar.Language.Tokens
 
         public Token Clone(int _index)
         {
-            var copy =  Clone();
+            var copy = Clone();
             copy.Index = _index;
 
             return copy;
@@ -61,10 +56,7 @@ namespace Sugar.Language.Tokens
             if (obj is null)
                 return false;
 
-            if (ReferenceEquals(this, obj))
-                return true;
-
-            return UniqueID == obj.UniqueID;
+            return SyntaxKind == obj.SyntaxKind;
         }
 
         public override int GetHashCode() => base.GetHashCode();

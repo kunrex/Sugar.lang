@@ -5,23 +5,14 @@ namespace Sugar.Language.Tokens.Keywords.Subtypes.ControlStatements
 {
     internal sealed partial class ControlKeyword : Keyword
     {
-        public override KeywordType KeywordType => KeywordType.ControlStatement;
+        public override KeywordType KeywordType { get => KeywordType.ControlStatement; }
 
-        private ControlKeyword(string _value, byte _id) : base(_value, _id)
+        private ControlKeyword(string _value, SyntaxKind _syntaxKind) : base(_value, _syntaxKind)
         {
 
         }
 
-        private ControlKeyword() : base()
-        {
-
-        }
-
-        public override Token Clone() => new ControlKeyword()
-        {
-            Value = Value,
-            Id = Id
-        };
+        public override Token Clone() => new ControlKeyword(Value, SyntaxKind);
     }
 }
 

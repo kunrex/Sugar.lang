@@ -6,22 +6,13 @@ namespace Sugar.Language.Tokens.Keywords.Subtypes.Conditions
 {
     internal sealed partial class ConditionKeyword : Keyword
     {
-        public override KeywordType KeywordType => KeywordType.Condition;
+        public override KeywordType KeywordType { get => KeywordType.Condition; }
 
-        private ConditionKeyword(string _value, byte _id) : base(_value, _id)
+        private ConditionKeyword(string _value, SyntaxKind _syntaxKind) : base(_value, _syntaxKind)
         {
 
         }
 
-        private ConditionKeyword() : base()
-        {
-
-        }
-
-        public override Token Clone() => new ConditionKeyword()
-        {
-            Value = Value,
-            Id = Id
-        };
+        public override Token Clone() => new ConditionKeyword(Value, SyntaxKind);
     }
 }

@@ -10,6 +10,7 @@ using Sugar.Language.Tokens.Constants;
 using Sugar.Language.Tokens.Seperators;
 using Sugar.Language.Tokens.Operators.Unary;
 using Sugar.Language.Tokens.Operators.Binary;
+using Sugar.Language.Tokens.Operators.Assignment;
 using Sugar.Language.Tokens.Constants.Numeric.Real;
 using Sugar.Language.Tokens.Constants.Numeric.Integral;
 
@@ -39,8 +40,6 @@ namespace Sugar.Language.Lexing
 
         private void CloneToken(Token token) => Tokens.Add(token.Clone(index));
 
-        private void AddAssignment(BinaryOperator binaryOperator) => Tokens.Add(binaryOperator.CreateAssignment(index));
-
         internal List<Token> Lex()
         {
             Tokens = new List<Token>();
@@ -67,7 +66,7 @@ namespace Sugar.Language.Lexing
                             index++;
                         }
                         else
-                            CloneToken(BinaryOperator.Assignment);
+                            CloneToken(AssignmentOperator.Assignment);
                         break;
                     case '!':
                         next = LookAhead();
@@ -90,7 +89,7 @@ namespace Sugar.Language.Lexing
 
                             if (LookAhead() == '=')
                             {
-                                AddAssignment(BinaryOperator.RightShift);
+                                CloneToken(AssignmentOperator.AssignmentRightShift);
                                 index++;
                             }
                             else
@@ -116,7 +115,7 @@ namespace Sugar.Language.Lexing
 
                             if (LookAhead() == '=')
                             {
-                                AddAssignment(BinaryOperator.LeftShift);
+                                CloneToken(AssignmentOperator.AssignmentLeftShift);
                                 index++;
                             }
                             else
@@ -140,7 +139,7 @@ namespace Sugar.Language.Lexing
                         }
                         else if (next == '=')
                         {
-                            AddAssignment(BinaryOperator.BitwiseAnd);
+                            CloneToken(AssignmentOperator.AssignmentBitwiseAnd);
                             index++;
                         }
                         else
@@ -156,7 +155,7 @@ namespace Sugar.Language.Lexing
                         }
                         else if(next == '=')
                         {
-                            AddAssignment(BinaryOperator.BitwiseOr);
+                            CloneToken(AssignmentOperator.AssignmentBitwiseOr);
                             index++; 
                         }
                         else
@@ -165,7 +164,7 @@ namespace Sugar.Language.Lexing
                     case '^':
                         if (LookAhead() == '=')
                         {
-                            AddAssignment(BinaryOperator.BitwiseXor);
+                            CloneToken(AssignmentOperator.AssignmentBitwiseXor);
                             index++;
                         }
                         else
@@ -184,7 +183,7 @@ namespace Sugar.Language.Lexing
                         }
                         else if (next == '=')
                         {
-                            AddAssignment(BinaryOperator.Addition);
+                            CloneToken(AssignmentOperator.AssignmentAddition);
                             index++;
                         }
                         else
@@ -200,7 +199,7 @@ namespace Sugar.Language.Lexing
                         }
                         else if (next == '=')
                         {
-                            AddAssignment(BinaryOperator.Subtraction);
+                            CloneToken(AssignmentOperator.AssignmentSubtraction);
                             index++;
                         }
                         else
@@ -261,7 +260,7 @@ namespace Sugar.Language.Lexing
                         break;
                     case '*':
                         if (LookAhead() == '=')
-                            AddAssignment(BinaryOperator.Multiplication);
+                            CloneToken(AssignmentOperator.AssignmentMultiplication);
                         else
                             CloneToken(BinaryOperator.Multiplication);
                         break;
@@ -269,7 +268,7 @@ namespace Sugar.Language.Lexing
                     case '/':
                         next = LookAhead();
                         if (next == '=')
-                            AddAssignment(BinaryOperator.Division);
+                            CloneToken(AssignmentOperator.AssignmentDivision);
                         else if (next == '/')
                             ReadSingleLineComment();
                         else if (next == '*')
@@ -279,7 +278,7 @@ namespace Sugar.Language.Lexing
                         break;
                     case '%':
                         if (LookAhead() == '=')
-                            AddAssignment(BinaryOperator.Modulus);
+                            CloneToken(AssignmentOperator.AssignmentModulus);
                         else
                             CloneToken(BinaryOperator.Modulus);
                         break;
@@ -587,7 +586,7 @@ namespace Sugar.Language.Lexing
                 var valueToString = value.ToString();
 
                 var token = FindKeyWord(valueToString);
-                return token == null ? new Identifier(valueToString, index) : token;
+                return token == null ? new Identifier(valueToString, index) : token.Clone(index);
             }
         }
 
@@ -595,16 +594,16 @@ namespace Sugar.Language.Lexing
         {
             foreach(var keyword in Keyword.Keywords)
                 if(keyword.Value == _value)
-                    return keyword.Clone(index);
+                    return keyword;
 
             if (BinaryOperator.AsCastOperator.Value == _value)
-                return BinaryOperator.AsCastOperator.Clone(index);
+                return BinaryOperator.AsCastOperator;
             else if (BoolConstant.True.Value == _value)
-                return BoolConstant.True.Clone(index);
+                return BoolConstant.True;
             else if (BoolConstant.False.Value == _value)
-                return BoolConstant.False.Clone(index);
+                return BoolConstant.False;
             else if (NullConstant.Null.Value == _value)
-                return NullConstant.Null.Clone(index);
+                return NullConstant.Null;
 
             return null;
         }

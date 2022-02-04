@@ -5,22 +5,13 @@ namespace Sugar.Language.Tokens.Keywords.Subtypes.Entities
 {
     internal sealed partial class EntityKeyword : Keyword
     {
-        public override KeywordType KeywordType => KeywordType.Entity;
+        public override KeywordType KeywordType { get => KeywordType.Entity; }
 
-        private EntityKeyword(string _value, byte _id) : base(_value, _id)
+        private EntityKeyword(string _value, SyntaxKind _syntaxKind) : base(_value, _syntaxKind)
         {
 
         }
 
-        private EntityKeyword() : base()
-        {
-
-        }
-
-        public override Token Clone() => new EntityKeyword()
-        {
-            Value = Value,
-            Id = Id
-        };
+        public override Token Clone() => new EntityKeyword(Value, SyntaxKind);
     }
 }

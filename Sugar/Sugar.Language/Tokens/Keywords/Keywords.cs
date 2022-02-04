@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Sugar.Language.Tokens.Enums;
 using Sugar.Language.Tokens.Keywords.Subtypes.Types;
 using Sugar.Language.Tokens.Keywords.Subtypes.Loops;
 using Sugar.Language.Tokens.Keywords.Subtypes.Entities;
@@ -12,22 +13,22 @@ namespace Sugar.Language.Tokens.Keywords
 {
     internal partial class Keyword : Token
     {
-        public static readonly Keyword Var = new Keyword("var", 0);
-        public static readonly Keyword This = new Keyword("this", 1);
-        public static readonly Keyword When = new Keyword("when", 2);
-        public static readonly Keyword Print = new Keyword("print", 3);
-        public static readonly Keyword Throw = new Keyword("throw", 4);
-        public static readonly Keyword Input = new Keyword("input", 5);
-        public static readonly Keyword Create = new Keyword("create", 6);
-        public static readonly Keyword Import = new Keyword("import", 7);
-        public static readonly Keyword Default = new Keyword("default", 8);
+        public static readonly Keyword Var = new Keyword("var", SyntaxKind.Var);
+        public static readonly Keyword This = new Keyword("this", SyntaxKind.This);
+        public static readonly Keyword When = new Keyword("when", SyntaxKind.When);
+        public static readonly Keyword Print = new Keyword("print", SyntaxKind.Print);
+        public static readonly Keyword Throw = new Keyword("throw", SyntaxKind.Throw);
+        public static readonly Keyword Input = new Keyword("input", SyntaxKind.Input);
+        public static readonly Keyword Create = new Keyword("create", SyntaxKind.Create);
+        public static readonly Keyword Import = new Keyword("import", SyntaxKind.Import);
+        public static readonly Keyword Default = new Keyword("default", SyntaxKind.Default);
 
-        public static readonly Keyword Get = new Keyword("get", 9);
-        public static readonly Keyword Set = new Keyword("set", 10);
+        public static readonly Keyword Get = new Keyword("get", SyntaxKind.Get);
+        public static readonly Keyword Set = new Keyword("set", SyntaxKind.Set);
 
-        public static readonly Keyword Try = new Keyword("try", 11);
-        public static readonly Keyword Catch = new Keyword("catch", 12);
-        public static readonly Keyword Finally = new Keyword("finally", 13);
+        public static readonly Keyword Try = new Keyword("try", SyntaxKind.Try);
+        public static readonly Keyword Catch = new Keyword("catch", SyntaxKind.Catch);
+        public static readonly Keyword Finally = new Keyword("finally", SyntaxKind.Finally);
 
         public static readonly Keyword[] Keywords =
         {

@@ -5,20 +5,18 @@ namespace Sugar.Language.Tokens.Operators.Unary
 {
     internal sealed partial class UnaryOperator : Operator
     {
-        public override TokenType Type => TokenType.UnaryOperator;
+        public override TokenType Type { get => TokenType.UnaryOperator; }
 
-        protected override byte OperatorTypeId { get => 0; }
-
-        private UnaryOperator(string _value, byte _id, OperatorType _operatorType, bool _leftAssociative, int _precedence) : base(_value, _id, _operatorType, _leftAssociative, _precedence)
+        private UnaryOperator(string _value, OperatorKind _operatorType, bool _leftAssociative, int _precedence) : base(_value, _operatorType, _leftAssociative, _precedence)
         {
 
         }
 
-        private UnaryOperator(UnaryOperator other) : base(other.Value, other.Id, other.OperatorType, other.LeftAssociative, other.Precedence)
+        private UnaryOperator(string _value, SyntaxKind _syntaxKind, bool _leftAssociative, int _precedence) : base(_value, _syntaxKind, _leftAssociative, _precedence)
         {
 
         }
 
-        public override Token Clone() => new UnaryOperator(this);
+        public override Token Clone() => new UnaryOperator(Value, SyntaxKind, LeftAssociative, Precedence);
     }
 }

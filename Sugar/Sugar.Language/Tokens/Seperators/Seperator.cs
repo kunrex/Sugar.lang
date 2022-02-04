@@ -5,28 +5,20 @@ namespace Sugar.Language.Tokens.Seperators
 {
     internal partial class Seperator : Token
     {
-        public override TokenType Type => TokenType.Seperator;
-        public override int SubType => (int)SeperatorType;
+        public override TokenType Type { get => TokenType.Seperator; }
 
-        protected override byte TypeID { get => 3; }
+        public SeperatorKind SeperatorKind { get; private set; }
 
-        public SeperatorType SeperatorType { get; private set; }
-
-        public Seperator(string _value, byte _id, SeperatorType _type) : base(_value, _id)
+        private Seperator(string _value, SeperatorKind _type) : base(_value, (SyntaxKind)_type)
         {
-            SeperatorType = _type;
+            SeperatorKind = _type;
         }
 
-        private Seperator()
+        private Seperator(string _value, SyntaxKind _type, SeperatorKind _seperatorType) : base(_value, _type)
         {
-
+            SeperatorKind = _seperatorType;
         }
 
-        public override Token Clone() => new Seperator()
-        {
-            Value = Value,
-            Id = Id,
-            SeperatorType = SeperatorType
-        };
+        public override Token Clone() => new Seperator(Value, SyntaxKind, SeperatorKind);
     }
 }

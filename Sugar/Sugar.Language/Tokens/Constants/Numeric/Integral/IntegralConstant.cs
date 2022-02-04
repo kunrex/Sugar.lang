@@ -9,7 +9,7 @@ namespace Sugar.Language.Tokens.Constants.Numeric.Integral
         public abstract IntegerType IntegerType { get; }
         public override ConstantType ConstantType => ConstantType.Integer;
 
-        public IntegralConstant(string _value, int _index) : base(_value, 0)
+        public IntegralConstant(string _value, int _index) : base(_value)
         {
             Index = _index;
         }

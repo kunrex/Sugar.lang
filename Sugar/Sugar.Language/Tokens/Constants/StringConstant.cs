@@ -8,7 +8,7 @@ namespace Sugar.Language.Tokens.Constants
     {
         public override ConstantType ConstantType => ConstantType.String;
 
-        public StringConstant(string _value, int _index) : base(_value, 0)
+        public StringConstant(string _value, int _index) : base(_value)
         {
             Index = _index;
         }

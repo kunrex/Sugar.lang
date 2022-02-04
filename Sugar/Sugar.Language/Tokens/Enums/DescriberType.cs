@@ -1,12 +1,12 @@
 ﻿using System;
 namespace Sugar.Language.Tokens.Enums
 {
-    internal enum DescriberType 
+    internal enum DescriberType : byte
     {
-        Static,
-        Function,
-        Mutability,
-        Inhertiance,
-        AccessModifier
+        Static = 0,
+        Function = 1,
+        Mutability = 2,
+        Inhertiance = 3,
+        AccessModifier = 4
     }
 }
