@@ -6,6 +6,7 @@ namespace Sugar.Language.Tokens.Enums
     internal enum SeperatorKind : ushort
     {
         Any = 0,
+
         Colon = 4,
         Semicolon = 8,
 
@@ -17,10 +18,10 @@ namespace Sugar.Language.Tokens.Enums
         OpenBracket = 256,
         CloseBracket = 512,
 
-        BoxOpenBracket = 2024,
-        BoxCloseBracket = 4096,
+        BoxOpenBracket = 1024,
+        BoxCloseBracket = 2048,
 
-        FlowerOpenBracket = 8192,
-        FlowerCloseBracket = 16384,
+        FlowerOpenBracket = 4096,
+        FlowerCloseBracket = 8192,
     }
 }
