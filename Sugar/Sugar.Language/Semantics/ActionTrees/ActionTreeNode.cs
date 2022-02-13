@@ -1,42 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Sugar.Language.Semantics.Analysis;
-using Sugar.Language.Parsing.Nodes.Enums;
-
-namespace Sugar.Language.Parsing.Nodes
+namespace Sugar.Language.Semantics.ActionTrees
 {
-    internal abstract class Node
+    internal abstract class ActionTreeNode 
     {
-        public Node Parent { get; protected set; }
+        public ActionTreeNode Parent { get; protected set; }
 
-        protected List<Node> Children { get; set; }
-        public abstract NodeType NodeType { get; }
+        protected List<ActionTreeNode> Children { get; set; }
 
         public int ChildCount => Children.Count;
 
-        public Node this[int index]
+        public ActionTreeNode this[int index]
         {
             get => index >= ChildCount || index < 0 ? null : Children[index];
         }
 
-        public IEnumerable<Node> GetChildren()
+        public IEnumerable<ActionTreeNode> GetChildren()
         {
             foreach (var child in Children)
                 yield return child;
         }
 
-        public Node()
+        public ActionTreeNode()
         {
-            Children = new List<Node>();
+            Children = new List<ActionTreeNode>();
         }
 
-        public Node(List<Node> children)
-        {
-            Children = children;
-        }
-
-        public virtual Node AddChild(Node _node)
+        public virtual ActionTreeNode AddChild(ActionTreeNode _node)
         {
             Children.Add(_node);
 
@@ -49,28 +40,11 @@ namespace Sugar.Language.Parsing.Nodes
                 child.SetParent(this);
         }
 
-        public void SetParent(Node _parent)
+        public void SetParent(ActionTreeNode _parent)
         {
             Parent = _parent;
 
             SetParent();
-        }
-
-        public IEnumerable<Node> GetChildrenBefore(int index)
-        {
-            for (int i = 0; i < index; i++)
-                yield return Children[i];
-        }
-
-        public IEnumerable<Node> GetChildrenBefore(Node node)
-        {
-            var index = Children.IndexOf(node);
-
-            if (index == -1)
-                yield return null;
-
-            foreach (var child in GetChildrenBefore(index))
-                yield return child;
         }
 
         public abstract override string ToString();

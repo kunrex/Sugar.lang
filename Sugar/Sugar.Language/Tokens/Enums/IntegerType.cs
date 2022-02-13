@@ -1,16 +1,21 @@
 ﻿using System;
 
+using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
+
 namespace Sugar.Language.Tokens.Enums
 {
     internal enum IntegerType : byte
     {
-        Byte = 0,
-        Sbyte = 1,
-        Short = 2,
-        UShort = 3,
-        Int = 4,
-        UInt = 5,
-        Long = 6,
-        ULong = 7
+        Byte = (byte)TypeEnum.Byte,
+        Sbyte = (byte)TypeEnum.SByte,
+
+        Short = (byte)TypeEnum.Short,
+        UShort = (byte)TypeEnum.UShort,
+
+        Int = (byte)TypeEnum.Int,
+        UInt = (byte)TypeEnum.UInt,
+
+        Long = (byte)TypeEnum.Long,
+        ULong = (byte)TypeEnum.ULong,
     }
 }

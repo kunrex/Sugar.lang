@@ -187,7 +187,67 @@ namespace Sugar.Language.Lexing
                             index++;
                         }
                         else
-                            CloneToken(BinaryOperator.Addition);
+                        {
+                            var prev = Tokens.Count == 0 ? null : Tokens[Tokens.Count - 1];
+
+                            if (next.HasValue && char.IsNumber(next.Value))
+                            {
+                                if (prev == null)
+                                {
+                                    index++;
+                                    Tokens.Add(ReadNumber());
+                                    break;
+                                }
+
+                                switch (prev.Type)
+                                {
+                                    case TokenType.Constant:
+                                    case TokenType.Identifier:
+                                        CloneToken(BinaryOperator.Addition);
+                                        break;
+                                    case TokenType.Seperator:
+                                        if (prev == Seperator.CloseBracket || prev == Seperator.BoxCloseBracket)
+                                            CloneToken(BinaryOperator.Addition);
+                                        else
+                                        {
+                                            index++;
+                                            Tokens.Add(ReadNumber());
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            index++;
+                                            Tokens.Add(ReadNumber());
+                                        }
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                if (prev == null || next == '-')
+                                {
+                                    CloneToken(UnaryOperator.Plus);
+                                    break;
+                                }
+
+                                switch (prev.Type)
+                                {
+                                    case TokenType.Constant:
+                                    case TokenType.Identifier:
+                                        CloneToken(BinaryOperator.Addition);
+                                        break;
+                                    case TokenType.Seperator:
+                                        if (prev == Seperator.CloseBracket || prev == Seperator.BoxCloseBracket)
+                                            CloneToken(BinaryOperator.Addition);
+                                        else
+                                            CloneToken(UnaryOperator.Plus);
+                                        break;
+                                    default:
+                                        CloneToken(UnaryOperator.Plus);
+                                        break;
+                                }
+                            }
+                        }
                         break;
                     case '-':
                         next = LookAhead();
@@ -233,7 +293,7 @@ namespace Sugar.Language.Lexing
                             }
                             else
                             {
-                                if (prev == null)
+                                if (prev == null || next == '+')
                                 {
                                     CloneToken(UnaryOperator.Minus);
                                     break;

@@ -56,6 +56,13 @@
     <None Remove="Tokens\Constants\Numeric\Real\" />
     <None Remove="Parsing\Nodes\TryCatchFinally\" />
     <None Remove="Parsing\Nodes\TryCatchFinally\Blocks\" />
+    <None Remove="SemanticAnalysis\" />
+    <None Remove="Semantics\Analysing\" />
+    <None Remove="Semantics\ActionTrees\" />
+    <None Remove="Semantics\ActionTrees\NodeGroup\" />
+    <None Remove="Semantics\ActionTrees\Statements\" />
+    <None Remove="Semantics\ActionTrees\Statements\Declarations\" />
+    <None Remove="Semantics\BuiltInTypes\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -109,6 +116,13 @@
     <Folder Include="Tokens\Constants\Numeric\Real\" />
     <Folder Include="Parsing\Nodes\TryCatchFinally\" />
     <Folder Include="Parsing\Nodes\TryCatchFinally\Blocks\" />
+    <Folder Include="Semantics\" />
+    <Folder Include="Semantics\Analysis\" />
+    <Folder Include="Semantics\ActionTrees\" />
+    <Folder Include="Semantics\ActionTrees\NodeGroups\" />
+    <Folder Include="Semantics\ActionTrees\Statements\" />
+    <Folder Include="Semantics\ActionTrees\Statements\VariableCreation\" />
+    <Folder Include="Semantics\BuiltInTypes\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

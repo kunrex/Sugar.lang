@@ -24,6 +24,8 @@ namespace Sugar.Language.Tokens
 
         }
 
+        public override string ToString() => $"[{Type} : {Value}]";
+
         public abstract Token Clone();
 
         public Token Clone(int _index)

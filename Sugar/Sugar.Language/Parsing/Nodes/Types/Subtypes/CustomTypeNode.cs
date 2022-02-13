@@ -8,7 +8,7 @@ namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
     internal sealed class CustomTypeNode : TypeNode
     {
         public Node CustomType { get => Children[0]; }
-        public override TypeNodeEnum Type => TypeNodeEnum.BuiltIn;
+        public override TypeNodeEnum Type => TypeNodeEnum.Custom;
 
         public CustomTypeNode(Node _type)
         {

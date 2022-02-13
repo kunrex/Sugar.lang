@@ -7,7 +7,7 @@ namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
 {
     internal sealed class ConstructorTypeNode : TypeNode
     {
-        public Node ReturnType { get => Children[0]; }
+        public Node ConstructorReturnType { get => Children[0]; }
         public override TypeNodeEnum Type => TypeNodeEnum.Constructor;
 
         public ConstructorTypeNode(Node _returnType)

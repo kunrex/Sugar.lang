@@ -164,6 +164,8 @@ namespace Sugar.Language.Tokens.Enums
 
         AsType = 112,
 
+        Plus = OperatorKind.Plus,
+
         QuestionMark = SeperatorKind.QuestionMark,
 
         OpenBracket = SeperatorKind.OpenBracket,

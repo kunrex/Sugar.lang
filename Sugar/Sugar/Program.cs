@@ -8,7 +8,7 @@ namespace Sugar
     {
         static void Main(string[] args)
         {
-            var source = "";
+            var source = "int: x = -+-+x; ";
             new Compiler(source).Compile();
 
             Console.ReadKey();

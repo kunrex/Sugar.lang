@@ -18,11 +18,6 @@ namespace Sugar.Language.Parsing
             BaseNode = _baseNode;
         }
 
-        public SyntaxTree AddChildToBaseNode(Node _node)
-        {
-            BaseNode.AddChild(_node);
-
-            return this;
-        }
+        public void ParentNodes() => BaseNode.SetParent();
     }
 }

@@ -537,7 +537,7 @@ namespace Sugar.Language.Parsing.Parser
                 case 1:
                     return assignNodes[0];
                 default:
-                    return new CompoundStatementNode(assignNodes);
+                    return new CompoundVariableDeclarationNode(assignNodes);
             }
         }
 
@@ -736,6 +736,7 @@ namespace Sugar.Language.Parsing.Parser
                                 AddPostfix();
                                 break;
                             case TokenType.BinaryOperator:
+                            case TokenType.AssignmentOperator:
                                 AddPrefix();
                                 break;
                             case TokenType.Seperator:

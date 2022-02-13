@@ -7,7 +7,7 @@ namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation
 {
     internal sealed class DeclarationNode : VariableCreationNode
     {
-        public override NodeType NodeType => NodeType.Assignment;
+        public override NodeType NodeType => NodeType.Declaration;
 
         public DeclarationNode(Node _describer, Node _type, Node _name) : base(_describer, _type, _name)
         {

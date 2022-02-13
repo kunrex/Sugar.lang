@@ -48,6 +48,8 @@ namespace Sugar.Language.Tokens.Enums
         AssignmentBitwiseOr = 104,
         AssignmentBitwiseXor = 105,
         AssignmentBitwiseRighshift = 106,
-        AssignmentBitwiseLeftShift = 107
+        AssignmentBitwiseLeftShift = 107,
+
+        Plus = 113
     }
 }

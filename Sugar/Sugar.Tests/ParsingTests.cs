@@ -13,7 +13,9 @@ namespace Sugar.Tests
             string source = "string: name = input(\"whats your name?\"); print(\"hi \" + name + \"!\");";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -24,7 +26,9 @@ namespace Sugar.Tests
             string source = "int: x;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(result, true);
         }
@@ -36,7 +40,9 @@ namespace Sugar.Tests
             string source = "int: x = 10;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -47,7 +53,9 @@ namespace Sugar.Tests
             string source = "int: x, y = 10 >> 2;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -58,7 +66,9 @@ namespace Sugar.Tests
             string source = "x = 10;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -69,7 +79,9 @@ namespace Sugar.Tests
             string source = "x = y = 10;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -80,7 +92,9 @@ namespace Sugar.Tests
             string source = "Function(10);";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -91,7 +105,9 @@ namespace Sugar.Tests
             string source = "int: x = Function(10)<int>;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -102,7 +118,9 @@ namespace Sugar.Tests
             string source = "var: x = create Array(10)<int>;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -113,7 +131,9 @@ namespace Sugar.Tests
             string source = "int: x = Function(Function2()<x,z> + y);";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -124,7 +144,9 @@ namespace Sugar.Tests
             string source = "int: x = Function(Function2()< x, z > y);";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -135,7 +157,9 @@ namespace Sugar.Tests
             string source = "int: x = y[y.length - 1] + z[0, 0];";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -146,7 +170,9 @@ namespace Sugar.Tests
             string source = "int: x = 1 + 2 > 3 ? 10 : 4 * 2;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -157,7 +183,9 @@ namespace Sugar.Tests
             string source = "Array<T> ReturnArray(int: length)<T; Y : int> { return null; }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -168,7 +196,9 @@ namespace Sugar.Tests
             string source = "for(int: i = 0; i < 10; i++) { print(i); }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -179,7 +209,9 @@ namespace Sugar.Tests
             string source = "for(int: i = 0, k = 1; i < 10 && k < 9; i++, k++) { print(i + k); }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -190,7 +222,9 @@ namespace Sugar.Tests
             string source = "for(;true;) { print(true); }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -201,7 +235,9 @@ namespace Sugar.Tests
             string source = "while(true) { print(true); }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -212,7 +248,9 @@ namespace Sugar.Tests
             string source = "do { print(true); } while(true)";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -223,7 +261,9 @@ namespace Sugar.Tests
             string source = "foreach(var: x in array) print(x);";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -234,7 +274,9 @@ namespace Sugar.Tests
             string source = "if(true) print(true); else if(true && false) print(\"somethings wrong\"); else print(false);";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -245,7 +287,9 @@ namespace Sugar.Tests
             string source = "switch(x) { case 1: print(1); break; case var: x when x == 10: { print(10); } break; default: break; }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -256,7 +300,9 @@ namespace Sugar.Tests
             string source = "class A{   }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -267,7 +313,9 @@ namespace Sugar.Tests
             string source = "struct A{   }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -278,7 +326,9 @@ namespace Sugar.Tests
             string source = "interface A{   }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -289,7 +339,9 @@ namespace Sugar.Tests
             string source = "enum RockPaperScissors : int {  Rock = 0, Papers = 1, Scissors }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -300,7 +352,9 @@ namespace Sugar.Tests
             string source = "class A<T; Y : int> {   }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -311,7 +365,9 @@ namespace Sugar.Tests
             string source = "class A : Class, IInterface {   }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -322,7 +378,9 @@ namespace Sugar.Tests
             string source = "int: x { get => 10; set => x = value; }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -333,7 +391,9 @@ namespace Sugar.Tests
             string source = "int: x { get => 10; }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -344,7 +404,9 @@ namespace Sugar.Tests
             string source = "int: x { set => x = value; }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -355,7 +417,9 @@ namespace Sugar.Tests
             string source = "import Namespace.Subnamespace; import class Namespace.Class;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -366,7 +430,9 @@ namespace Sugar.Tests
             string source = "[public][abstract] class Abstract {  }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -377,7 +443,9 @@ namespace Sugar.Tests
             string source = "throw create Exception(); throw exceptionVariable;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -388,7 +456,9 @@ namespace Sugar.Tests
             string source = "Array<int>: x = create Array(2)<int> { 1, 2 };";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -399,7 +469,9 @@ namespace Sugar.Tests
             string source = "var: x = create Class() { value1 = 10, value2 = \"hi\" };";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -410,7 +482,9 @@ namespace Sugar.Tests
             string source = "explicit string(int: i) => i + \"\";";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -421,7 +495,9 @@ namespace Sugar.Tests
             string source = "implicit float(int: i) => i + 0.0;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -432,7 +508,9 @@ namespace Sugar.Tests
             string source = "operator string +(string: a, string: b) => a.Append(b);";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -443,7 +521,9 @@ namespace Sugar.Tests
             string source = "int Invert(int: i) : int => i * -1;";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -454,7 +534,9 @@ namespace Sugar.Tests
             string source = "indexer object(int: index) => arrayVariable[index];";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }
@@ -465,7 +547,22 @@ namespace Sugar.Tests
             string source = "try { print(10 / 0); } catch(Exception: e) { print(e); } finally { print(\"done\"); }";
 
             var compiler = new Compiler(source);
-            var result = compiler.Compile();
+
+            compiler.Lex();
+            var result = compiler.Parse();
+
+            Assert.AreEqual(true, result);
+        }
+
+        [TestMethod]
+        public void DefaultAndAsType()
+        {
+            string source = "bool: isClass = default(string) == null; var: intType = astype(int);";
+
+            var compiler = new Compiler(source);
+
+            compiler.Lex();
+            var result = compiler.Parse();
 
             Assert.AreEqual(true, result);
         }

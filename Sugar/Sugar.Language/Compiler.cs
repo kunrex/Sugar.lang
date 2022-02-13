@@ -5,8 +5,10 @@ using System.Linq;
 using Sugar.Language.Lexing;
 using Sugar.Language.Parsing;
 using Sugar.Language.Tokens;
-using Sugar.Language.Parsing.Parser;
 using Sugar.Language.Exceptions;
+using Sugar.Language.Parsing.Parser;
+
+using Sugar.Language.Semantics.Analysis;
 
 namespace Sugar.Language
 {
@@ -21,37 +23,58 @@ namespace Sugar.Language
         public Compiler(string _sourceCode)
         {
             sourceCode = _sourceCode;
+
+            Console.WriteLine("_____Source_____");
+            Console.WriteLine(sourceCode);
         }
 
-        public bool Compile()
+        public bool Lex()
+        {
+            Lexer lexer = new Lexer(sourceCode);
+            Tokens = lexer.Lex();
+
+            Console.WriteLine("\n_____Lexed_____");
+            Console.WriteLine(string.Join('\n', Tokens));
+
+            return true;
+        }
+
+        public bool Parse()
+        {
+            SyntaxTree = new Parser(Tokens).Parse();
+
+            Console.WriteLine("\n_____Parsed_____");
+
+            if (SyntaxTree == null)
+            {
+                Console.WriteLine("Source Code Empty");
+                return false;
+            }
+            else
+                SyntaxTree.BaseNode.Print("", true);
+
+            SyntaxTree.ParentNodes();
+            return true;
+        }
+
+        public void Compile()
         {
             try
             {
-                Console.WriteLine("_____Source_____");
-                Console.WriteLine(sourceCode);
+                Lex();
 
-                Lexer lexer = new Lexer(sourceCode);
-                Tokens = lexer.Lex();
+                var parseResult = Parse();
+                if (!parseResult)
+                    return;
 
-                Console.WriteLine("\n_____Lexed_____");
-                Console.WriteLine(string.Join('\n', Tokens.Select(x => $"[{x.Type}, {x.Value}]")));
+                var analyser = new SemanticAnalyser(SyntaxTree);
 
-                SyntaxTree = new Parser(Tokens).Parse();
-
-                Console.WriteLine("\n_____Parsed_____");
-
-                if (SyntaxTree == null)
-                    Console.WriteLine("Source Code Empty");
-                else
-                    SyntaxTree.BaseNode.Print("", true);
-
-                return true;
+                var analysisResult = analyser.Analyse();
+                Console.WriteLine(analysisResult);
             }
             catch(CompileException e)
             {
                 Console.WriteLine($"Exception: {e.Message}");
-
-                return false;
             }
         }
     }

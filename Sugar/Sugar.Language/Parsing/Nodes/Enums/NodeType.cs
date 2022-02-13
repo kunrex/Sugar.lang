@@ -19,6 +19,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         Assignment,
         Declaration,
         Initialise,
+        CompoundDeclaration,
 
         For,
         While,
