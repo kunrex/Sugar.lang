@@ -5,28 +5,24 @@ using Sugar.Language.Tokens.Operators;
 
 using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
 
-namespace Sugar.Language.Semantics.BuiltInTypes
+namespace Sugar.Language.Semantics.BuiltInTypes.Numeric.Real
 {
-    internal sealed class CharType : SugarType
+    internal abstract class RealType : NumericType
     {
-        public override bool ReferenceType { get => false; }
-
-        public CharType() : base(TypeEnum.Char | TypeEnum.FromCharConvertables, TypeEnum.Boolean | TypeEnum.String)
+        public RealType(TypeEnum _return, TypeEnum _implicit, TypeEnum _subReal) : base(_return, _implicit, TypeEnum.Numeric, _subReal)
         {
-
+           
         }
 
         public override (bool, TypeEnum) MatchOperator(Operator operatorToMatch)
         {
             switch(operatorToMatch.OperatorType)
             {
-                case OperatorKind.Increment:
-                case OperatorKind.Decrement:
-                    return (true, TypeEnum.Char);
                 case OperatorKind.Plus:
                 case OperatorKind.Minus:
-                case OperatorKind.BitwiseNot:
-                    return (true, TypeEnum.Int);
+                case OperatorKind.Increment:
+                case OperatorKind.Decrement:
+                    return (true, returnType);
                 default:
                     return (false, 0);
             }
@@ -41,13 +37,9 @@ namespace Sugar.Language.Semantics.BuiltInTypes
                 case OperatorKind.Multiplication:
                 case OperatorKind.Division:
                 case OperatorKind.Modulus:
-                    if(MatchType(TypeEnum.Char | TypeEnum.Integral, otherOperhand))
-                        return (true, TypeEnum.Int);
-                    break;
-                case OperatorKind.RightShit:
-                case OperatorKind.LeftShift:
-                    if(MatchType(TypeEnum.Char | TypeEnum.Byte | TypeEnum.SByte | TypeEnum.Short | TypeEnum.UShort | TypeEnum.Int, otherOperhand))
-                        return (true, TypeEnum.Int);
+                    if (MatchType(returnType | subTypes | TypeEnum.Integral, otherOperhand))
+                        return (true, returnType);
+
                     break;
             }
 

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 
-using Sugar.Language.Tokens.Enums;
 using Sugar.Language.Tokens.Operators;
 
 using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
@@ -15,44 +13,18 @@ namespace Sugar.Language.Semantics.BuiltInTypes
         protected TypeEnum ImplicitConversions;
         protected TypeEnum ExplicitConversions;
 
-        protected OperatorKind[] UnaryOperators;
-        protected Dictionary<OperatorKind, TypeEnum> BinaryOperators;
-
-        public SugarType(TypeEnum _implicit, TypeEnum _explicit, OperatorKind[] unaryOperators, Dictionary<OperatorKind, TypeEnum> binaryOperators) 
+        public SugarType(TypeEnum _implicit, TypeEnum _explicit)
         {
-            ImplicitConversions = _implicit;
+            ImplicitConversions = _implicit | TypeEnum.Object;
             ExplicitConversions = _implicit | _explicit;
-
-            UnaryOperators = unaryOperators;
-            BinaryOperators = binaryOperators;
         }
 
         public bool MatchExplicitConversion(TypeEnum toMatch) => (toMatch & ExplicitConversions) == toMatch;
         public bool MatchImplicitConversion(TypeEnum toMatch) => (toMatch & ImplicitConversions) == toMatch;
 
-        public bool MatchOperator(Operator operatorToMatch, TypeEnum otherOperhand)
-        {
-            if (BinaryOperators == null)
-                return false;
+        protected bool MatchType(TypeEnum allowed, TypeEnum current) => (current & allowed) == current;
 
-            foreach (var opSet in BinaryOperators)
-                if (opSet.Key == operatorToMatch.OperatorType)
-                    if((otherOperhand & opSet.Value) == otherOperhand)
-                        return true;
-
-            return false;
-        }
-
-        public bool MatchOperator(Operator operatorToMatch)
-        {
-            if (UnaryOperators == null)
-                return false;
-
-            foreach (var op in UnaryOperators)
-                if(op == operatorToMatch.OperatorType)
-                    return true;
-
-            return false;
-        }
+        public abstract (bool, TypeEnum) MatchOperator(Operator operatorToMatch);
+        public abstract (bool, TypeEnum) MatchOperator(Operator operatorToMatch, TypeEnum otherOperhand);
     }
 }
