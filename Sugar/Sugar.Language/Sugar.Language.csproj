@@ -63,6 +63,9 @@
     <None Remove="Semantics\ActionTrees\Statements\" />
     <None Remove="Semantics\ActionTrees\Statements\Declarations\" />
     <None Remove="Semantics\BuiltInTypes\" />
+    <None Remove="Semantics\BuiltInTypes\Numeric\" />
+    <None Remove="Semantics\BuiltInTypes\Numeric\Integral\" />
+    <None Remove="Semantics\BuiltInTypes\Numeric\Real\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -123,6 +126,9 @@
     <Folder Include="Semantics\ActionTrees\Statements\" />
     <Folder Include="Semantics\ActionTrees\Statements\VariableCreation\" />
     <Folder Include="Semantics\BuiltInTypes\" />
+    <Folder Include="Semantics\BuiltInTypes\Numeric\" />
+    <Folder Include="Semantics\BuiltInTypes\Numeric\Integral\" />
+    <Folder Include="Semantics\BuiltInTypes\Numeric\Real\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

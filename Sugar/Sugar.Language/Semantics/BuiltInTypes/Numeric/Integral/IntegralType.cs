@@ -5,28 +5,25 @@ using Sugar.Language.Tokens.Operators;
 
 using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
 
-namespace Sugar.Language.Semantics.BuiltInTypes
+namespace Sugar.Language.Semantics.BuiltInTypes.Numeric.Integral
 {
-    internal sealed class CharType : SugarType
+    internal abstract class IntegralType : NumericType
     {
-        public override bool ReferenceType { get => false; }
-
-        public CharType() : base(TypeEnum.Char | TypeEnum.FromCharConvertables, TypeEnum.Boolean | TypeEnum.String)
+        public IntegralType(TypeEnum _return, TypeEnum _implicit, TypeEnum _explicit, TypeEnum _subIngetrals) : base(_return, _implicit | TypeEnum.Char, _explicit, _subIngetrals)
         {
-
+            
         }
 
         public override (bool, TypeEnum) MatchOperator(Operator operatorToMatch)
         {
-            switch(operatorToMatch.OperatorType)
+            switch (operatorToMatch.OperatorType)
             {
-                case OperatorKind.Increment:
-                case OperatorKind.Decrement:
-                    return (true, TypeEnum.Char);
                 case OperatorKind.Plus:
                 case OperatorKind.Minus:
+                case OperatorKind.Increment:
+                case OperatorKind.Decrement:
                 case OperatorKind.BitwiseNot:
-                    return (true, TypeEnum.Int);
+                    return (true, returnType);
                 default:
                     return (false, 0);
             }
@@ -41,13 +38,16 @@ namespace Sugar.Language.Semantics.BuiltInTypes
                 case OperatorKind.Multiplication:
                 case OperatorKind.Division:
                 case OperatorKind.Modulus:
-                    if(MatchType(TypeEnum.Char | TypeEnum.Integral, otherOperhand))
-                        return (true, TypeEnum.Int);
+                case OperatorKind.BitwiseAnd:
+                case OperatorKind.BitwiseOr:
+                case OperatorKind.BitwiseXor:
+                    if (MatchType(returnType | subTypes | TypeEnum.Char, otherOperhand))
+                        return (true, returnType);
                     break;
                 case OperatorKind.RightShit:
                 case OperatorKind.LeftShift:
-                    if(MatchType(TypeEnum.Char | TypeEnum.Byte | TypeEnum.SByte | TypeEnum.Short | TypeEnum.UShort | TypeEnum.Int, otherOperhand))
-                        return (true, TypeEnum.Int);
+                    if (MatchType(returnType | TypeEnum.Byte | TypeEnum.SByte | TypeEnum.Short | TypeEnum.UShort | TypeEnum.Int | TypeEnum.Char, otherOperhand))
+                        return (true, returnType);
                     break;
             }
 
