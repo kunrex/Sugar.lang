@@ -72,6 +72,9 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         Finally,
         TryCatchFinally,
 
-        AsType
+        AsType,
+
+        ImplicitDeclaration,
+        ExplicitDeclaration
     }
 }

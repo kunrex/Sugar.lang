@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Sugar.Language.Semantics.ActionTrees
 {
@@ -7,38 +6,7 @@ namespace Sugar.Language.Semantics.ActionTrees
     {
         public ActionTreeNode Parent { get; protected set; }
 
-        protected List<ActionTreeNode> Children { get; set; }
-
-        public int ChildCount => Children.Count;
-
-        public ActionTreeNode this[int index]
-        {
-            get => index >= ChildCount || index < 0 ? null : Children[index];
-        }
-
-        public IEnumerable<ActionTreeNode> GetChildren()
-        {
-            foreach (var child in Children)
-                yield return child;
-        }
-
-        public ActionTreeNode()
-        {
-            Children = new List<ActionTreeNode>();
-        }
-
-        public virtual ActionTreeNode AddChild(ActionTreeNode _node)
-        {
-            Children.Add(_node);
-
-            return this;
-        }
-
-        public void SetParent()
-        {
-            foreach (var child in Children)
-                child.SetParent(this);
-        }
+        public void SetParent() => SetChildrenParent();
 
         public void SetParent(ActionTreeNode _parent)
         {
@@ -46,8 +14,6 @@ namespace Sugar.Language.Semantics.ActionTrees
 
             SetParent();
         }
-
-        public abstract override string ToString();
 
         public void Print(string indent, bool last)
         {
@@ -65,8 +31,12 @@ namespace Sugar.Language.Semantics.ActionTrees
 
             Console.WriteLine(ToString());
 
-            for (int i = 0; i < Children.Count; i++)
-                Children[i].Print(indent, i == Children.Count - 1);
+            PrintChildren(indent);
         }
+
+        public abstract override string ToString();
+
+        protected virtual void SetChildrenParent() { }
+        protected virtual void PrintChildren(string indent) { }
     }
 }

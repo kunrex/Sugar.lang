@@ -60,12 +60,14 @@
     <None Remove="Semantics\Analysing\" />
     <None Remove="Semantics\ActionTrees\" />
     <None Remove="Semantics\ActionTrees\NodeGroup\" />
-    <None Remove="Semantics\ActionTrees\Statements\" />
     <None Remove="Semantics\ActionTrees\Statements\Declarations\" />
-    <None Remove="Semantics\BuiltInTypes\" />
-    <None Remove="Semantics\BuiltInTypes\Numeric\" />
-    <None Remove="Semantics\BuiltInTypes\Numeric\Integral\" />
-    <None Remove="Semantics\BuiltInTypes\Numeric\Real\" />
+    <None Remove="Semantics\ActionTrees\DataTypes\" />
+    <None Remove="Semantics\ActionTrees\Namespaces\" />
+    <None Remove="Semantics\ActionTrees\Interfaces\" />
+    <None Remove="Semantics\ActionTrees\Interfaces\Namespaces\" />
+    <None Remove="Semantics\ActionTrees\Interfaces\DataTypes\" />
+    <None Remove="Semantics\ActionTrees\Enums\" />
+    <None Remove="Semantics\WrapperFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -122,13 +124,13 @@
     <Folder Include="Semantics\" />
     <Folder Include="Semantics\Analysis\" />
     <Folder Include="Semantics\ActionTrees\" />
-    <Folder Include="Semantics\ActionTrees\NodeGroups\" />
-    <Folder Include="Semantics\ActionTrees\Statements\" />
-    <Folder Include="Semantics\ActionTrees\Statements\VariableCreation\" />
-    <Folder Include="Semantics\BuiltInTypes\" />
-    <Folder Include="Semantics\BuiltInTypes\Numeric\" />
-    <Folder Include="Semantics\BuiltInTypes\Numeric\Integral\" />
-    <Folder Include="Semantics\BuiltInTypes\Numeric\Real\" />
+    <Folder Include="Semantics\ActionTrees\DataTypes\" />
+    <Folder Include="Semantics\ActionTrees\Namespaces\" />
+    <Folder Include="Semantics\ActionTrees\Interfaces\" />
+    <Folder Include="Semantics\ActionTrees\Interfaces\Namespaces\" />
+    <Folder Include="Semantics\ActionTrees\Interfaces\DataTypes\" />
+    <Folder Include="Semantics\ActionTrees\Enums\" />
+    <Folder Include="Semantics\WrapperFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

@@ -1149,7 +1149,20 @@ namespace Sugar.Language.Parsing.Parser
             var node = entity;
             while (true)
                 if (node.NodeType == NodeType.Dot)
-                    node = ((DotExpression)node).RHS;
+                {
+                    var dot = (DotExpression)node;
+
+                    switch(dot.LHS.NodeType)
+                    {
+                        case NodeType.Type:
+                        case NodeType.Variable:
+                            break;
+                        default:
+                            throw new InvalidTokenException(token, token.Index);
+                    }
+
+                    node = dot.RHS;
+                }
                 else
                     break;
 
@@ -1892,16 +1905,21 @@ namespace Sugar.Language.Parsing.Parser
         {
             var token = Current;
 
+            index++;
             var name = ParseEntity(false, SeperatorKind.FlowerOpenBracket);
             var node = name;
             while (true)
                 if (node.NodeType == NodeType.Dot)
-                    node = ((DotExpression)node).RHS;
+                {
+                    var dot = (DotExpression)node;
+
+                    if(dot.LHS.NodeType != NodeType.Variable)
+                        throw new InvalidTokenException(token, token.Index);
+
+                    node = dot.RHS;
+                }
                 else
                     break;
-
-            if (node.NodeType != NodeType.Variable)
-                throw new InvalidTokenException(token, token.Index);
 
             ForceMatchCurrent(Seperator.FlowerOpenBracket);
             return new NamespaceNode(describer, name, ParseScope());

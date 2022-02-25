@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Sugar.Language.Parsing;
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
-using Sugar.Language.Parsing.Nodes.Statements;
-using Sugar.Language.Parsing.Nodes.UDDataTypes;
 using Sugar.Language.Parsing.Nodes.Values;
+using Sugar.Language.Parsing.Nodes.UDDataTypes;
+using Sugar.Language.Parsing.Nodes.Expressions.Associative;
+
+using Sugar.Language.Semantics.ActionTrees;
+using Sugar.Language.Semantics.ActionTrees.Namespaces;
+using Sugar.Language.Semantics.ActionTrees.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
 
 namespace Sugar.Language.Semantics.Analysis
 {
@@ -14,90 +19,158 @@ namespace Sugar.Language.Semantics.Analysis
     {
         public SyntaxTree Base { get; private set; }
 
+
+        private readonly DefaultNameSpaceNode defaultNameSpace;
+        private readonly CreatedNameSpaceCollectionNode createdNameSpaces;
+
         public SemanticAnalyser(SyntaxTree _base)
         {
             Base = _base;
+
+            defaultNameSpace = new DefaultNameSpaceNode();
+            createdNameSpaces = new CreatedNameSpaceCollectionNode();
         }
 
-        public bool Analyse()
+        public SugarPackage Analyse()
         {
             var baseNode = Base.BaseNode;
 
             switch (baseNode.NodeType)
             {
                 case NodeType.Group:
-                    if (!AnalyseScope(baseNode))
-                        return false;
-
+                    foreach (var child in baseNode.GetChildren())
+                        AnalyseNode(child);
+                    break;
+                default:
+                    AnalyseNode(baseNode);
                     break;
             }
 
-            return true;
+            createdNameSpaces.Print("");
+            return new SugarPackage(defaultNameSpace, createdNameSpaces);
         }
 
-        private bool AnalyseScope(Node current)
+        private void AnalyseNode(Node node)
         {
-            foreach(var child in current.GetChildren())
+            switch(node.NodeType)
+            {
+                case NodeType.Group:
+                    foreach (var child in node.GetChildren())
+                        AnalyseNode(child);
+                    break;
+                default:
+
+                case NodeType.Namespace:
+                    AnalyseNameSpace((NamespaceNode)node);
+                    break;
+                case NodeType.Enum:
+                case NodeType.Class:
+                case NodeType.Struct:
+                case NodeType.Interface:
+                    defaultNameSpace.AddDataType(CreateDataType((UDDataTypeNode)node, defaultNameSpace));
+                    break;
+            }
+        }
+
+        private void AnalyseNameSpace(NamespaceNode node)
+        {
+            var name = node.Name;
+            INameSpaceCollection collection = createdNameSpaces;
+
+            while (name != null)
+            {
+                switch(name.NodeType)
+                {
+                    case NodeType.Dot:
+                        var dotExpression = (DotExpression)name;
+                        var lhs = (IdentifierNode)dotExpression.LHS;
+
+                        collection = EvaluateResult(lhs, collection);
+                        name = dotExpression.RHS;
+                        break;
+                    case NodeType.Variable:
+                        var converted = (IdentifierNode)name;
+                        collection = EvaluateResult(converted, collection);
+
+                        name = null;
+                        break;
+                    default:
+                        throw new Exception("Parser ain't working mate");
+                }
+            }
+
+            var dataTypeCollection = (IDataTypeCollection)collection;
+
+            foreach(var child in node.GetDataTypes())
             {
                 switch(child.NodeType)
                 {
-                    case NodeType.Assignment:
-                        var name = (IdentifierNode)((AssignmentNode)child).Value;
+                    case NodeType.Enum:
+                    case NodeType.Class:
+                    case NodeType.Struct:
+                    case NodeType.Interface:
+                        dataTypeCollection.AddDataType(CreateDataType((UDDataTypeNode)child, dataTypeCollection));
+                        break;
+                    default:
+                        throw new Exception("invalid statement");
+                }
+            }
 
-                        var declaration = FindVariableDeclaration(name, child);
-                        if (declaration == null)
-                            return false;
+            INameSpaceCollection EvaluateResult(IdentifierNode identifier, INameSpaceCollection collection)
+            {
+                var result = collection.TryFindNameSpace(identifier);
+                if (result == null)
+                {
+                    var created = new CreatedNameSpaceNode(identifier);
+                    collection.AddNameSpace(created);
+
+                    return created;
+                }
+                else
+                {
+                    return result;
+                }
+            }
+        }
+
+        private DataType CreateDataType(UDDataTypeNode dataTypeNode, IDataTypeCollection collection)
+        {
+            DataType createdType;
+
+            var identifier = (IdentifierNode)dataTypeNode.Name;
+            if (collection.TryFindDataType(identifier) != null)
+                throw new Exception($"Type {identifier.Value} already exists");
+
+            switch(dataTypeNode.NodeType)
+            {
+                case NodeType.Enum:
+                    createdType =  new EnumType(identifier);
+                    break;
+                case NodeType.Class:
+                    createdType =  new ClassType(identifier);
+                    break;
+                case NodeType.Struct:
+                    createdType =  new StructType(identifier);
+                    break;
+                default:
+                    createdType =  new InterfaceType(identifier);
+                    break;
+            }
+
+            foreach(var child in dataTypeNode.GetChildren())
+            {
+                switch(child.NodeType)
+                {
+                    case NodeType.Enum:
+                    case NodeType.Class:
+                    case NodeType.Struct:
+                    case NodeType.Interface:
+                        createdType.AddDataType(CreateDataType((UDDataTypeNode)child, createdType));
                         break;
                 }
             }
 
-            return true;
-        }
-
-        private Node FindVariableDeclaration(Node variable, Node currentLocation)
-        {
-            switch(variable.NodeType)
-            {
-                case NodeType.Dot:
-                    //find the first identifiers definition
-                    //locate the type and find the definition for the type
-                    //continue the variable needed has veen found
-                    break;
-                case NodeType.Variable:
-                    return FindVariableDeclaration((IdentifierNode)variable, currentLocation);
-            }
-
-            return null;
-        }
-
-        private Node FindVariableDeclaration(IdentifierNode variable, Node currentLocation)
-        {
-            var parent = currentLocation;
-
-            while(parent != null)
-            {
-                var stopAt = parent;
-                parent = parent.Parent;
-
-                if (parent == null)
-                    break;
-
-                foreach (var child in parent.GetChildrenBefore(stopAt))
-                {
-                    switch(child.NodeType)
-                    {
-                        case NodeType.Initialise:
-                        case NodeType.Declaration:
-                            var converted = (ICreationNode_Name)child;
-
-                            if (variable.Value == ((IdentifierNode)converted.Name).Value)
-                                return child;
-                            break;
-                    }
-                }
-            }
-
-            return null;
+            return createdType;
         }
     }
 }

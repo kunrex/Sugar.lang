@@ -1,0 +1,43 @@
+﻿namespace Sugar
+{
+    struct Character
+    {
+        [private] int: ascii;
+
+        [public, static]
+        implicit ushort(char: c) => (ushort)c.ascii;
+
+        [public, static]
+        implicit int(char: c) => c.ascii;
+
+        [public, static]
+        implicit uint(char: c) => (uint)c.ascii;
+
+        [public, static]
+        implicit long(char: c) => (long)c.ascii;
+
+        [public, static]
+        implicit ulong(char: c) => (ulong)c.ascii;
+
+        [public, static]
+        implicit float(char: c) => (float)c.ascii;
+
+        [public, static]
+        implicit double(char: c) => (double)c.ascii;
+
+        [public, static]
+        implicit decimal(char: c) => (decimal)c.ascii;
+
+        [public, static]
+        explicit bool(char: c)
+        {
+            if(c.ascii == 0)
+                return true;
+            else
+                return false;
+        }
+
+        [public, static]
+        explicit string(char: c) => c + "";
+    }
+}

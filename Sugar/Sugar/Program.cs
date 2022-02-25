@@ -8,7 +8,7 @@ namespace Sugar
     {
         static void Main(string[] args)
         {
-            var source = "int: x = -+-+x; ";
+            var source = "namespace x { class y {  enum x { } } } namespace x.y { class x { } } class z { }";
             new Compiler(source).Compile();
 
             Console.ReadKey();

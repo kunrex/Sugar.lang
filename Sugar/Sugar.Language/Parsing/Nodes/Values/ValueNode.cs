@@ -6,7 +6,7 @@ namespace Sugar.Language.Parsing.Nodes.Values
 {
     internal abstract class ValueNode<T> : Node where T : Token
     {
-        protected readonly T Token;
+        public readonly T Token;
         public string Value { get => Token.Value; }
 
         public ValueNode(T token)

@@ -20,9 +20,15 @@ namespace Sugar.Language.Parsing.Nodes.UDDataTypes
             Children = new List<Node>() { _describer, _name, _body };
         }
 
-        public override string ToString()
+        public IEnumerable<Node> GetDataTypes()
         {
-            throw new NotImplementedException();
+            if (Body.NodeType == NodeType.Group)
+                foreach (var child in Body.GetChildren())
+                    yield return child;
+            else
+                yield return Body;
         }
+
+        public override string ToString() => $"Name Space Node";
     }
 }
