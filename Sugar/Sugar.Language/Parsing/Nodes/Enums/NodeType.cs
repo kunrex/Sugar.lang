@@ -4,7 +4,10 @@ namespace Sugar.Language.Parsing.Nodes.Enums
 {
     internal enum NodeType : byte
     {
-        Group,
+        Scope,
+        Compound,
+        SugarFile,
+        ExpressionList,
 
         Variable,
         Constant,

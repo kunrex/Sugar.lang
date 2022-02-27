@@ -10,6 +10,13 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
     {
         protected readonly List<DataType> dataTypes;
 
+        public int DatatypeCount { get => dataTypes.Count; }
+
+        public DataType this[int index]
+        {
+            get => dataTypes[index];
+        }
+
         public BaseNameSpaceNode()  
         {
             dataTypes = new List<DataType>();

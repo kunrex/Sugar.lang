@@ -11,6 +11,13 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
     {
         private readonly List<CreatedNameSpaceNode> namespaces;
 
+        public int NamespaceCount { get => namespaces.Count; }
+
+        public CreatedNameSpaceNode this[int index]
+        {
+            get => namespaces[index];
+        }
+
         public CreatedNameSpaceCollectionNode()
         {
             namespaces = new List<CreatedNameSpaceNode>();

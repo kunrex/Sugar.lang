@@ -22,7 +22,7 @@ namespace Sugar.Language.Parsing.Nodes.UDDataTypes
 
         public IEnumerable<Node> GetDataTypes()
         {
-            if (Body.NodeType == NodeType.Group)
+            if (Body.NodeType == NodeType.Scope)
                 foreach (var child in Body.GetChildren())
                     yield return child;
             else

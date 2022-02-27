@@ -11,6 +11,8 @@ namespace Sugar.Language.Parsing.Nodes.Statements
         public UDDataType EntityType { get; private set; }
         public override NodeType NodeType => NodeType.Import;
 
+        public Node Name { get => Children[0]; }
+
         public ImportNode(UDDataType _entityType, Node _name)
         {
             EntityType = _entityType;

@@ -68,6 +68,7 @@
     <None Remove="Semantics\ActionTrees\Interfaces\DataTypes\" />
     <None Remove="Semantics\ActionTrees\Enums\" />
     <None Remove="Semantics\WrapperFiles\" />
+    <None Remove="Semantics\ActionTrees\VariableCreation\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -131,8 +132,10 @@
     <Folder Include="Semantics\ActionTrees\Interfaces\DataTypes\" />
     <Folder Include="Semantics\ActionTrees\Enums\" />
     <Folder Include="Semantics\WrapperFiles\" />
+    <Folder Include="Semantics\ActionTrees\VariableCreation\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />
+    <Compile Remove="Parsing\Nodes\NodeGroups\NodeGroup.cs" />
   </ItemGroup>
 </Project>

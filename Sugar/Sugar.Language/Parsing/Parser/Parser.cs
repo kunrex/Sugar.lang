@@ -168,7 +168,7 @@ namespace Sugar.Language.Parsing.Parser
                     nodes.Add(toAdd);
             }
 
-            return nodes.Count == 0 ? null : new SyntaxTree(nodes.Count == 1 ? nodes[0] : new CompoundStatementNode(nodes));
+            return nodes.Count == 0 ? null : new SyntaxTree(new SugarFileGroupNode(nodes));
         }
 
         private Node ParseStatement() => TryMatchCurrent(Seperator.FlowerOpenBracket) ? ParseScope() : ParseStatement(true, SeperatorKind.Semicolon);
@@ -978,7 +978,7 @@ namespace Sugar.Language.Parsing.Parser
                 if (nodes.Count == 0)
                     return new EmptyNode();
                 else
-                    return new CompoundStatementNode(nodes);
+                    return new ExpressionListNode(nodes);
             }
         }
 

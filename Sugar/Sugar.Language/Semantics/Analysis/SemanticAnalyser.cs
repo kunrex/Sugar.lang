@@ -12,13 +12,13 @@ using Sugar.Language.Semantics.ActionTrees;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
+using Sugar.Language.Parsing.Nodes.Statements;
 
 namespace Sugar.Language.Semantics.Analysis
 {
     internal sealed class SemanticAnalyser
     {
         public SyntaxTree Base { get; private set; }
-
 
         private readonly DefaultNameSpaceNode defaultNameSpace;
         private readonly CreatedNameSpaceCollectionNode createdNameSpaces;
@@ -33,46 +33,49 @@ namespace Sugar.Language.Semantics.Analysis
 
         public SugarPackage Analyse()
         {
-            var baseNode = Base.BaseNode;
+            StructureNamespacesAndTypes(Base.BaseNode);
 
-            switch (baseNode.NodeType)
-            {
-                case NodeType.Group:
-                    foreach (var child in baseNode.GetChildren())
-                        AnalyseNode(child);
-                    break;
-                default:
-                    AnalyseNode(baseNode);
-                    break;
-            }
+            ValidateImportStatements(defaultNameSpace);
+            for (int i = 0; i < createdNameSpaces.NamespaceCount; i++)
+                ValidateImportStatements(createdNameSpaces[i]);
 
             createdNameSpaces.Print("");
+            defaultNameSpace.Print("", true);
             return new SugarPackage(defaultNameSpace, createdNameSpaces);
         }
 
-        private void AnalyseNode(Node node)
+        private void StructureNamespacesAndTypes(Node node)
         {
-            switch(node.NodeType)
-            {
-                case NodeType.Group:
-                    foreach (var child in node.GetChildren())
-                        AnalyseNode(child);
-                    break;
-                default:
+            bool allowImports = true;
+            List<ImportNode> importStatements = new List<ImportNode>();
 
-                case NodeType.Namespace:
-                    AnalyseNameSpace((NamespaceNode)node);
-                    break;
-                case NodeType.Enum:
-                case NodeType.Class:
-                case NodeType.Struct:
-                case NodeType.Interface:
-                    defaultNameSpace.AddDataType(CreateDataType((UDDataTypeNode)node, defaultNameSpace));
-                    break;
+            foreach (var child in node.GetChildren())
+            {
+                switch (child.NodeType)
+                {
+                    case NodeType.Import:
+                        if (!allowImports)
+                            throw new Exception("Import statements must preceed all definitions");
+                        importStatements.Add((ImportNode)child);
+                        break;
+                    case NodeType.Namespace:
+                        allowImports = false;
+                        AnalyseNameSpace((NamespaceNode)child, importStatements);
+                        break;
+                    case NodeType.Enum:
+                    case NodeType.Class:
+                    case NodeType.Struct:
+                    case NodeType.Interface:
+                        allowImports = false;
+                        defaultNameSpace.AddDataType(CreateDataType((UDDataTypeNode)child, defaultNameSpace, importStatements));
+                        break;
+                    default:
+                        throw new Exception("Invalid statement");
+                }
             }
         }
 
-        private void AnalyseNameSpace(NamespaceNode node)
+        private void AnalyseNameSpace(NamespaceNode node, List<ImportNode> importStatements)
         {
             var name = node.Name;
             INameSpaceCollection collection = createdNameSpaces;
@@ -109,7 +112,7 @@ namespace Sugar.Language.Semantics.Analysis
                     case NodeType.Class:
                     case NodeType.Struct:
                     case NodeType.Interface:
-                        dataTypeCollection.AddDataType(CreateDataType((UDDataTypeNode)child, dataTypeCollection));
+                        dataTypeCollection.AddDataType(CreateDataType((UDDataTypeNode)child, dataTypeCollection, importStatements));
                         break;
                     default:
                         throw new Exception("invalid statement");
@@ -133,7 +136,7 @@ namespace Sugar.Language.Semantics.Analysis
             }
         }
 
-        private DataType CreateDataType(UDDataTypeNode dataTypeNode, IDataTypeCollection collection)
+        private DataType CreateDataType(UDDataTypeNode dataTypeNode, IDataTypeCollection collection, List<ImportNode> importStatements)
         {
             DataType createdType;
 
@@ -144,16 +147,16 @@ namespace Sugar.Language.Semantics.Analysis
             switch(dataTypeNode.NodeType)
             {
                 case NodeType.Enum:
-                    createdType =  new EnumType(identifier);
+                    createdType =  new EnumType(identifier, importStatements, (EnumNode)dataTypeNode);
                     break;
                 case NodeType.Class:
-                    createdType =  new ClassType(identifier);
+                    createdType =  new ClassType(identifier, importStatements, (ClassNode)dataTypeNode);
                     break;
                 case NodeType.Struct:
-                    createdType =  new StructType(identifier);
+                    createdType =  new StructType(identifier, importStatements, (StructNode)dataTypeNode);
                     break;
                 default:
-                    createdType =  new InterfaceType(identifier);
+                    createdType =  new InterfaceType(identifier, importStatements, (InterfaceNode)dataTypeNode);
                     break;
             }
 
@@ -165,12 +168,63 @@ namespace Sugar.Language.Semantics.Analysis
                     case NodeType.Class:
                     case NodeType.Struct:
                     case NodeType.Interface:
-                        createdType.AddDataType(CreateDataType((UDDataTypeNode)child, createdType));
+                        createdType.AddDataType(CreateDataType((UDDataTypeNode)child, createdType, importStatements));
                         break;
                 }
             }
 
             return createdType;
+        }
+
+        private void ValidateImportStatements(CreatedNameSpaceNode namespaceNode)
+        {
+            for (int i = 0; i < namespaceNode.NamespaceCount; i++)
+                ValidateImportStatements(namespaceNode[i]);
+
+            ValidateImportStatements((IDataTypeCollection)namespaceNode);
+        }
+
+        private void ValidateImportStatements(IDataTypeCollection collection)
+        {
+            for(int i = 0; i < collection.DatatypeCount; i++)
+            {
+                var dataType = collection[i];
+
+                foreach (var import in dataType.GetReferencedNamespaces())
+                    ValidateNamespaceExistance(import.Name);
+            }
+        }
+
+        private bool ValidateNamespaceExistance(Node name)
+        {
+            Node current = name;
+            INameSpaceCollection collection = createdNameSpaces;
+
+            while(true)
+            {
+                switch(current.NodeType)
+                {
+                    case NodeType.Dot:
+                        var dot = (DotExpression)current;
+                        Validate((IdentifierNode)dot.RHS);
+
+                        current = dot.LHS;
+                        break;
+                    case NodeType.Variable:
+                        Validate((IdentifierNode)current);
+                        break;
+                    default:
+                        throw new Exception("parser aint working mate");
+
+                }
+            }
+
+            void Validate(IdentifierNode name)
+            {
+                var result = collection.TryFindNameSpace(name);
+                if (result == null)
+                    throw new Exception($"namespace {name} doesn't exist");
+            }
         }
     }
 }

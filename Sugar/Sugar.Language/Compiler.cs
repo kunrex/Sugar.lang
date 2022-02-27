@@ -67,6 +67,8 @@ namespace Sugar.Language
                 if (!parseResult)
                     return;
 
+                Console.WriteLine("\n_____Analysed_____");
+
                 var analyser = new SemanticAnalyser(SyntaxTree);
 
                 var analysisResult = analyser.Analyse();
