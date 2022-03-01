@@ -13,6 +13,9 @@ using Sugar.Language.Semantics.ActionTrees.Namespaces;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
 using Sugar.Language.Parsing.Nodes.Statements;
+using Sugar.Language.Parsing.Nodes.UDDataTypes.Enums;
+using Sugar.Language.Semantics.Analysis.Structure;
+using Sugar.Language.Semantics.ActionTrees.Enums;
 
 namespace Sugar.Language.Semantics.Analysis
 {
@@ -35,12 +38,13 @@ namespace Sugar.Language.Semantics.Analysis
         {
             StructureNamespacesAndTypes(Base.BaseNode);
 
+            createdNameSpaces.Print("");
+            defaultNameSpace.Print("", true);
+
             ValidateImportStatements(defaultNameSpace);
             for (int i = 0; i < createdNameSpaces.NamespaceCount; i++)
                 ValidateImportStatements(createdNameSpaces[i]);
 
-            createdNameSpaces.Print("");
-            defaultNameSpace.Print("", true);
             return new SugarPackage(defaultNameSpace, createdNameSpaces);
         }
 
@@ -191,39 +195,132 @@ namespace Sugar.Language.Semantics.Analysis
                 var dataType = collection[i];
 
                 foreach (var import in dataType.GetReferencedNamespaces())
-                    ValidateNamespaceExistance(import.Name);
+                {
+                    switch(import.EntityType)
+                    {
+                        case UDDataType.Namespace:
+                            ValidateNameSpaceNode(import.Name);
+                            break;
+                        case UDDataType.Enum:
+                            var enumType = ValidateDataExistance(import.Name);
+
+                            if (enumType.TypeEnum != DataTypeEnum.Enum)
+                                throw new Exception($"{enumType.Name} is not an enum");
+                            break;
+                        case UDDataType.Class:
+                            var classType = ValidateDataExistance(import.Name);
+
+                            if (classType.TypeEnum != DataTypeEnum.Class)
+                                throw new Exception($"{classType.Name} is not a class");
+                            break;
+                        case UDDataType.Struct:
+                            var structType = ValidateDataExistance(import.Name);
+
+                            if (structType.TypeEnum != DataTypeEnum.Struct)
+                                throw new Exception($"{structType.Name} is not a struct");
+                            break;
+                        default:
+                            var interfaceType = ValidateDataExistance(import.Name);
+
+                            if (interfaceType.TypeEnum != DataTypeEnum.Interface)
+                                throw new Exception($"{interfaceType.Name} is not an interface");
+                            break;
+                    }
+                }
             }
         }
 
-        private bool ValidateNamespaceExistance(Node name)
+        private CreatedNameSpaceNode ValidateNameSpaceNode(Node name)
+        {
+            var result = FindPossibleNamespaceNode(name);
+
+            if(!result.CompleteValidation)
+                throw new Exception($"namespace not found");
+
+            return result.CreatedNameSpace;
+        }
+
+        private FindNamespaceResult FindPossibleNamespaceNode(Node name)
         {
             Node current = name;
             INameSpaceCollection collection = createdNameSpaces;
 
             while(true)
             {
-                switch(current.NodeType)
+                switch (current.NodeType)
                 {
                     case NodeType.Dot:
                         var dot = (DotExpression)current;
-                        Validate((IdentifierNode)dot.RHS);
+                        var result = collection.TryFindNameSpace((IdentifierNode)dot.LHS);
+                        if (result == null)
+                            return new FindNamespaceResult(false, (CreatedNameSpaceNode)collection);
 
-                        current = dot.LHS;
+                        current = dot.RHS;
+                        collection = result;
                         break;
                     case NodeType.Variable:
-                        Validate((IdentifierNode)current);
-                        break;
-                    default:
-                        throw new Exception("parser aint working mate");
+                        result = collection.TryFindNameSpace((IdentifierNode)current);
 
+                        if(result == null)
+                            return new FindNamespaceResult(false, (CreatedNameSpaceNode)collection);
+                        else
+                            return new FindNamespaceResult(true, result);
+                    default:
+                        throw new Exception("Parser aint working mate");
+                }
+            }
+        }
+
+        private DataType ValidateDataExistance(Node name)
+        {
+            var findResult = FindPossibleNamespaceNode(name);
+
+            if (findResult.CompleteValidation)
+                throw new Exception("type expected, namespace found");
+
+            var nameSpace = findResult.CreatedNameSpace;
+
+            var current = name;
+            while (true)
+                if (current.NodeType == NodeType.Dot)
+                {
+                    var dot = (DotExpression)current;
+
+                    current = dot.RHS;
+                    if (((IdentifierNode)dot.LHS).Value == nameSpace.Name)
+                        break;
+                }
+                else
+                    break;
+
+            var dataTypeCollection = (IDataTypeCollection)nameSpace;
+
+            while(true)
+            {
+                switch (current.NodeType)
+                {
+                    case NodeType.Dot:
+                        var dot = (DotExpression)current;
+                        var result = Validate((IdentifierNode)dot.LHS);
+
+                        current = dot.RHS;
+                        dataTypeCollection = result;
+                        break;
+                    case NodeType.Variable:
+                        return Validate((IdentifierNode)current);
+                    default:
+                        throw new Exception("Parser aint working mate");
                 }
             }
 
-            void Validate(IdentifierNode name)
+            DataType Validate(IdentifierNode name)
             {
-                var result = collection.TryFindNameSpace(name);
+                var result = dataTypeCollection.TryFindDataType(name);
+
                 if (result == null)
-                    throw new Exception($"namespace {name} doesn't exist");
+                    throw new Exception("data Type doesn't exist");
+
+                return result;
             }
         }
     }
