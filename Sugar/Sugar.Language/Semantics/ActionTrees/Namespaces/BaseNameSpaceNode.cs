@@ -6,11 +6,11 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
 
 namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 {
-    internal abstract class BaseNameSpaceNode : ActionTreeNode, IDataTypeCollection
+    internal abstract class BaseNameSpaceNode : ParentableActionTreeNode<INameSpaceCollection>, IDataTypeCollection
     {
         protected readonly List<DataType> dataTypes;
 
-        public int DatatypeCount { get => dataTypes.Count; }
+        public int DataTypeCount { get => dataTypes.Count; }
 
         public DataType this[int index]
         {
@@ -27,15 +27,6 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             dataTypes.Add(dataType);
 
             return this;
-        }
-
-        public bool ContainsDataType(DataType dataTypeToCheck)
-        {
-            foreach (var type in dataTypes)
-                if (dataTypeToCheck == type)
-                    return true;
-
-            return false;
         }
 
         public DataType TryFindDataType(IdentifierNode identifier)

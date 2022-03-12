@@ -20,7 +20,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             subNamespaces = new List<CreatedNameSpaceNode>();
         }
 
-        public int NamespaceCount { get => subNamespaces.Count; }
+        public int NameSpaceCount { get => subNamespaces.Count; }
 
         public CreatedNameSpaceNode this[int index]
         {

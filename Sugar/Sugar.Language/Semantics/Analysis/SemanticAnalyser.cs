@@ -16,6 +16,10 @@ using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.UDDataTypes.Enums;
 using Sugar.Language.Semantics.Analysis.Structure;
 using Sugar.Language.Semantics.ActionTrees.Enums;
+using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
+using Sugar.Language.Semantics.ActionTrees.VariableCreation;
+using Sugar.Language.Parsing.Nodes.Types;
+using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 
 namespace Sugar.Language.Semantics.Analysis
 {
@@ -38,12 +42,16 @@ namespace Sugar.Language.Semantics.Analysis
         {
             StructureNamespacesAndTypes(Base.BaseNode);
 
-            createdNameSpaces.Print("");
+            createdNameSpaces.Print("", true);
             defaultNameSpace.Print("", true);
 
             ValidateImportStatements(defaultNameSpace);
-            for (int i = 0; i < createdNameSpaces.NamespaceCount; i++)
+            for (int i = 0; i < createdNameSpaces.NameSpaceCount; i++)
                 ValidateImportStatements(createdNameSpaces[i]);
+
+            CrateGlobalMembers(defaultNameSpace);
+            for (int i = 0; i < createdNameSpaces.NameSpaceCount; i++)
+                CrateGlobalMembers(createdNameSpaces[i]);
 
             return new SugarPackage(defaultNameSpace, createdNameSpaces);
         }
@@ -182,52 +190,62 @@ namespace Sugar.Language.Semantics.Analysis
 
         private void ValidateImportStatements(CreatedNameSpaceNode namespaceNode)
         {
-            for (int i = 0; i < namespaceNode.NamespaceCount; i++)
+            for (int i = 0; i < namespaceNode.NameSpaceCount; i++)
                 ValidateImportStatements(namespaceNode[i]);
 
-            ValidateImportStatements((IDataTypeCollection)namespaceNode);
+            ValidateImportStatements(namespaceNode, namespaceNode);
         }
 
         private void ValidateImportStatements(IDataTypeCollection collection)
         {
-            for(int i = 0; i < collection.DatatypeCount; i++)
+            for (int i = 0; i < collection.DataTypeCount; i++)
             {
                 var dataType = collection[i];
+                ValidateImportStatements(dataType);
 
-                foreach (var import in dataType.GetReferencedNamespaces())
+                ValidateImportStatements((IDataTypeCollection)dataType);
+            }
+        }
+
+        private void ValidateImportStatements(IDataTypeCollection collection, CreatedNameSpaceNode baseNamespaceNode)
+        {
+            for(int i = 0; i < collection.DataTypeCount; i++)
+            {
+                var dataType = collection[i];
+                ValidateImportStatements(dataType);
+
+                if (baseNamespaceNode != null)
+                    dataType.WithReferencedNamespace(baseNamespaceNode);
+
+                ValidateImportStatements(dataType, baseNamespaceNode);
+            }
+        }
+
+        private void ValidateImportStatements(DataType dataType)
+        {
+            foreach (var import in dataType.GetReferencedNamespaces())
+            {
+                if (import.EntityType == UDDataType.Namespace)
+                    dataType.WithReferencedNamespace(ValidateNameSpaceNode(import.Name));
+                else
                 {
-                    switch(import.EntityType)
+                    DataType type = ValidateDataExistance(import.Name);
+                    DataTypeEnum expected = import.EntityType switch
                     {
-                        case UDDataType.Namespace:
-                            ValidateNameSpaceNode(import.Name);
-                            break;
-                        case UDDataType.Enum:
-                            var enumType = ValidateDataExistance(import.Name);
+                        UDDataType.Enum => DataTypeEnum.Enum,
+                        UDDataType.Class => DataTypeEnum.Class,
+                        UDDataType.Struct => DataTypeEnum.Struct,
+                        _ => DataTypeEnum.Interface
+                    };
 
-                            if (enumType.TypeEnum != DataTypeEnum.Enum)
-                                throw new Exception($"{enumType.Name} is not an enum");
-                            break;
-                        case UDDataType.Class:
-                            var classType = ValidateDataExistance(import.Name);
+                    if (type.TypeEnum != expected)
+                        throw new Exception($"{type.Name} is not a(n) {expected}");
 
-                            if (classType.TypeEnum != DataTypeEnum.Class)
-                                throw new Exception($"{classType.Name} is not a class");
-                            break;
-                        case UDDataType.Struct:
-                            var structType = ValidateDataExistance(import.Name);
-
-                            if (structType.TypeEnum != DataTypeEnum.Struct)
-                                throw new Exception($"{structType.Name} is not a struct");
-                            break;
-                        default:
-                            var interfaceType = ValidateDataExistance(import.Name);
-
-                            if (interfaceType.TypeEnum != DataTypeEnum.Interface)
-                                throw new Exception($"{interfaceType.Name} is not an interface");
-                            break;
-                    }
+                    dataType.WithReferencedDataType(type);
                 }
             }
+
+            dataType.ReferenceParentNamespaces();
         }
 
         private CreatedNameSpaceNode ValidateNameSpaceNode(Node name)
@@ -321,6 +339,38 @@ namespace Sugar.Language.Semantics.Analysis
                     throw new Exception("data Type doesn't exist");
 
                 return result;
+            }
+        }
+
+        private void CrateGlobalMembers(IDataTypeCollection collection)
+        {
+            for (int i = 0; i < collection.DataTypeCount; i++)
+                CreateGlobalMembers(collection[i]);
+        }
+
+        private void CreateGlobalMembers(DataType dataType)
+        {
+            switch(dataType.TypeEnum)
+            {
+                case DataTypeEnum.Class:
+                    CreateClassMembers((ClassType)dataType);
+                    break;
+            }
+        }
+
+        private void CreateClassMembers(ClassType classType)
+        {
+            foreach(var node in classType.Skeleton.GetChildren())
+            {
+                switch(node.NodeType)
+                {
+                    case NodeType.Declaration:
+                        var declaration = (DeclarationNode)node;
+                        var type = (CustomTypeNode)declaration.Type;
+
+                        classType.AddDeclaration(new GlobalVariableDeclaration(classType.FindReferencedType(type.CustomType, defaultNameSpace), (IdentifierNode)declaration.Name));
+                        break;
+                }
             }
         }
     }

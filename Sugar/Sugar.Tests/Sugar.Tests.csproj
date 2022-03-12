@@ -16,4 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Sugar.Language\Sugar.Language.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.editorconfig" />
+  </ItemGroup>
 </Project>

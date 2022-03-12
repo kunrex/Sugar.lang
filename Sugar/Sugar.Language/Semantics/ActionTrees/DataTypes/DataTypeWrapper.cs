@@ -9,7 +9,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
     internal abstract class DataTypeWrapper<T> : DataType where T : UDDataTypeNode
     {
-        protected T Skeleton { get; set; }
+        public T Skeleton { get; protected set; }
 
         public DataTypeWrapper(IdentifierNode _name, List<ImportNode> _imports, T _skeleton) : base(_name, _imports)
         {

@@ -1,20 +1,11 @@
 ﻿using System;
 
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
+
 namespace Sugar.Language.Semantics.ActionTrees
 {
-    internal abstract class ActionTreeNode 
+    internal abstract class ActionTreeNode : IActionTreeNode, IPrintable
     {
-        public ActionTreeNode Parent { get; protected set; }
-
-        public void SetParent() => SetChildrenParent();
-
-        public void SetParent(ActionTreeNode _parent)
-        {
-            Parent = _parent;
-
-            SetParent();
-        }
-
         public void Print(string indent, bool last)
         {
             Console.Write(indent);
@@ -34,9 +25,8 @@ namespace Sugar.Language.Semantics.ActionTrees
             PrintChildren(indent);
         }
 
-        public abstract override string ToString();
-
-        protected virtual void SetChildrenParent() { }
         protected virtual void PrintChildren(string indent) { }
+
+        public abstract override string ToString();
     }
 }

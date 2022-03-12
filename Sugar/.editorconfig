@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0026: Use expression body for indexers
+csharp_style_expression_bodied_indexers = false

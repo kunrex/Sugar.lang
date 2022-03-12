@@ -10,6 +10,7 @@ namespace Sugar.Language.Semantics.ActionTrees.VariableCreation
     {
         public GlobalVariableDeclaration(DataType _creationType, IdentifierNode _creationName) : base(_creationType, _creationName)
         {
+
         }
 
         public override string ToString() => $"Global Variable Declaraion [{CreationName.Value}]";

@@ -6,9 +6,9 @@ using Sugar.Language.Semantics.ActionTrees.Namespaces;
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces
 {
-    internal interface INameSpaceCollection 
+    internal interface INameSpaceCollection : IActionTreeNode
     {
-        public int NamespaceCount { get; }
+        public int NameSpaceCount { get; }
 
         public CreatedNameSpaceNode this[int index] { get; }
 

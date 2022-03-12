@@ -2,7 +2,7 @@
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
-    internal interface IOperatorContainer
+    internal interface IOperatorContainer 
     {
 
     }

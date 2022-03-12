@@ -3,15 +3,16 @@ using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Values;
 
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
 
 namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 {
-    internal sealed class CreatedNameSpaceCollectionNode : INameSpaceCollection
+    internal sealed class CreatedNameSpaceCollectionNode : INameSpaceCollection, IPrintable
     {
         private readonly List<CreatedNameSpaceNode> namespaces;
 
-        public int NamespaceCount { get => namespaces.Count; }
+        public int NameSpaceCount { get => namespaces.Count; }
 
         public CreatedNameSpaceNode this[int index]
         {
@@ -39,7 +40,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             return this;
         }
 
-        public void Print(string indent)
+        public void Print(string indent, bool last)
         {
             for (int i = 0; i < namespaces.Count; i++)
                 namespaces[i].Print(indent, i == namespaces.Count - 1);
