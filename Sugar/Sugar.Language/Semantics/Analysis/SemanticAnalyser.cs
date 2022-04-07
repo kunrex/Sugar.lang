@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Sugar.Language.Tokens.Enums;
+
 using Sugar.Language.Parsing;
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Enums;
@@ -18,21 +20,22 @@ using Sugar.Language.Semantics.Analysis.Structure;
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
 using Sugar.Language.Semantics.ActionTrees.VariableCreation;
-using Sugar.Language.Parsing.Nodes.Types;
 using Sugar.Language.Parsing.Nodes.Types.Subtypes;
+using Sugar.Language.Parsing.Nodes.Describers;
+using Sugar.Language.Semantics.ActionTrees.Describers;
 
 namespace Sugar.Language.Semantics.Analysis
 {
     internal sealed class SemanticAnalyser
     {
-        public SyntaxTree Base { get; private set; }
+        public SyntaxTreeCollection Collection { get; private set; }
 
         private readonly DefaultNameSpaceNode defaultNameSpace;
         private readonly CreatedNameSpaceCollectionNode createdNameSpaces;
 
-        public SemanticAnalyser(SyntaxTree _base)
+        public SemanticAnalyser(SyntaxTreeCollection _collection)
         {
-            Base = _base;
+            Collection = _collection;
 
             defaultNameSpace = new DefaultNameSpaceNode();
             createdNameSpaces = new CreatedNameSpaceCollectionNode();
@@ -40,26 +43,25 @@ namespace Sugar.Language.Semantics.Analysis
 
         public SugarPackage Analyse()
         {
-            StructureNamespacesAndTypes(Base.BaseNode);
+            foreach (var tree in Collection)
+                StructureTree(tree.BaseNode);
 
             createdNameSpaces.Print("", true);
             defaultNameSpace.Print("", true);
 
             ValidateImportStatements(defaultNameSpace);
-            for (int i = 0; i < createdNameSpaces.NameSpaceCount; i++)
-                ValidateImportStatements(createdNameSpaces[i]);
+            ValidateImportStatements(createdNameSpaces);
 
-            CrateGlobalMembers(defaultNameSpace);
-            for (int i = 0; i < createdNameSpaces.NameSpaceCount; i++)
-                CrateGlobalMembers(createdNameSpaces[i]);
+            CreateCollectionGlobalMembers(defaultNameSpace);
+            CreateCollectionGlobalMembers(createdNameSpaces);
 
             return new SugarPackage(defaultNameSpace, createdNameSpaces);
         }
 
-        private void StructureNamespacesAndTypes(Node node)
+        private void StructureTree(Node node)
         {
             bool allowImports = true;
-            List<ImportNode> importStatements = new List<ImportNode>();
+            var importStatements = new List<ImportNode>();
 
             foreach (var child in node.GetChildren())
             {
@@ -79,7 +81,7 @@ namespace Sugar.Language.Semantics.Analysis
                     case NodeType.Struct:
                     case NodeType.Interface:
                         allowImports = false;
-                        defaultNameSpace.AddDataType(CreateDataType((UDDataTypeNode)child, defaultNameSpace, importStatements));
+                        defaultNameSpace.AddEntity(CreateDataType((UDDataTypeNode)child, defaultNameSpace, importStatements));
                         break;
                     default:
                         throw new Exception("Invalid statement");
@@ -100,12 +102,12 @@ namespace Sugar.Language.Semantics.Analysis
                         var dotExpression = (DotExpression)name;
                         var lhs = (IdentifierNode)dotExpression.LHS;
 
-                        collection = EvaluateResult(lhs, collection);
+                        collection = EvaluateResult(lhs);
                         name = dotExpression.RHS;
                         break;
                     case NodeType.Variable:
                         var converted = (IdentifierNode)name;
-                        collection = EvaluateResult(converted, collection);
+                        collection = EvaluateResult(converted);
 
                         name = null;
                         break;
@@ -124,20 +126,20 @@ namespace Sugar.Language.Semantics.Analysis
                     case NodeType.Class:
                     case NodeType.Struct:
                     case NodeType.Interface:
-                        dataTypeCollection.AddDataType(CreateDataType((UDDataTypeNode)child, dataTypeCollection, importStatements));
+                        dataTypeCollection.AddEntity(CreateDataType((UDDataTypeNode)child, dataTypeCollection, importStatements));
                         break;
                     default:
                         throw new Exception("invalid statement");
                 }
             }
 
-            INameSpaceCollection EvaluateResult(IdentifierNode identifier, INameSpaceCollection collection)
+            INameSpaceCollection EvaluateResult(IdentifierNode identifier)
             {
                 var result = collection.TryFindNameSpace(identifier);
                 if (result == null)
                 {
                     var created = new CreatedNameSpaceNode(identifier);
-                    collection.AddNameSpace(created);
+                    collection.AddEntity(created);
 
                     return created;
                 }
@@ -180,7 +182,7 @@ namespace Sugar.Language.Semantics.Analysis
                     case NodeType.Class:
                     case NodeType.Struct:
                     case NodeType.Interface:
-                        createdType.AddDataType(CreateDataType((UDDataTypeNode)child, createdType, importStatements));
+                        createdType.AddEntity(CreateDataType((UDDataTypeNode)child, createdType, importStatements));
                         break;
                 }
             }
@@ -188,30 +190,36 @@ namespace Sugar.Language.Semantics.Analysis
             return createdType;
         }
 
-        private void ValidateImportStatements(CreatedNameSpaceNode namespaceNode)
-        {
-            for (int i = 0; i < namespaceNode.NameSpaceCount; i++)
-                ValidateImportStatements(namespaceNode[i]);
-
-            ValidateImportStatements(namespaceNode, namespaceNode);
-        }
-
         private void ValidateImportStatements(IDataTypeCollection collection)
         {
             for (int i = 0; i < collection.DataTypeCount; i++)
             {
-                var dataType = collection[i];
+                var dataType = collection.GetSubDataType(i);
                 ValidateImportStatements(dataType);
 
                 ValidateImportStatements((IDataTypeCollection)dataType);
             }
         }
 
+        private void ValidateImportStatements(INameSpaceCollection collection)
+        {
+            for (int i = 0; i < collection.NameSpaceCount; i++)
+                ValidateImportStatements(collection.GetSubNameSpace(i));
+        }
+
+        private void ValidateImportStatements(CreatedNameSpaceNode namespaceNode)
+        {
+            for (int i = 0; i < namespaceNode.NameSpaceCount; i++)
+                ValidateImportStatements(namespaceNode.GetSubNameSpace(i));
+
+            ValidateImportStatements(namespaceNode, namespaceNode);
+        }
+
         private void ValidateImportStatements(IDataTypeCollection collection, CreatedNameSpaceNode baseNamespaceNode)
         {
             for(int i = 0; i < collection.DataTypeCount; i++)
             {
-                var dataType = collection[i];
+                var dataType = collection.GetSubDataType(i);
                 ValidateImportStatements(dataType);
 
                 if (baseNamespaceNode != null)
@@ -342,15 +350,31 @@ namespace Sugar.Language.Semantics.Analysis
             }
         }
 
-        private void CrateGlobalMembers(IDataTypeCollection collection)
+        private void CreateCollectionGlobalMembers(IDataTypeCollection collection)
         {
             for (int i = 0; i < collection.DataTypeCount; i++)
-                CreateGlobalMembers(collection[i]);
+                CreateGlobalMembers(collection.GetSubDataType(i));
+        }
+
+        private void CreateCollectionGlobalMembers(INameSpaceCollection collection)
+        {
+            for (int i = 0; i < collection.NameSpaceCount; i++)
+                CreateGlobalMembers(collection.GetSubNameSpace(i));
+        }
+
+        private void CreateGlobalMembers(CreatedNameSpaceNode nameSpace)
+        {
+            int i;
+            for (i = 0; i < nameSpace.DataTypeCount; i++)
+                CreateGlobalMembers(nameSpace.GetSubDataType(i));
+
+            for (i = 0; i < nameSpace.NameSpaceCount; i++)
+                CreateGlobalMembers(nameSpace.GetSubNameSpace(i));
         }
 
         private void CreateGlobalMembers(DataType dataType)
         {
-            switch(dataType.TypeEnum)
+            switch (dataType.TypeEnum)
             {
                 case DataTypeEnum.Class:
                     CreateClassMembers((ClassType)dataType);
@@ -362,16 +386,56 @@ namespace Sugar.Language.Semantics.Analysis
         {
             foreach(var node in classType.Skeleton.GetChildren())
             {
-                switch(node.NodeType)
+                switch (node.NodeType)
                 {
                     case NodeType.Declaration:
-                        var declaration = (DeclarationNode)node;
-                        var type = (CustomTypeNode)declaration.Type;
+                        var declarationNode = (DeclarationNode)node;
+                        var type = (CustomTypeNode)declarationNode.Type;
 
-                        classType.AddDeclaration(new GlobalVariableDeclaration(classType.FindReferencedType(type.CustomType, defaultNameSpace), (IdentifierNode)declaration.Name));
+                        var declaration = new GlobalVariableDeclaration(classType.FindReferencedType(type.CustomType, defaultNameSpace, createdNameSpaces), (IdentifierNode)declarationNode.Name, AnalyseDescriber((DescriberNode)declarationNode.Describer));
+
+                        if (!declaration.ValidateDescriber())
+                            throw new Exception("The describer is not valid on this item");
+
+                        classType.AddDeclaration(declaration);
                         break;
                 }
             }
+        }
+
+        private Describer AnalyseDescriber(DescriberNode describerNode) => new Describer(GatherDescribers(describerNode));
+
+        private DescriberEnum GatherDescribers(DescriberNode describerNode)
+        {
+            DescriberEnum describer = 0;
+
+            for(int i = 0; i < describerNode.ChildCount; i++)
+            {
+                var child = (DescriberKeywordNode)describerNode[i];
+
+                switch(child.Keyword.SyntaxKind)
+                {
+                    case SyntaxKind.Public:
+                        describer |= DescriberEnum.Public;
+                        break;
+                    case SyntaxKind.Private:
+                        describer |= DescriberEnum.Private;
+                        break;
+                    case SyntaxKind.Protected:
+                        describer |= DescriberEnum.Protected;
+                        break;
+
+                    case SyntaxKind.Static:
+                        describer |= DescriberEnum.Static;
+                        break;
+
+                    case SyntaxKind.Sealed:
+                        describer |= DescriberEnum.Sealed;
+                        break;
+                }
+            }
+
+            return describer;
         }
     }
 }

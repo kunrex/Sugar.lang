@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Sugar.Language.Parsing.Nodes.UDDataTypes;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Statements;
+using Sugar.Language.Parsing.Nodes.UDDataTypes;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.VariableCreation;
@@ -22,8 +22,6 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             globalVariableDeclarations = new List<GlobalVariableDeclaration>();
         }
 
-        public override string ToString() => $"Class Node [{Name.Value}]";
-
         public GlobalVariableDeclaration TryFindDeclaration(IdentifierNode identifier)
         {
             foreach (var declaration in globalVariableDeclarations)
@@ -39,5 +37,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
             return this;
         }
+
+        public override string ToString() => $"Class Node [{name.Value}]";
     }
 }

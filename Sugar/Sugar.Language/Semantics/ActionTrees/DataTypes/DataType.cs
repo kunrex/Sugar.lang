@@ -16,7 +16,9 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
     internal abstract class DataType : ParentableActionTreeNode<IDataTypeCollection>, IDataTypeCollection
     {
         public abstract DataTypeEnum TypeEnum { get; }
-        public IdentifierNode Name { get; private set; }
+
+        protected readonly IdentifierNode name;
+        public string Name { get => name.Value; }
 
         protected readonly List<DataType> subTypes;
 
@@ -27,30 +29,27 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public int DataTypeCount { get => subTypes.Count; }
 
-        public DataType this[int index]
-        {
-            get => subTypes[index];
-        }
-
         public DataType(IdentifierNode _name, List<ImportNode> _imports)
         {
-            Name = _name;
+            name = _name;
 
             referencedImports = _imports;
             subTypes = referencedTypes = new List<DataType>();
             referencedNameSpaces = new List<CreatedNameSpaceNode>();
         }
 
+        public DataType GetSubDataType(int index) => subTypes[index];
+
         public DataType TryFindDataType(IdentifierNode identifier)
         {
             foreach (var type in subTypes)
-                if (type.Name.Value == identifier.Value)
+                if (type.Name == identifier.Value)
                     return type;
 
             return null;
         }
 
-        public IDataTypeCollection AddDataType(DataType datatypeToAdd)
+        public IDataTypeCollection AddEntity(DataType datatypeToAdd)
         {
             subTypes.Add(datatypeToAdd);
             ReferenceSubType(datatypeToAdd);
@@ -63,7 +62,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             referencedTypes.Add(type);
 
             for (int i = 0; i < type.DataTypeCount; i++)
-                ReferenceSubType(type[i]);
+                ReferenceSubType(type.GetSubDataType(i));
         }
 
         public void ReferenceParentNamespaces()
@@ -113,101 +112,76 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             return this;
         }
 
-        public DataType FindReferencedType(Node type, DefaultNameSpaceNode defaultNameSpace)
+        public DataType FindReferencedType(Node type, DefaultNameSpaceNode defaultNameSpace, CreatedNameSpaceCollectionNode collectionNode)
         {
-            if(type.NodeType == NodeType.Variable)
-            {
-                var identifier = (IdentifierNode)type;
-                for(int i = 0; i < defaultNameSpace.DataTypeCount; i++)
-                {
-                    var defaultType = defaultNameSpace[i];
+            var dataTypes = new Queue<DataType>(referencedTypes);
+            var nameSpaces = new Queue<CreatedNameSpaceNode>(referencedNameSpaces);
 
-                    if (defaultType.Name.Value == identifier.Value)
-                        return defaultType;
-                }
-            }
-
-            var match = new Queue<IDataTypeCollection>(referencedNameSpaces);
-            foreach(var refType in referencedTypes)
-                match.Enqueue(refType);
+            for (int i = 0; i < defaultNameSpace.DataTypeCount; i++)
+                dataTypes.Enqueue(defaultNameSpace.GetSubDataType(i));
 
             var current = type;
-            while(true)
+            bool first = true;
+
+            while (true)
             {
                 switch(current.NodeType)
                 {
                     case NodeType.Dot:
                         var dot = (DotExpression)current;
 
-                        var lhs = (IdentifierNode)dot.LHS;
-                        var count = match.Count;
-                        for (int i = 0; i < count; i++)
-                        {
-                            switch (match.Dequeue())
-                            {
-                                case CreatedNameSpaceNode nameSpace:
-                                    var nameSpaceResult = nameSpace.TryFindNameSpace(lhs);
-                                    if (nameSpaceResult != null)
-                                        match.Enqueue(nameSpaceResult);
-
-                                    var result = nameSpace.TryFindDataType(lhs);
-                                    if (result != null)
-                                        match.Enqueue(result);
-                                    break;
-                                case DataType dataType:
-                                    Console.WriteLine(dataType.Name.Value);
-                                    result = dataType.TryFindDataType(lhs);
-
-                                    if (result != null)
-                                        match.Enqueue(result);
-                                    break;
-                            }
-                        }
-
+                        Match((IdentifierNode)dot.LHS);
                         current = dot.RHS;
                         break;
                     case NodeType.Variable:
-                        var identifier = (IdentifierNode)current;
+                        Match((IdentifierNode)current);
 
-                        count = match.Count;
-                        for (int i = 0; i < count; i++)
-                        {
-                            switch (match.Dequeue())
-                            {
-                                case CreatedNameSpaceNode nameSpace:
-                                    var nameSpaceResult = nameSpace.TryFindNameSpace(identifier);
-                                    if (nameSpaceResult != null)
-                                        match.Enqueue(nameSpaceResult);
-
-                                    var result = nameSpace.TryFindDataType(identifier);
-                                    if (result != null)
-                                        match.Enqueue(result);
-                                    break;
-                                case DataType dataType:
-                                    Console.WriteLine(dataType.Name.Value);
-                                    result = dataType.TryFindDataType(identifier);
-
-                                    if (result != null)
-                                        match.Enqueue(result);
-                                    break;
-                            }
-                        }
-
-                        switch(match.Count)
+                        switch (dataTypes.Count)
                         {
                             case 0:
-                                throw new Exception("type referenc doesn't exist");
+                                throw new Exception("type reference doesn't exist");
                             case 1:
-                                switch (match.Dequeue())
-                                {
-                                    case DataType dataType:
-                                        return dataType;
-                                    default:
-                                        throw new Exception("type referenc doesn't exist");
-                                }
+                                return dataTypes.Dequeue();
                             default:
-                                throw new Exception("Ambigious reference");
+                                throw new Exception("ambigious reference");
                         }
+                }
+
+                if (first)
+                    first = false;
+            }
+
+            void Match(IdentifierNode identifier)
+            {
+                int nameSpaceCount = nameSpaces.Count, dataTypeCount = dataTypes.Count;
+                for (int i = 0; i < nameSpaceCount; i++)
+                {
+                    var nameSpace = nameSpaces.Dequeue();
+
+                    var nameSpaceResult = nameSpace.TryFindNameSpace(identifier);
+
+                    if (nameSpaceResult != null)
+                        nameSpaces.Enqueue(nameSpaceResult);
+                    else if(first)
+                    {
+                        var baseNamespace = collectionNode.TryFindNameSpace(identifier);
+
+                        if (baseNamespace != null && baseNamespace != Parent)
+                            nameSpaces.Enqueue(baseNamespace);
+                    }
+
+                    TryFindDataType(nameSpace);
+                }
+
+                for(int i = 0; i < dataTypeCount; i++)
+                    TryFindDataType(dataTypes.Dequeue());
+
+                void TryFindDataType(IDataTypeCollection dataType)
+                {
+                    var result = dataType.TryFindDataType(identifier);
+
+                    if (result != null)
+                        dataTypes.Enqueue(result);
                 }
             }
         }

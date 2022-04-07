@@ -2,13 +2,17 @@
 
 using Sugar.Language.Parsing.Nodes.Values;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.Describers;
 
 namespace Sugar.Language.Semantics.ActionTrees.VariableCreation
 {
     internal sealed class GlobalVariableDeclaration : VariableCreationNode
     {
-        public GlobalVariableDeclaration(DataType _creationType, IdentifierNode _creationName) : base(_creationType, _creationName)
+        public override DescriberEnum Allowed { get => DescriberEnum.AccessModifiers | DescriberEnum.Static; }
+
+        public GlobalVariableDeclaration(DataType _creationType, IdentifierNode _creationName, Describer _describer) : base(_creationType, _creationName, _describer)
         {
 
         }

@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/*using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Sugar.Language;
 
@@ -568,3 +568,4 @@ namespace Sugar.Tests
         }
     }
 }
+*/

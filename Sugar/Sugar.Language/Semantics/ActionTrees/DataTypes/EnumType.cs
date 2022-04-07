@@ -18,6 +18,6 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         }
 
-        public override string ToString() => $"Enum Node [{Name.Value}]";
+        public override string ToString() => $"Enum Node [{name.Value}]";
     }
 }

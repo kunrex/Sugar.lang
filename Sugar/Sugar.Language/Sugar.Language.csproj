@@ -70,6 +70,8 @@
     <None Remove="Semantics\WrapperFiles\" />
     <None Remove="Semantics\ActionTrees\VariableCreation\" />
     <None Remove="Semantics\Analysis\Structure\" />
+    <None Remove="Semantics\ActionTrees\Interfaces\Describers\" />
+    <None Remove="Semantics\ActionTrees\Describers\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -135,6 +137,8 @@
     <Folder Include="Semantics\WrapperFiles\" />
     <Folder Include="Semantics\ActionTrees\VariableCreation\" />
     <Folder Include="Semantics\Analysis\Structure\" />
+    <Folder Include="Semantics\ActionTrees\Interfaces\Describers\" />
+    <Folder Include="Semantics\ActionTrees\Describers\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

@@ -6,13 +6,11 @@ using Sugar.Language.Semantics.ActionTrees.Namespaces;
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces
 {
-    internal interface INameSpaceCollection : IActionTreeNode
+    internal interface INameSpaceCollection : IEntityCollection<CreatedNameSpaceNode, INameSpaceCollection>
     {
         public int NameSpaceCount { get; }
 
-        public CreatedNameSpaceNode this[int index] { get; }
-
+        public CreatedNameSpaceNode GetSubNameSpace(int index);
         public CreatedNameSpaceNode TryFindNameSpace(IdentifierNode identifier);
-        public INameSpaceCollection AddNameSpace(CreatedNameSpaceNode namespaceToAdd);
     }
 }

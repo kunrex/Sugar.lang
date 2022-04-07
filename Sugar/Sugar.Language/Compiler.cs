@@ -1,82 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Sugar.Language.Lexing;
-using Sugar.Language.Parsing;
-using Sugar.Language.Tokens;
 using Sugar.Language.Exceptions;
 using Sugar.Language.Parsing.Parser;
 
 using Sugar.Language.Semantics.Analysis;
+using Sugar.Language.Parsing;
 
 namespace Sugar.Language
 {
     public sealed class Compiler
     {
-        private readonly string sourceCode;
-        public string SourceCode { get => sourceCode; }
+        private readonly string[] sourceFiles;
 
-        private List<Token> Tokens { get; set; }
-        private SyntaxTree SyntaxTree { get; set; }
-
-        public Compiler(string _sourceCode)
+        public Compiler(string source)
         {
-            sourceCode = _sourceCode;
-
-            Console.WriteLine("_____Source_____");
-            Console.WriteLine(sourceCode);
+            sourceFiles = new string[] { source };
         }
 
-        public bool Lex()
+        public Compiler(List<string> source)
         {
-            Lexer lexer = new Lexer(sourceCode);
-            Tokens = lexer.Lex();
-
-            Console.WriteLine("\n_____Lexed_____");
-            Console.WriteLine(string.Join('\n', Tokens));
-
-            return true;
+            sourceFiles = source.ToArray();
         }
 
-        public bool Parse()
-        {
-            SyntaxTree = new Parser(Tokens).Parse();
-
-            Console.WriteLine("\n_____Parsed_____");
-
-            if (SyntaxTree == null)
-            {
-                Console.WriteLine("Source Code Empty");
-                return false;
-            }
-            else
-                SyntaxTree.BaseNode.Print("", true);
-
-            SyntaxTree.ParentNodes();
-            return true;
-        }
-
-        public void Compile()
+        public bool Compile()
         {
             try
             {
-                Lex();
+                var treeCollection = new SyntaxTreeCollection();
+                foreach(var source in sourceFiles)
+                {
+                    var tokens = new Lexer(source).Lex();
 
-                var parseResult = Parse();
-                if (!parseResult)
-                    return;
+                    var tree = new Parser(tokens).Parse();
+                    if (tree == null)
+                    {
+                        Console.WriteLine("Source Code Empty");
+                        continue;
+                    }
 
-                Console.WriteLine("\n_____Analysed_____");
+                    treeCollection.Add(tree);
+                    tree.BaseNode.Print("", true);
+                }
 
-                var analyser = new SemanticAnalyser(SyntaxTree);
+                if(treeCollection.Count == 0)
+                {
+                    Console.WriteLine("No Output");
+                    return true;
+                }    
 
-                var analysisResult = analyser.Analyse();
-                Console.WriteLine(analysisResult);
+                /*Console.WriteLine("\n_____Analysed_____");
+
+                var analysisResult = new SemanticAnalyser(treeCollection).Analyse();
+
+                Console.WriteLine(analysisResult);*/
+                return true;
             }
             catch(CompileException e)
             {
                 Console.WriteLine($"Exception: {e.Message}");
+                return false;
             }
         }
     }

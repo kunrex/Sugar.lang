@@ -14,15 +14,13 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 
         public int NameSpaceCount { get => namespaces.Count; }
 
-        public CreatedNameSpaceNode this[int index]
-        {
-            get => namespaces[index];
-        }
-
         public CreatedNameSpaceCollectionNode()
         {
             namespaces = new List<CreatedNameSpaceNode>();
         }
+
+
+        public CreatedNameSpaceNode GetSubNameSpace(int index) => namespaces[index];
 
         public CreatedNameSpaceNode TryFindNameSpace(IdentifierNode identifier)
         {
@@ -33,7 +31,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             return null;
         }
 
-        public INameSpaceCollection AddNameSpace(CreatedNameSpaceNode namespaceToAdd)
+        public INameSpaceCollection AddEntity(CreatedNameSpaceNode namespaceToAdd)
         {
             namespaces.Add(namespaceToAdd);
 

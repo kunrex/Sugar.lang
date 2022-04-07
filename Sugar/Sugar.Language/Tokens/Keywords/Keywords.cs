@@ -22,6 +22,7 @@ namespace Sugar.Language.Tokens.Keywords
         public static readonly Keyword Create = new Keyword("create", SyntaxKind.Create);
         public static readonly Keyword Import = new Keyword("import", SyntaxKind.Import);
         public static readonly Keyword AsType = new Keyword("astype", SyntaxKind.AsType);
+        public static readonly Keyword Parent = new Keyword("parent", SyntaxKind.Parent);
         public static readonly Keyword Default = new Keyword("default", SyntaxKind.Default);
 
         public static readonly Keyword Get = new Keyword("get", SyntaxKind.Get);
@@ -33,7 +34,7 @@ namespace Sugar.Language.Tokens.Keywords
 
         public static readonly Keyword[] Keywords =
         {
-            Input, Throw, Import, Print, Create, Var, Default, When, This, Get, Set, Try, Catch, Finally, AsType,
+            Input, Throw, Import, Print, Create, Var, Default, When, This, Get, Set, Try, Catch, Finally, AsType, Parent,
 
             TypeKeyword.Object, TypeKeyword.SByte, TypeKeyword.Byte, TypeKeyword.Short, TypeKeyword.UShort, TypeKeyword.Int,
             TypeKeyword.UInt, TypeKeyword.Long, TypeKeyword.Ulong, TypeKeyword.Float, TypeKeyword.Double, TypeKeyword.Decimal,

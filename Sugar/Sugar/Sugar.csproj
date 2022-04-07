@@ -8,4 +8,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Sugar.Language\Sugar.Language.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="PrimarySource\" />
+    <None Remove="Configurations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PrimarySource\" />
+    <Folder Include="Configurations\" />
+  </ItemGroup>
 </Project>

@@ -18,6 +18,6 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         }
 
-        public override string ToString() => $"Struct Node [{Name.Value}]";
+        public override string ToString() => $"Struct Node [{name.Value}]";
     }
 }

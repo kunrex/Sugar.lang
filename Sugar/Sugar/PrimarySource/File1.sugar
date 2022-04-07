@@ -1,0 +1,5 @@
+﻿
+    constructor Name() : parent(10, 20, "hi", x)
+    {
+
+    }

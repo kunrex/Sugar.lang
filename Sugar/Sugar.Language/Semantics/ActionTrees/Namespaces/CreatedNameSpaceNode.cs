@@ -22,10 +22,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 
         public int NameSpaceCount { get => subNamespaces.Count; }
 
-        public CreatedNameSpaceNode this[int index]
-        {
-            get => subNamespaces[index];
-        }
+        public CreatedNameSpaceNode GetSubNameSpace(int index) => subNamespaces[index];
 
         public override string ToString() => $"Created Name Space [{name.Value}]";
 
@@ -38,7 +35,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             return null;
         }
 
-        public INameSpaceCollection AddNameSpace(CreatedNameSpaceNode namespaceToAdd)
+        public INameSpaceCollection AddEntity(CreatedNameSpaceNode namespaceToAdd)
         {
             subNamespaces.Add(namespaceToAdd);
 
