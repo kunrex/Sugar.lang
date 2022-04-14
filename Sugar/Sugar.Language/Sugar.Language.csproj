@@ -68,10 +68,17 @@
     <None Remove="Semantics\ActionTrees\Interfaces\DataTypes\" />
     <None Remove="Semantics\ActionTrees\Enums\" />
     <None Remove="Semantics\WrapperFiles\" />
-    <None Remove="Semantics\ActionTrees\VariableCreation\" />
     <None Remove="Semantics\Analysis\Structure\" />
     <None Remove="Semantics\ActionTrees\Interfaces\Describers\" />
     <None Remove="Semantics\ActionTrees\Describers\" />
+    <None Remove="Semantics\ActionTrees\Functions\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\VariableCreation\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\PropertyCreationNode\" />
+    <None Remove="Semantics\ActionTrees\Interfaces\DataTypes\Properties\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\Functions\" />
+    <None Remove="Parsing\Nodes\Functions\Delegates\Structure\" />
+    <None Remove="Parsing\Nodes\Statements\VariableCreation\Delegates\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -131,14 +138,20 @@
     <Folder Include="Semantics\ActionTrees\DataTypes\" />
     <Folder Include="Semantics\ActionTrees\Namespaces\" />
     <Folder Include="Semantics\ActionTrees\Interfaces\" />
-    <Folder Include="Semantics\ActionTrees\Interfaces\Namespaces\" />
+    <Folder Include="Semantics\ActionTrees\Interfaces\Collections\" />
     <Folder Include="Semantics\ActionTrees\Interfaces\DataTypes\" />
     <Folder Include="Semantics\ActionTrees\Enums\" />
     <Folder Include="Semantics\WrapperFiles\" />
-    <Folder Include="Semantics\ActionTrees\VariableCreation\" />
     <Folder Include="Semantics\Analysis\Structure\" />
     <Folder Include="Semantics\ActionTrees\Interfaces\Describers\" />
     <Folder Include="Semantics\ActionTrees\Describers\" />
+    <Folder Include="Semantics\ActionTrees\Functions\" />
+    <Folder Include="Semantics\ActionTrees\CreatableNodes\" />
+    <Folder Include="Semantics\ActionTrees\CreatableNodes\VariableCreation\" />
+    <Folder Include="Semantics\ActionTrees\CreatableNodes\PropertyCreation\" />
+    <Folder Include="Semantics\ActionTrees\Interfaces\DataTypes\Properties\" />
+    <Folder Include="Semantics\ActionTrees\CreatableNodes\Functions\" />
+    <Folder Include="Parsing\Nodes\Statements\VariableCreation\Delegates\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

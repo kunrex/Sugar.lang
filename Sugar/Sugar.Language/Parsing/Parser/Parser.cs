@@ -52,6 +52,7 @@ using Sugar.Language.Parsing.Nodes.Conditions.SwitchConditions;
 using Sugar.Language.Parsing.Nodes.Values.Generics.Declarations;
 using Sugar.Language.Parsing.Nodes.Functions.Properties.Accessors;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
+using Sugar.Language.Parsing.Nodes.Statements.VariableCreation.Delegates;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations.OperatorOverloading;
 
 namespace Sugar.Language.Parsing.Parser
@@ -272,14 +273,23 @@ namespace Sugar.Language.Parsing.Parser
                         case KeywordType.Function:
                             return ParseFunctionKeyword(describer);
                         case KeywordType.General:
-                            if (TryMatchCurrent(Keyword.Var, true))
+                            switch(keyword.SyntaxKind)
                             {
-                                ForceMatchCurrent(Seperator.Colon, true);
-                                toReturn = ParseVariableDeclaration(new DescriberNode(), new AnonymousTypeNode());
-                                break;
+                                case SyntaxKind.Var:
+                                    index++;
+                                    ForceMatchCurrent(Seperator.Colon, true);
+                                    toReturn = ParseVariableDeclaration(new DescriberNode(), new AnonymousTypeNode());
+                                    break;
+                                case SyntaxKind.Action:
+                                    toReturn = ParseActionDelegateDeclaration(new DescriberNode());
+                                    break;
+                                case SyntaxKind.Function:
+                                    toReturn = ParseFunctionDelegateDeclaration(new DescriberNode());
+                                    break;
+                                default:
+                                    throw new TokenExpectedException(keyword, "Type", keyword.Index);
                             }
-
-                            throw new TokenExpectedException(keyword, "Type", keyword.Index);
+                            break;
                         case KeywordType.Type:
                             toReturn = ParseDeclaration(describer);
 
@@ -396,6 +406,12 @@ namespace Sugar.Language.Parsing.Parser
                     return ParseIfCondition();
                 case SyntaxKind.Switch:
                     return ParseSwitchCase();
+                case SyntaxKind.Action:
+                    toReturn = ParseActionDelegateDeclaration(new DescriberNode());
+                    break;
+                case SyntaxKind.Function:
+                    toReturn = ParseFunctionDelegateDeclaration(new DescriberNode());
+                    break;
                 default:
                     switch (((Keyword)current).KeywordType)
                     {
@@ -642,6 +658,51 @@ namespace Sugar.Language.Parsing.Parser
                 finallyBlock = new FinallyBlockNode(ParseBlock(ParseScopeType.Scope | ParseScopeType.SingleLine));
 
             return new TryCatchFinallyBlockNode(tryBlock, catchBlock, finallyBlock);
+        }
+
+        private Node ParseActionDelegateDeclaration(Node describer)
+        {
+            ForceMatchCurrent(Keyword.Action, true);
+            ForceMatchCurrent(Seperator.Colon, true);
+
+            ForceMatchCurrentType(TokenType.Identifier, false);
+            var name = new IdentifierNode((Identifier)Current);
+
+            index++;
+            ForceMatchCurrent(AssignmentOperator.Assignment, true);
+
+            var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
+            index++;
+
+            ForceMatchCurrent(Seperator.Lambda, true);
+            var body = ParseBlock(ParseScopeType.Scope);
+
+            index++;
+            return new ActionDelegateNode(describer, name, arguments, body);
+        }
+
+        private Node ParseFunctionDelegateDeclaration(Node describer)
+        {
+            ForceMatchCurrent(Keyword.Function);
+            var type = new FunctionTypeNode(ParseGenericCall(true));
+
+            index++;
+            ForceMatchCurrent(Seperator.Colon, true);
+
+            ForceMatchCurrentType(TokenType.Identifier, false);
+            var name = new IdentifierNode((Identifier)Current);
+
+            index++;
+            ForceMatchCurrent(AssignmentOperator.Assignment, true);
+
+            var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
+            index++;
+
+            ForceMatchCurrent(Seperator.Lambda, true);
+            var body = ParseBlock(ParseScopeType.Scope);
+
+            index++;
+            return new FunctionDelegateNode(describer, type, name, arguments, body);
         }
 
         //Expressions and Entities
@@ -992,7 +1053,6 @@ namespace Sugar.Language.Parsing.Parser
             while (index < tokens.Count)
             {
                 var current = Current;
-                Console.WriteLine(current.Value);
 
                 switch (current.Type)
                 {
@@ -1167,7 +1227,6 @@ namespace Sugar.Language.Parsing.Parser
                 else
                     break;
 
-            Console.WriteLine(node.NodeType);
             switch (node.NodeType)
             {
                 case NodeType.Type:

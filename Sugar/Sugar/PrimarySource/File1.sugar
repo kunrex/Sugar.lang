@@ -1,5 +1,6 @@
-﻿
-    constructor Name() : parent(10, 20, "hi", x)
-    {
+﻿function<int>: add = (int: y, int: z) => 
+{
+    return x + y;
+};
 
-    }
+print(add.invoke(10, 20));

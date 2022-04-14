@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
-using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 
 namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 {
@@ -26,7 +26,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             return this;
         }
 
-        public DataType TryFindDataType(IdentifierNode identifier)
+        public DataType TryFindDataType(IdentifierNode identifier) 
         {
             foreach (var type in dataTypes)
                 if (type.Name == identifier.Value)

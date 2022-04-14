@@ -9,7 +9,7 @@ using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
-using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
@@ -21,20 +21,29 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
         public string Name { get => name.Value; }
 
         protected readonly List<DataType> subTypes;
+        public int DataTypeCount { get => subTypes.Count; }
 
         protected readonly List<ImportNode> referencedImports;
+        public IEnumerable<ImportNode> ReferencedNameSpaces
+        {
+            get
+            {
+                foreach (var nameSpace in referencedImports)
+                    yield return nameSpace;
+            }
+        }
 
         protected readonly List<DataType> referencedTypes;
-        protected readonly List<CreatedNameSpaceNode> referencedNameSpaces;
 
-        public int DataTypeCount { get => subTypes.Count; }
+        protected readonly List<CreatedNameSpaceNode> referencedNameSpaces;
 
         public DataType(IdentifierNode _name, List<ImportNode> _imports)
         {
             name = _name;
 
             referencedImports = _imports;
-            subTypes = referencedTypes = new List<DataType>();
+            subTypes = new List<DataType>();
+            referencedTypes = new List<DataType>();
             referencedNameSpaces = new List<CreatedNameSpaceNode>();
         }
 
@@ -52,20 +61,16 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
         public IDataTypeCollection AddEntity(DataType datatypeToAdd)
         {
             subTypes.Add(datatypeToAdd);
-            ReferenceSubType(datatypeToAdd);
+            referencedTypes.Add(datatypeToAdd);
 
             return this;
         }
 
-        private void ReferenceSubType(DataType type)
-        {
-            referencedTypes.Add(type);
+        public void ReferencedDataType(DataType dataTypes) => referencedTypes.Add(dataTypes);
 
-            for (int i = 0; i < type.DataTypeCount; i++)
-                ReferenceSubType(type.GetSubDataType(i));
-        }
+        public void ReferencedNameSpace(CreatedNameSpaceNode createdNameSpaces) => referencedNameSpaces.Add(createdNameSpaces);
 
-        public void ReferenceParentNamespaces()
+        public void ReferenceParentNameSpaces()
         {
             var parent = (CreatedNameSpaceNode)Parent;
 
@@ -76,42 +81,6 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             }
         }
 
-        protected override void PrintChildren(string indent)
-        {
-            for (int i = 0; i < subTypes.Count; i++)
-                subTypes[i].Print(indent, i == subTypes.Count - 1);
-
-            if (referencedImports.Count > 0)
-            {
-                Console.WriteLine(indent + "Imports: ");
-
-                for (int i = 0; i < referencedImports.Count; i++)
-                    referencedImports[i].Print(indent, i == referencedImports.Count - 1);
-            }
-            else
-                Console.WriteLine(indent + "Imports: None");
-        }
-
-        public IEnumerable<ImportNode> GetReferencedNamespaces()
-        {
-            foreach (var import in referencedImports)
-                yield return import;
-        }
-
-        public DataType WithReferencedNamespace(CreatedNameSpaceNode createdNameSpaces)
-        {
-            referencedNameSpaces.Add(createdNameSpaces);
-
-            return this;
-        }
-
-        public DataType WithReferencedDataType(DataType dataTypes)
-        {
-            referencedTypes.Add(dataTypes);
-
-            return this;
-        }
-
         public DataType FindReferencedType(Node type, DefaultNameSpaceNode defaultNameSpace, CreatedNameSpaceCollectionNode collectionNode)
         {
             var dataTypes = new Queue<DataType>(referencedTypes);
@@ -120,8 +89,8 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             for (int i = 0; i < defaultNameSpace.DataTypeCount; i++)
                 dataTypes.Enqueue(defaultNameSpace.GetSubDataType(i));
 
-            var current = type;
             bool first = true;
+            var current = type;
 
             while (true)
             {
@@ -184,6 +153,22 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
                         dataTypes.Enqueue(result);
                 }
             }
+        }
+
+        protected override void PrintChildren(string indent)
+        {
+            for (int i = 0; i < subTypes.Count; i++)
+                subTypes[i].Print(indent, i == subTypes.Count - 1);
+
+            if (referencedImports.Count > 0)
+            {
+                Console.WriteLine(indent + "Imports: ");
+
+                for (int i = 0; i < referencedImports.Count; i++)
+                    referencedImports[i].Print(indent, i == referencedImports.Count - 1);
+            }
+            else
+                Console.WriteLine(indent + "Imports: None");
         }
     }
 }

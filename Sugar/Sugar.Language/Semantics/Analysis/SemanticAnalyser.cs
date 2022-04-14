@@ -13,16 +13,16 @@ using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 using Sugar.Language.Semantics.ActionTrees;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
-using Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.UDDataTypes.Enums;
 using Sugar.Language.Semantics.Analysis.Structure;
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
-using Sugar.Language.Semantics.ActionTrees.VariableCreation;
 using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 using Sugar.Language.Parsing.Nodes.Describers;
 using Sugar.Language.Semantics.ActionTrees.Describers;
+using Sugar.Language.Semantics.ActionTrees.CreatableNodes.VariableCreation;
 
 namespace Sugar.Language.Semantics.Analysis
 {
@@ -223,7 +223,7 @@ namespace Sugar.Language.Semantics.Analysis
                 ValidateImportStatements(dataType);
 
                 if (baseNamespaceNode != null)
-                    dataType.WithReferencedNamespace(baseNamespaceNode);
+                    dataType.ReferencedNameSpace(baseNamespaceNode);
 
                 ValidateImportStatements(dataType, baseNamespaceNode);
             }
@@ -231,13 +231,13 @@ namespace Sugar.Language.Semantics.Analysis
 
         private void ValidateImportStatements(DataType dataType)
         {
-            foreach (var import in dataType.GetReferencedNamespaces())
+            foreach (var import in dataType.ReferencedNameSpaces)
             {
                 if (import.EntityType == UDDataType.Namespace)
-                    dataType.WithReferencedNamespace(ValidateNameSpaceNode(import.Name));
+                    dataType.ReferencedNameSpace(ValidateNameSpaceNode(import.Name));
                 else
                 {
-                    DataType type = ValidateDataExistance(import.Name);
+                    DataType type = ValidateDataTypeExistance(import.Name);
                     DataTypeEnum expected = import.EntityType switch
                     {
                         UDDataType.Enum => DataTypeEnum.Enum,
@@ -249,11 +249,11 @@ namespace Sugar.Language.Semantics.Analysis
                     if (type.TypeEnum != expected)
                         throw new Exception($"{type.Name} is not a(n) {expected}");
 
-                    dataType.WithReferencedDataType(type);
+                    dataType.ReferencedDataType(type);
                 }
             }
 
-            dataType.ReferenceParentNamespaces();
+            dataType.ReferenceParentNameSpaces();
         }
 
         private CreatedNameSpaceNode ValidateNameSpaceNode(Node name)
@@ -297,7 +297,7 @@ namespace Sugar.Language.Semantics.Analysis
             }
         }
 
-        private DataType ValidateDataExistance(Node name)
+        private DataType ValidateDataTypeExistance(Node name)
         {
             var findResult = FindPossibleNamespaceNode(name);
 

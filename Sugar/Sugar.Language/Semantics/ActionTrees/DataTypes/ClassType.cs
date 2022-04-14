@@ -6,8 +6,8 @@ using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.UDDataTypes;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
-using Sugar.Language.Semantics.ActionTrees.VariableCreation;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.CreatableNodes.VariableCreation;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
@@ -22,10 +22,10 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             globalVariableDeclarations = new List<GlobalVariableDeclaration>();
         }
 
-        public GlobalVariableDeclaration TryFindDeclaration(IdentifierNode identifier)
+        public GlobalVariableDeclaration TryFindVariableDeclaration(IdentifierNode identifier)
         {
             foreach (var declaration in globalVariableDeclarations)
-                if (declaration.CreationName.Value == identifier.Value)
+                if (declaration.Name == identifier.Value)
                     return declaration;
 
             return null;

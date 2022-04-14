@@ -2,7 +2,7 @@
 
 using Sugar.Language.Parsing.Nodes.Values;
 
-namespace Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces
+namespace Sugar.Language.Semantics.ActionTrees.Interfaces.Collections
 {
     internal interface IEntityCollection<T, K> : IActionTreeNode
     {

@@ -4,7 +4,7 @@ using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 
-namespace Sugar.Language.Semantics.ActionTrees.Interfaces.Namespaces
+namespace Sugar.Language.Semantics.ActionTrees.Interfaces.Collections
 {
     internal interface IDataTypeCollection : IEntityCollection<DataType, IDataTypeCollection>
     {

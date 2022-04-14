@@ -48,7 +48,7 @@ namespace Sugar.Language
                 {
                     Console.WriteLine("No Output");
                     return true;
-                }    
+                }
 
                 /*Console.WriteLine("\n_____Analysed_____");
 

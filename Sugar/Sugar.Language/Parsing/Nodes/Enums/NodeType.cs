@@ -80,6 +80,9 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         ImplicitDeclaration,
         ExplicitDeclaration,
 
-        Parent
+        Parent,
+
+        Action,
+        Function
     }
 }

@@ -168,6 +168,9 @@ namespace Sugar.Language.Tokens.Enums
 
         Parent = 114,
 
+        Action = 115,
+        Function = 116,
+
         QuestionMark = SeperatorKind.QuestionMark,
 
         OpenBracket = SeperatorKind.OpenBracket,

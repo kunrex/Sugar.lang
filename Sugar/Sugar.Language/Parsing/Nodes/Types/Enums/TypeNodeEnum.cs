@@ -6,8 +6,10 @@ namespace Sugar.Language.Parsing.Nodes.Types.Enums
     {
         Void,
         Array,
+        Action,
         Custom,
         BuiltIn,
+        Function,
         Anonymous,
         Constructor
     }
