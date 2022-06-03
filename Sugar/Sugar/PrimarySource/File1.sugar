@@ -1,6 +1,10 @@
-﻿function<int>: add = (int: y, int: z) => 
+﻿namespace X
 {
-    return x + y;
-};
+    class Z
+    {
+        class Y
+        {
 
-print(add.invoke(10, 20));
+        }
+    }
+}

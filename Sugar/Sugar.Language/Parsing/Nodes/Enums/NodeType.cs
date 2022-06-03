@@ -31,7 +31,9 @@ namespace Sugar.Language.Parsing.Nodes.Enums
 
         Get,
         Set,
-        Property,
+        PropertyGet,
+        PropertySet,
+        PropertyGetSet,
 
         FunctionCall,
         ArgumentCall,

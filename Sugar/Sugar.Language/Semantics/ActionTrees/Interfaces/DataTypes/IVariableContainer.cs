@@ -1,12 +1,12 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes.Values;
-using Sugar.Language.Semantics.ActionTrees.CreatableNodes.VariableCreation;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation;
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
-    internal interface IVariableContainer : IContainer<GlobalVariableDeclaration, IVariableContainer>
+    internal interface IVariableContainer : IContainer<VariableCreationStmt, IVariableContainer>
     {
-        public GlobalVariableDeclaration TryFindVariableDeclaration(IdentifierNode identifier);
+        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier);
     }
 }

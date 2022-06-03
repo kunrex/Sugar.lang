@@ -71,14 +71,27 @@
     <None Remove="Semantics\Analysis\Structure\" />
     <None Remove="Semantics\ActionTrees\Interfaces\Describers\" />
     <None Remove="Semantics\ActionTrees\Describers\" />
-    <None Remove="Semantics\ActionTrees\Functions\" />
     <None Remove="Semantics\ActionTrees\CreatableNodes\" />
-    <None Remove="Semantics\ActionTrees\CreatableNodes\VariableCreation\" />
     <None Remove="Semantics\ActionTrees\CreatableNodes\PropertyCreationNode\" />
-    <None Remove="Semantics\ActionTrees\Interfaces\DataTypes\Properties\" />
     <None Remove="Semantics\ActionTrees\CreatableNodes\Functions\" />
     <None Remove="Parsing\Nodes\Functions\Delegates\Structure\" />
     <None Remove="Parsing\Nodes\Statements\VariableCreation\Delegates\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\PropertyCreation\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\VariableCreation\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\Functions\Global\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\Functions\Global\Conversion\" />
+    <None Remove="Semantics\ActionTrees\CreatableNodes\Functions\Local\" />
+    <None Remove="Semantics\ActionTrees\Interfaces\DataTypes\Casts\" />
+    <None Remove="Semantics\ActionTrees\CreationStatements\Functions\Structure\" />
+    <None Remove="Semantics\Services\" />
+    <None Remove="Semantics\Services\Interfaces\" />
+    <None Remove="Semantics\Services\Implementations\" />
+    <None Remove="Semantics\Results\" />
+    <None Remove="Exceptions\Lexing\" />
+    <None Remove="Exceptions\Parsing\" />
+    <None Remove="Exceptions\Analytics\" />
+    <None Remove="Exceptions\Analytics\ImportStatements\" />
+    <None Remove="Semantics\Services\Implementations\Structures\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -145,13 +158,25 @@
     <Folder Include="Semantics\Analysis\Structure\" />
     <Folder Include="Semantics\ActionTrees\Interfaces\Describers\" />
     <Folder Include="Semantics\ActionTrees\Describers\" />
-    <Folder Include="Semantics\ActionTrees\Functions\" />
-    <Folder Include="Semantics\ActionTrees\CreatableNodes\" />
-    <Folder Include="Semantics\ActionTrees\CreatableNodes\VariableCreation\" />
-    <Folder Include="Semantics\ActionTrees\CreatableNodes\PropertyCreation\" />
-    <Folder Include="Semantics\ActionTrees\Interfaces\DataTypes\Properties\" />
-    <Folder Include="Semantics\ActionTrees\CreatableNodes\Functions\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\Functions\" />
     <Folder Include="Parsing\Nodes\Statements\VariableCreation\Delegates\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\PropertyCreation\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\Functions\Global\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\Functions\Global\Conversion\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\Functions\Local\" />
+    <Folder Include="Semantics\ActionTrees\Interfaces\DataTypes\Casts\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\Functions\Structure\" />
+    <Folder Include="Semantics\Services\" />
+    <Folder Include="Semantics\Services\Interfaces\" />
+    <Folder Include="Semantics\Services\Implementations\" />
+    <Folder Include="Semantics\Results\" />
+    <Folder Include="Exceptions\Lexing\" />
+    <Folder Include="Exceptions\Parsing\" />
+    <Folder Include="Exceptions\Analytics\" />
+    <Folder Include="Exceptions\Analytics\ImportStatements\" />
+    <Folder Include="Semantics\Services\Implementations\Structures\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

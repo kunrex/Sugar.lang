@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Sugar.Language.Exceptions;
+using Sugar.Language.Exceptions.Lexing;
+using Sugar.Language.Exceptions.Parsing;
+
 using Sugar.Language.Parsing.Parser.Enums;
 using Sugar.Language.Parsing.Parser.Structure;
 

@@ -3,7 +3,6 @@ using System.Text;
 using System.Collections.Generic;
 
 using Sugar.Language.Tokens;
-using Sugar.Language.Exceptions;
 using Sugar.Language.Tokens.Enums;
 using Sugar.Language.Tokens.Keywords;
 using Sugar.Language.Tokens.Constants;
@@ -13,6 +12,8 @@ using Sugar.Language.Tokens.Operators.Binary;
 using Sugar.Language.Tokens.Operators.Assignment;
 using Sugar.Language.Tokens.Constants.Numeric.Real;
 using Sugar.Language.Tokens.Constants.Numeric.Integral;
+
+using Sugar.Language.Exceptions.Lexing;
 
 namespace Sugar.Language.Lexing
 {

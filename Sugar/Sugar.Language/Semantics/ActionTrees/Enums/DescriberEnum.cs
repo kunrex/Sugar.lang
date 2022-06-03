@@ -24,6 +24,8 @@ namespace Sugar.Language.Semantics.ActionTrees.Enums
         Out = 2048,
         Ref = 4096,
 
+        None = 8192,
+
         ReferenceModifiers = In | Out | Ref,
         MutabilityModifier = Const | Readonly,
         AccessModifiers = Public | Private | Protected,

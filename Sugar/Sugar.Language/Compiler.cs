@@ -31,6 +31,8 @@ namespace Sugar.Language
                 var treeCollection = new SyntaxTreeCollection();
                 foreach(var source in sourceFiles)
                 {
+                    Console.WriteLine(source);
+
                     var tokens = new Lexer(source).Lex();
 
                     var tree = new Parser(tokens).Parse();
@@ -50,11 +52,11 @@ namespace Sugar.Language
                     return true;
                 }
 
-                /*Console.WriteLine("\n_____Analysed_____");
+                Console.WriteLine("\n_____Analysed_____");
 
                 var analysisResult = new SemanticAnalyser(treeCollection).Analyse();
 
-                Console.WriteLine(analysisResult);*/
+                Console.WriteLine(analysisResult);
                 return true;
             }
             catch(CompileException e)

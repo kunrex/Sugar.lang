@@ -2,8 +2,8 @@
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
-    internal interface IContainer<T, S> : IActionTreeNode where T : IActionTreeNode
+    internal interface IContainer<Element, IContainerType> : IActionTreeNode where Element : IActionTreeNode where IContainerType : IContainer<Element, IContainerType>
     {
-        public S AddDeclaration(T declaration);
+        public IContainerType AddDeclaration(Element declaration);
     }
 }

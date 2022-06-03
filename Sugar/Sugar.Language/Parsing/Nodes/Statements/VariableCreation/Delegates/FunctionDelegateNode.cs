@@ -14,6 +14,6 @@ namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation.Delegates
 
         }
 
-        public override string ToString() => $"Action Decleration Node";
+        public override string ToString() => $"Function Decleration Node";
     }
 }

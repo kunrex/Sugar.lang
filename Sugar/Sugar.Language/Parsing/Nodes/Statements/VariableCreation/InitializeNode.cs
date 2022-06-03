@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using Sugar.Language.Parsing.Nodes.Enums;
 using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
 
-using Sugar.Language.Semantics.Analysis;
-
 namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation
 {
-    internal sealed class InitializeNode : VariableCreationNode, ICreationNode_Value
+    internal sealed class InitializeNode : DeclarationNode, ICreationNode_Value
     {
         public override NodeType NodeType => NodeType.Initialise;
 

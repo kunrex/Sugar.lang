@@ -5,7 +5,7 @@ using Sugar.Language.Parsing.Nodes.Enums;
 
 namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation
 {
-    internal sealed class DeclarationNode : VariableCreationNode
+    internal class DeclarationNode : VariableCreationNode
     {
         public override NodeType NodeType => NodeType.Declaration;
 
