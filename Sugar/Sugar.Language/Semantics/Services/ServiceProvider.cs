@@ -9,7 +9,7 @@ namespace Sugar.Language.Semantics.Services
 
         }
 
-        public K ProvideService<T, K>(params object[] paramaters) where T : ISemanticService<T> where K : T
+        public K ProvideService<T, K>(params object[] paramaters) where T : ISemanticService where K : T
         {
             var instance = Activator.CreateInstance(typeof(K), paramaters);
 

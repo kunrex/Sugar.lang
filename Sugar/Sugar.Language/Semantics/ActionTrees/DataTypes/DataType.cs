@@ -8,12 +8,14 @@ using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
+using Sugar.Language.Semantics.Services.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
+using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.SubTypeSearching;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
-    internal abstract class DataType : ParentableActionTreeNode<IDataTypeCollection>, IDataTypeCollection
+    internal abstract class DataType : ParentableActionTreeNode<IDataTypeCollection>, IDataTypeCollection, ISubTypeSearcher
     {
         public abstract DataTypeEnum TypeEnum { get; }
 
@@ -51,8 +53,9 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public DataType TryFindDataType(IdentifierNode identifier)
         {
+            var value = identifier.Value;
             foreach (var type in subTypes)
-                if (type.Name == identifier.Value)
+                if (type.Name == value)
                     return type;
 
             return null;
@@ -66,9 +69,9 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             return this;
         }
 
-        public void ReferencedDataType(DataType dataTypes) => referencedTypes.Add(dataTypes);
+        public void ReferenceDataType(DataType dataTypes) => referencedTypes.Add(dataTypes);
 
-        public void ReferencedNameSpace(CreatedNameSpaceNode createdNameSpaces) => referencedNameSpaces.Add(createdNameSpaces);
+        public void ReferenceNameSpace(CreatedNameSpaceNode createdNameSpaces) => referencedNameSpaces.Add(createdNameSpaces);
 
         public void ReferenceParentNameSpaces()
         {
@@ -81,20 +84,17 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             }
         }
 
-        public DataType FindReferencedType(Node type, DefaultNameSpaceNode defaultNameSpace, CreatedNameSpaceCollectionNode collectionNode)
+        public virtual DataType FindReferencedType(Node type, CreatedNameSpaceCollectionNode collectionNode)
         {
             var dataTypes = new Queue<DataType>(referencedTypes);
             var nameSpaces = new Queue<CreatedNameSpaceNode>(referencedNameSpaces);
 
-            for (int i = 0; i < defaultNameSpace.DataTypeCount; i++)
-                dataTypes.Enqueue(defaultNameSpace.GetSubDataType(i));
-
-            bool first = true;
+            var first = true;
             var current = type;
 
             while (true)
             {
-                switch(current.NodeType)
+                switch (current.NodeType)
                 {
                     case NodeType.Dot:
                         var dot = (DotExpression)current;
@@ -103,16 +103,32 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
                         current = dot.RHS;
                         break;
                     case NodeType.Variable:
-                        Match((IdentifierNode)current);
+                        var identifier = (IdentifierNode)current;
+
+                        var value = identifier.Value;
+                        int dataTypeCount = dataTypes.Count;
+
+                        if (first)
+                        {
+                            for (int i = 0; i < dataTypeCount; i++)
+                            {
+                                var dataType = dataTypes.Dequeue();
+
+                                if (dataType.Name == value)
+                                    dataTypes.Enqueue(dataType);
+                            }
+                        }
+                        else
+                            Match(identifier);
 
                         switch (dataTypes.Count)
                         {
                             case 0:
-                                throw new Exception("type reference doesn't exist");
+                                throw new NoReferenceToTypeException(value, Name, 0);
                             case 1:
                                 return dataTypes.Dequeue();
                             default:
-                                throw new Exception("ambigious reference");
+                                throw new AmbigiousReferenceException(value, Name, 0);
                         }
                 }
 
@@ -122,28 +138,53 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
             void Match(IdentifierNode identifier)
             {
-                int nameSpaceCount = nameSpaces.Count, dataTypeCount = dataTypes.Count;
-                for (int i = 0; i < nameSpaceCount; i++)
+                int nameSpaceCount = nameSpaces.Count, dataTypeCount = dataTypes.Count, i = 0;
+
+                for (i = 0; i < nameSpaceCount; i++)
                 {
                     var nameSpace = nameSpaces.Dequeue();
 
-                    var nameSpaceResult = nameSpace.TryFindNameSpace(identifier);
+                    if(first)
+                    {
+                        if (nameSpace.Name == identifier.Value)
+                            nameSpaces.Enqueue(nameSpace);
 
+                        var baseNamespace = collectionNode.TryFindNameSpace(identifier);
+                        if (baseNamespace != null && baseNamespace != Parent)
+                        {
+                            if (baseNamespace.Name == identifier.Value)
+                            {
+                                nameSpaces.Enqueue(baseNamespace);
+                                continue;
+                            }
+                        }
+                    }
+
+                    var nameSpaceResult = nameSpace.TryFindNameSpace(identifier);
                     if (nameSpaceResult != null)
                         nameSpaces.Enqueue(nameSpaceResult);
-                    else if(first)
-                    {
-                        var baseNamespace = collectionNode.TryFindNameSpace(identifier);
-
-                        if (baseNamespace != null && baseNamespace != Parent)
-                            nameSpaces.Enqueue(baseNamespace);
-                    }
 
                     TryFindDataType(nameSpace);
                 }
 
-                for(int i = 0; i < dataTypeCount; i++)
-                    TryFindDataType(dataTypes.Dequeue());
+                if (i == 0 && first)
+                {
+                    var baseNamespace = collectionNode.TryFindNameSpace(identifier);
+                    if (baseNamespace != null && baseNamespace != Parent)
+                        nameSpaces.Enqueue(baseNamespace);
+                }
+
+                for (i = 0; i < dataTypeCount; i++)
+                {
+                    var dataType = dataTypes.Dequeue();
+                    if(first)
+                    {
+                        dataTypes.Enqueue(dataType);
+                        continue;
+                    }
+
+                    TryFindDataType(dataType);
+                }
 
                 void TryFindDataType(IDataTypeCollection dataType)
                 {
@@ -152,6 +193,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
                     if (result != null)
                         dataTypes.Enqueue(result);
                 }
+
             }
         }
 
@@ -162,10 +204,13 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
             if (referencedImports.Count > 0)
             {
-                Console.WriteLine(indent + "Imports: ");
+                Console.WriteLine("Referenced Data Types");
+                for (int i = 0; i < referencedTypes.Count; i++)
+                    referencedTypes[i].Print(indent, i == referencedImports.Count - 1);
 
-                for (int i = 0; i < referencedImports.Count; i++)
-                    referencedImports[i].Print(indent, i == referencedImports.Count - 1);
+                Console.WriteLine("Referenced Name Spaces");
+                for (int i = 0; i < referencedNameSpaces.Count; i++)
+                    referencedNameSpaces[i].Print(indent, i == referencedImports.Count - 1);
             }
             else
                 Console.WriteLine(indent + "Imports: None");

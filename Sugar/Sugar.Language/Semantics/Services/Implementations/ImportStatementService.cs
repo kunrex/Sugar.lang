@@ -192,7 +192,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 if (importNode.EntityType != UDDataType.Namespace)
                     semanticsResult.Add(new InvalidEntityTypeException(importNode, DataTypeEnum.Namespace, (DataTypeEnum)importNode.EntityType));
 
-                dataType.ReferencedNameSpace(result);
+                dataType.ReferenceNameSpace(result);
             }
             else
                 ValidateImportStatements(nodeGroups, dataType, (INameSpaceCollection)result);
@@ -253,7 +253,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 if ((UDDataType)result.TypeEnum != importNode.EntityType)
                     semanticsResult.Add(new InvalidEntityTypeException(importNode, result.TypeEnum, (DataTypeEnum)importNode.EntityType));
 
-                dataType.ReferencedDataType(result);
+                dataType.ReferenceDataType(result);
             }
             else
                 ValidateImportStatements(nodeGroups, dataType, result);

@@ -1,9 +1,14 @@
-﻿import X.Z.Y;
-
+﻿
 namespace Y
 {
     class A
     {
-            
+       class B
+       {
+          class C
+          {
+
+           }
+       }
     }
 }

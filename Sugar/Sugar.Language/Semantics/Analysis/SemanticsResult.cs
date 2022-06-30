@@ -15,6 +15,8 @@ namespace Sugar.Language.Semantics.Analysis
         private readonly List<CompileException> exceptions;
         public IReadOnlyList<CompileException> Exceptions { get => exceptions; }
 
+        public object[] Results { get; private set; }
+
         public SemanticsResult(string _stage)
         {
             built = false;
@@ -23,6 +25,12 @@ namespace Sugar.Language.Semantics.Analysis
         }
 
         public void Add(CompileException exception) => exceptions.Add(exception);
+
+        public SemanticsResult Build(object[] buildResults)
+        {
+            Results = buildResults;
+            return Build();
+        }
 
         public SemanticsResult Build()
         {

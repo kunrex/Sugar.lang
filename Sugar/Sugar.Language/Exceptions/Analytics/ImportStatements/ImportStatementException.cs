@@ -8,7 +8,7 @@ using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 
 namespace Sugar.Language.Exceptions.Analytics.ImportStatements
 {
-    internal abstract class ImportStatementException : CompileException
+    internal abstract class ImportStatementException : ImportStatementCompileException
     {
         public ImportStatementException(ImportNode _importNode, string exception) : base(exception, GetIndex(_importNode))
         {
@@ -42,11 +42,5 @@ namespace Sugar.Language.Exceptions.Analytics.ImportStatements
 
             return builder.ToString();
         }
-
-        private static int GetIndex(ImportNode importNode) => importNode.Name.NodeType switch
-        {
-            NodeType.Dot => ((IdentifierNode)((DotExpression)importNode.Name).LHS).Token.Index,
-            _ => ((IdentifierNode)importNode.Name).Token.Index
-        };
     }
 }

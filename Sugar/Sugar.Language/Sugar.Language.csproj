@@ -92,6 +92,9 @@
     <None Remove="Exceptions\Analytics\" />
     <None Remove="Exceptions\Analytics\ImportStatements\" />
     <None Remove="Semantics\Services\Implementations\Structures\" />
+    <None Remove="Exceptions\Analytics\NameSpaceStructurisation\" />
+    <None Remove="Exceptions\Analytics\ClassMemberCreation\" />
+    <None Remove="Exceptions\Analytics\ClassMemberCreation\SubTypeSearching\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -177,6 +180,9 @@
     <Folder Include="Exceptions\Analytics\" />
     <Folder Include="Exceptions\Analytics\ImportStatements\" />
     <Folder Include="Semantics\Services\Implementations\Structures\" />
+    <Folder Include="Exceptions\Analytics\NameSpaceStructurisation\" />
+    <Folder Include="Exceptions\Analytics\ClassMemberCreation\" />
+    <Folder Include="Exceptions\Analytics\ClassMemberCreation\SubTypeSearching\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

@@ -2,7 +2,7 @@
 
 namespace Sugar.Language.Semantics.Services.Interfaces
 {
-    internal interface IImportStatementService : IValidatableService<IImportStatementService>
+    internal interface IDescriberService : ISemanticService
     {
         
     }
