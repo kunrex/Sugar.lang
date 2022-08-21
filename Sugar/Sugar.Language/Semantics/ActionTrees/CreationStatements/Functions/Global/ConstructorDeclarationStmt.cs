@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Sugar.Language.Tokens.Operators;
-
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
 
@@ -12,20 +10,18 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    internal sealed class OperatorOverloadDeclarationStmt : GlobalFunctionCreationStmt<IOperatorContainer>
+    internal sealed class ConstructorDeclarationStmt : GlobalFunctionCreationStmt<IConstructorContainer>
     {
-        private readonly Operator operatorToOverload;
-
-        public OperatorOverloadDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody, Operator _operator) : base(
+        public ConstructorDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
             _name,
             _describer,
             _arguments,
             _nodeBody)
         {
-            operatorToOverload = _operator;
+
         }
 
-        public override string ToString() => $"Operator Overload Node [Operator: {operatorToOverload.Value}]";
+        public override string ToString() => "Constructor Delcration Statement";
     }
 }

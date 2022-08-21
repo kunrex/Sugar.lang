@@ -1,6 +1,7 @@
 ﻿using System;
 
-using Sugar.Language.Parsing.Nodes.Functions.Declarations;
+using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
@@ -12,11 +13,12 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
     {
         private readonly DataType parentType;
 
-        public ExtensionMethodDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, FunctionDeclarationNode _baseNode, DataType _parentType) : base(
+        public ExtensionMethodDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody, DataType _parentType) : base(
            _creationType,
+           _name,
            _describer,
            _arguments,
-           _baseNode)
+           _nodeBody)
         {
             parentType = _parentType;
         }

@@ -6,11 +6,10 @@ using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
-using Sugar.Language.Semantics.ActionTrees.Interfaces.Describers;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
 {
-    internal abstract class CreationStatement<Parent> : ParentableActionTreeNode<Parent>, IDescribable where Parent : IActionTreeNode
+    internal abstract class CreationStatement<Parent> : ParentableActionTreeNode<Parent>, ICreationStatement where Parent : IActionTreeNode
     {
         protected readonly Describer describer;
         public Describer Describer { get => Describer; }

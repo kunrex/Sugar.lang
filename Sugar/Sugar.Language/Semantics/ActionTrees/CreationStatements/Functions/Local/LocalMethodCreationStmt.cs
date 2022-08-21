@@ -1,6 +1,7 @@
 ﻿using System;
 
-using Sugar.Language.Parsing.Nodes.Functions.Declarations;
+using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
@@ -10,14 +11,15 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local
 {
-    internal sealed class LocalMethodCreationStmt : FunctionCreationStmt<FunctionDeclarationNode, IFunctionContainer<LocalMethodCreationStmt>>, IMethodCreation
+    internal sealed class LocalMethodCreationStmt : FunctionCreationStmt<IFunctionContainer<LocalMethodCreationStmt>>, IMethodCreation
     {
-        public LocalMethodCreationStmt(DataType _creationType, Describer _describer, FunctionArguments arguments, FunctionDeclarationNode _baseNode) : base(
+        public LocalMethodCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
             _creationType,
+            _name,
             _describer,
             DescriberEnum.None,
             arguments,
-            _baseNode)
+            _nodeBody)
         {
 
         }

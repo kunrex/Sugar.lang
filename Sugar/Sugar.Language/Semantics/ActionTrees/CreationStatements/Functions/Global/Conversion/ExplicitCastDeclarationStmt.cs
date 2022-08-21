@@ -1,6 +1,7 @@
 ﻿using System;
 
-using Sugar.Language.Parsing.Nodes.Functions.Declarations.OperatorOverloading;
+using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
@@ -9,13 +10,14 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion
 {
-    internal sealed class ExplicitCastDeclarationStmt : CastDeclarationStmt<ExplicitCastDeclarationNode, IExplicitContainer>
+    internal sealed class ExplicitCastDeclarationStmt : CastDeclarationStmt<IExplicitContainer>
     {
-        public ExplicitCastDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, ExplicitCastDeclarationNode _baseNode) : base(
+        public ExplicitCastDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
+            _name,
             _describer,
             _arguments,
-            _baseNode)
+            _nodeBody)
         {
 
         }

@@ -7,12 +7,12 @@ namespace Sugar.Language.Parsing.Nodes.Functions.Properties
 {
     internal sealed class PropertyGetNode : PropertyNode
     {
-        public Node Get { get => Children[1]; }
+        public Node Get { get => Children[2]; }
         public override NodeType NodeType => NodeType.PropertyGet;
 
-        public PropertyGetNode(Node _name, Node _get) : base(_name)
+        public PropertyGetNode(Node _name, Node _type, Node _get) : base(_name, _type)
         {
-            Children = new List<Node>() { _name, _get };
+            Children = new List<Node>() { _name, _type, _get };
         }
 
         public override string ToString() => $"Only Get Property Node";

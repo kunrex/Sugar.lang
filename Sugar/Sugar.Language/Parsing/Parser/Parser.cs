@@ -1666,9 +1666,10 @@ namespace Sugar.Language.Parsing.Parser
             if (describer == null)
                 describer = new DescriberNode();
 
+            Console.WriteLine(describer == null);
             if (TryMatchCurrent(Keyword.Get, true))
             {
-                getNode = new GetNode(describer, ParseAccessorBody(ParseScopeType.LambdaExpression));
+                getNode = new GetNode(describer, ParseAccessorBody(ParseScopeType.Scope | ParseScopeType.LambdaExpression));
                 describer = TryParseDescriber();
             }
 
@@ -1683,11 +1684,11 @@ namespace Sugar.Language.Parsing.Parser
             ForceMatchCurrent(Seperator.FlowerCloseBracket);
 
             if (getNode != null && setNode != null)
-                return new PropertyGetSetNode(variableNode, getNode, setNode);
+                return new PropertyGetSetNode(variableNode, typeNode, getNode, setNode);
             else if (getNode != null)
-                return new PropertyGetNode(variableNode, getNode);
+                return new PropertyGetNode(variableNode, typeNode, getNode);
             else
-                return new PropertySetNode(variableNode, setNode);
+                return new PropertySetNode(variableNode, typeNode, setNode);
 
             Node TryParseDescriber()
             {
@@ -1861,7 +1862,7 @@ namespace Sugar.Language.Parsing.Parser
 
             index++;
             var body = ParseBlock(ParseScopeType.Scope | ParseScopeType.LambdaExpression);
-            var toReturn = new OperatorOverloadFunctionDeclarationLoad(describer, returnType, arguments, body, operatorToOverload);
+            var toReturn = new OperatorOverloadFunctionDeclarationNode(describer, returnType, arguments, body, operatorToOverload);
 
             if (generic != null)
                 toReturn.AddChild(generic);
@@ -1910,8 +1911,7 @@ namespace Sugar.Language.Parsing.Parser
             if (MatchToken(BinaryOperator.LesserThan, LookAhead(), false, true))
                 generic = ParseGenericDeclaration();
 
-            index++;
-            var body = ParseBlock(ParseScopeType.Scope | ParseScopeType.LambdaExpression);
+            var body = ParseProperty(returnType, returnType);
 
             Node toReturn = new IndexerDeclarationNode(describer, returnType, arguments, body);
 

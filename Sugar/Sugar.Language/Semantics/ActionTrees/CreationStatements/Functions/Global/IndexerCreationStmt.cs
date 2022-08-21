@@ -1,10 +1,31 @@
 ﻿using System;
+
+using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Values;
+
+using Sugar.Language.Semantics.ActionTrees.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.Describers;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
+
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    public class IndexerCreationStmt
+    internal sealed class IndexerCreationStmt : GlobalFunctionCreationStmt<IIndexerContainer>
     {
-        public IndexerCreationStmt()
+        private new PropertyCreationStmt nodeBody;
+        public new PropertyCreationStmt NodeBody { get => nodeBody; }
+
+        public IndexerCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, PropertyCreationStmt _nodeBody) : base(
+            _creationType,
+            _name,
+            _describer,
+            _arguments,
+            null)
         {
+            nodeBody = _nodeBody;
         }
+
+        public override string ToString() => $"Indexer Declaration Node";
     }
 }

@@ -40,6 +40,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         ConstructorCall,
         FunctionDeclaration,
         ArgumentDeclaration,
+        ConstructorDeclaration,
 
         Lambda,
 
@@ -79,6 +80,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
 
         AsType,
 
+        OperatorOverload,
         ImplicitDeclaration,
         ExplicitDeclaration,
 

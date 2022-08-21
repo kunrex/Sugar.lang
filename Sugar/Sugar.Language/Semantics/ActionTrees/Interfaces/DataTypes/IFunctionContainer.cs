@@ -5,7 +5,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions;
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
-    internal interface IFunctionContainer<T> : IContainer<T, IFunctionContainer<T>> where T : IMethodCreation
+    internal interface IFunctionContainer<T> : IBaseFunctionContainer, IContainer<T, IFunctionContainer<T>> where T : IMethodCreation
     {
         public T TryFindFunctionDeclaration(IdentifierNode identifier);
     }

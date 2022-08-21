@@ -4,6 +4,14 @@ namespace X
 {
     class Z
     {
-         Y.A.B.C: x;
+        indexer A.B()
+        {
+            get => 10;
+        }
+
+        indexer A()
+        {
+            get => 10;
+        }
     }
 }

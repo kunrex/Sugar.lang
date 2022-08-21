@@ -11,7 +11,7 @@ namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation
         public Node Describer { get => Children[0]; }
 
         public Node Type { get => Children[1]; }
-        public Node Name { get => Children[2]; }
+        public virtual Node Name { get => Children[2]; }
 
         public virtual NodeType CreationType { get => Name.NodeType; }
 

@@ -95,6 +95,10 @@
     <None Remove="Exceptions\Analytics\NameSpaceStructurisation\" />
     <None Remove="Exceptions\Analytics\ClassMemberCreation\" />
     <None Remove="Exceptions\Analytics\ClassMemberCreation\SubTypeSearching\" />
+    <None Remove="Semantics\ActionTrees\DataTypes\Structure\" />
+    <None Remove="Semantics\ActionTrees\CreationStatements\VariableCreation\Global\" />
+    <None Remove="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\" />
+    <None Remove="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\FunctionArguments\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -183,6 +187,10 @@
     <Folder Include="Exceptions\Analytics\NameSpaceStructurisation\" />
     <Folder Include="Exceptions\Analytics\ClassMemberCreation\" />
     <Folder Include="Exceptions\Analytics\ClassMemberCreation\SubTypeSearching\" />
+    <Folder Include="Semantics\ActionTrees\DataTypes\Structure\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Global\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\FunctionArguments\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

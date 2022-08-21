@@ -65,7 +65,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         private void ValidateDataType(DataType dataType)
         {
-            ValidateImportStatements(dataType.ReferencedNameSpaces, dataType);
+            ValidateImportStatements(dataType.ReferencedImports, dataType);
 
             dataType.ReferenceParentNameSpaces();
         }

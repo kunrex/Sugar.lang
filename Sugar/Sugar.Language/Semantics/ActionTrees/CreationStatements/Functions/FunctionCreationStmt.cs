@@ -2,7 +2,6 @@
 
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
-using Sugar.Language.Parsing.Nodes.Functions.Declarations;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
@@ -12,18 +11,21 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal abstract class FunctionCreationStmt<Base, Parent> : CreationStatement<Parent> where Base : BaseFunctionDeclarationNode where Parent : IActionTreeNode
+    internal abstract class FunctionCreationStmt<Parent> : CreationStatement<Parent> where Parent : IActionTreeNode
     {
-        protected readonly Node body;
-        protected readonly FunctionArguments arguments;
+        protected readonly Node nodeBody;
+        public Node NodeBody { get => nodeBody; }
 
-        public FunctionCreationStmt(DataType _creationType, Describer _describer, DescriberEnum _allowed, FunctionArguments _arguments, Base _baseNode) : base(
+        protected readonly FunctionArguments arguments;
+        public FunctionArguments FunctionArguments { get => arguments; }
+
+        public FunctionCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, DescriberEnum _allowed, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
-            (IdentifierNode)_baseNode.Name,
+            _name,
             _describer,
             _allowed)
         {
-            body = _baseNode.Body;
+            nodeBody = _nodeBody;
             arguments = _arguments;
         }
     }

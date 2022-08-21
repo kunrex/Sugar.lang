@@ -12,100 +12,62 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion;
-using Sugar.Language.Parsing.Nodes.Functions.Declarations.OperatorOverloading;
-using Sugar.Language.Semantics.ActionTrees.CreationStatements;
-using Sugar.Language.Semantics.ActionTrees.Interfaces;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
-    internal sealed class ClassType : DataTypeWrapper<ClassNode>, IVariableContainer, IPropertyContainer, IFunctionContainer<MethodDeclarationStmt>, IOperatorContainer, IImplicitContainer, IExplicitContainer
+    internal sealed class ClassType : DataTypeWrapper<ClassNode>, IVariableContainer, IConstructorContainer, IPropertyContainer, IFunctionContainer<MethodDeclarationStmt>, IOperatorContainer, IIndexerContainer, IImplicitContainer, IExplicitContainer
     {
         public override DataTypeEnum TypeEnum { get => DataTypeEnum.Class; }
 
-        private readonly List<PropertyCreationStmt> propertyCreationNodes;
-        private readonly List<VariableCreationStmt> globalVariableCreations;
-
-        private readonly List<MethodDeclarationStmt> functionDeclarations;
-
-        private readonly List<ExplicitCastDeclarationStmt> explicitCasts;
-        private readonly List<ImplicitCastDeclarationStmt> implicitCasts;
-        private readonly List<OperatorOverloadDeclarationStmt> operatorOverloads;
-
-        public ClassType(IdentifierNode _name, List<ImportNode> _imports, ClassNode _skeleton) : base(_name, _imports, _skeleton)
+        public ClassType(IdentifierNode _name, List<ImportNode> _imports, ClassNode _skeleton) : base(_name, _imports,
+                    GlobalMemberEnum.Indexer |
+                    GlobalMemberEnum.Variable |
+                    GlobalMemberEnum.Property |
+                    GlobalMemberEnum.Function |
+                    GlobalMemberEnum.Constructor |
+                    GlobalMemberEnum.ImplicitCast |
+                    GlobalMemberEnum.Explicitcast |
+                    GlobalMemberEnum.OperaterOverload,
+                    _skeleton)
         {
-            propertyCreationNodes = new List<PropertyCreationStmt>();
-            globalVariableCreations = new List<VariableCreationStmt>();
 
-            functionDeclarations = new List<MethodDeclarationStmt>();
-
-            explicitCasts = new List<ExplicitCastDeclarationStmt>();
-            implicitCasts = new List<ImplicitCastDeclarationStmt>();
-
-            operatorOverloads = new List<OperatorOverloadDeclarationStmt>();
         }
 
-        public IVariableContainer AddDeclaration(VariableCreationStmt declaration)
-        {
-            globalVariableCreations.Add(declaration);
+        public IVariableContainer AddDeclaration(VariableCreationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Variable, declaration);
 
-            return this;
-        }
+        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Property, declaration);
 
-        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration)
-        {
-            propertyCreationNodes.Add(declaration);
+        public IFunctionContainer<MethodDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Function, declaration);
 
-            return this;
-        }
+        public IConstructorContainer AddDeclaration(ConstructorDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Constructor, declaration);
 
-        public IFunctionContainer<MethodDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration)
-        {
-            functionDeclarations.Add(declaration);
+        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.OperaterOverload, declaration);
 
-            return this;
-        }
+        public IIndexerContainer AddDeclaration(IndexerCreationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Indexer, declaration);
 
-        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration)
-        {
-            operatorOverloads.Add(declaration);
+        public ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.ImplicitCast, declaration);
 
-            return this;
-        }
+        public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Explicitcast, declaration);
 
-        public ICastContainer<ImplicitCastDeclarationStmt, ImplicitCastDeclarationNode, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration)
-        {
-            implicitCasts.Add(declaration);
+        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(GlobalMemberEnum.Variable, identifier.Value);
 
-            return this;
-        }
+        public PropertyCreationStmt TryFindpropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(GlobalMemberEnum.Property, identifier.Value);
 
-        public ICastContainer<ExplicitCastDeclarationStmt, ExplicitCastDeclarationNode, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration)
-        {
-            explicitCasts.Add(declaration);
+        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(GlobalMemberEnum.Function, identifier.Value);
 
-            return this;
-        }
+        public ConstructorDeclarationStmt TryFindConstructorDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ConstructorDeclarationStmt,IConstructorContainer>(GlobalMemberEnum.Constructor, identifier.Value);
 
-        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => TryFindEntity<VariableCreationStmt, IVariableContainer>(identifier, globalVariableCreations);
+        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<OperatorOverloadDeclarationStmt, IOperatorContainer>(GlobalMemberEnum.OperaterOverload, identifier.Value);
 
-        public PropertyCreationStmt TryFindpropertyCreation(IdentifierNode identifier) => TryFindEntity<PropertyCreationStmt, IPropertyContainer>(identifier, propertyCreationNodes);
+        public ImplicitCastDeclarationStmt TryFindImplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ImplicitCastDeclarationStmt, IImplicitContainer>(GlobalMemberEnum.ImplicitCast, identifier.Value);
 
-        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => TryFindEntity<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(identifier, functionDeclarations);
+        public ExplicitCastDeclarationStmt TryFindExplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ExplicitCastDeclarationStmt, IExplicitContainer>(GlobalMemberEnum.Explicitcast, identifier.Value);
 
-        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(IdentifierNode identifier) => TryFindEntity<OperatorOverloadDeclarationStmt, IOperatorContainer>(identifier, operatorOverloads);
+        public IndexerCreationStmt TryFindIndexerCreationStatement(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<IndexerCreationStmt, IIndexerContainer>(GlobalMemberEnum.Indexer, identifier.Value);
 
-        public ImplicitCastDeclarationStmt TryFindImplicitCastDeclaration(IdentifierNode identifier) => TryFindEntity<ImplicitCastDeclarationStmt, IImplicitContainer>(identifier, implicitCasts);
+        public override bool IsDuplicateGlobalMember(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
 
-        public ExplicitCastDeclarationStmt TryFindExplicitCastDeclaration(IdentifierNode identifier) => TryFindEntity<ExplicitCastDeclarationStmt, IExplicitContainer>(identifier, explicitCasts);
-
-        private T TryFindEntity<T, Parent>(IdentifierNode identifier, List<T> collection) where T : CreationStatement<Parent> where Parent : IActionTreeNode
-        {
-            foreach (var creation in collection)
-                if (creation.Name == identifier.Value)
-                    return creation;
-
-            return null;
-        }
+        public bool IsDuplicateIndexer(DataType dataType) => globalMemberCollection.GetIndexerStatement(dataType) != null;
 
         public override string ToString() => $"Class Node [{name.Value}]";
     }
