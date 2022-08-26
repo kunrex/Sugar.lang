@@ -8,9 +8,17 @@ using Sugar.Language.Semantics.ActionTrees.Describers;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation
 {
-    internal sealed class GlobalVariableInitialisationStmt : GlobalVariableDeclarationStmt, IInitialisable
+    internal class GlobalVariableInitialisationStmt : GlobalVariableDeclarationStmt, IInitialisable
     {
-        public ExpressionNode Value { get; private set; }
+        public ExpressionNode Value { get; protected set; }
+
+        protected GlobalVariableInitialisationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer) : base(
+            _creationType,
+            _creationName,
+            _describer)
+        {
+            
+        }
 
         public GlobalVariableInitialisationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, ExpressionNode _value) : base(
             _creationType,

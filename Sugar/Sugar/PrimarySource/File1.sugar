@@ -1,17 +1,4 @@
-﻿import class Y.A;
-
-namespace X
+﻿enum a
 {
-    class Z
-    {
-        indexer A.B()
-        {
-            get => 10;
-        }
-
-        indexer A()
-        {
-            get => 10;
-        }
-    }
+    A = 10
 }

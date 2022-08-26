@@ -32,6 +32,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.C
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local.FunctionArguments;
 
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation;
+using Sugar.Language.Parsing.Nodes.NodeGroups;
 
 namespace Sugar.Language.Semantics.Services.Implementations
 {
@@ -95,11 +96,13 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 switch(dataType.TypeEnum)
                 {
                     case DataTypeEnum.Class:
-                        CreateGlobalMembers<ClassType, ClassNode>((ClassType)dataType, subTypeSearcher, CreateClassMembers);
+                        CreateGlobalMembers<ClassType, ClassNode>((ClassType)dataType, subTypeSearcher, CreateGeneralMembers);
                         break;
                     case DataTypeEnum.Struct:
+                        CreateGlobalMembers<StructType, StructNode>((StructType)dataType, subTypeSearcher, CreateGeneralMembers);
                         break;
                     case DataTypeEnum.Interface:
+                        CreateGlobalMembers<InterfaceType, InterfaceNode>((InterfaceType)dataType, subTypeSearcher, CreateInterfaceMembers);
                         break;
                 }
             }
@@ -121,7 +124,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
-        private void CreateClassMembers(Node node, ClassType classType, SubTypeSearcherService subTypeSearcher)
+        private void CreateGeneralMembers<Type>(Node node, Type generalType, SubTypeSearcherService subTypeSearcher) where Type : DataType, IGeneralContainer
         {
             var nodeType = node.NodeType;
             switch (nodeType)
@@ -137,17 +140,17 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     switch (entityCreationNode.CreationType)
                     {
                         case NodeType.Variable:
-                            InitailiseVariableDeclaration(entityCreationNode, name, type, describer, classType, subTypeSearcher);
+                            InitailiseVariableDeclaration(entityCreationNode, name, type, describer, generalType, subTypeSearcher);
                             break;
                         default:
-                            InitialisePropertyDeclaration(entityCreationNode, name, type, describer, classType, subTypeSearcher);
+                            InitialisePropertyDeclaration(entityCreationNode, name, type, describer, generalType, subTypeSearcher);
                             break;
                     }
                     break;
                 case NodeType.Indexer:
                     var creationNode = (BaseFunctionDeclarationNode)node;
 
-                    AddIndexer(creationNode, classType, subTypeSearcher, (CustomTypeNode)creationNode.Type);
+                    AddIndexer(creationNode, generalType, subTypeSearcher, (CustomTypeNode)creationNode.Type);
                     break;
                 case NodeType.OperatorOverload:
                 case NodeType.ExplicitDeclaration:
@@ -165,10 +168,64 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     switch(nodeType)
                     {
                         case NodeType.FunctionDeclaration:
-                            AddDeclaration<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(new MethodDeclarationStmt(result.ReturnType, result.Name, result.Describer, result.Arguments, result.Body), classType);
+                            AddDeclaration<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(new MethodDeclarationStmt(result.ReturnType, result.Name, result.Describer, result.Arguments, result.Body), generalType);
                             break;
                         case NodeType.ConstructorDeclaration:
-                            AddDeclaration<ConstructorDeclarationStmt, IConstructorContainer>(new ConstructorDeclarationStmt(classType, result.Name, result.Describer, result.Arguments, result.Body), classType);
+                            AddDeclaration<ConstructorDeclarationStmt, IConstructorContainer>(new ConstructorDeclarationStmt(generalType, result.Name, result.Describer, result.Arguments, result.Body), generalType);
+                            break;
+                        case NodeType.ImplicitDeclaration:
+                            AddDeclaration<ImplicitCastDeclarationStmt, ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer>>(new ImplicitCastDeclarationStmt(result.ReturnType, result.Name, result.Describer, result.Arguments, result.Body), generalType);
+                            break;
+                        case NodeType.ExplicitDeclaration:
+                            AddDeclaration<ExplicitCastDeclarationStmt, ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer>>(new ExplicitCastDeclarationStmt(result.ReturnType, result.Name, result.Describer, result.Arguments, result.Body), generalType);
+                            break;
+                        case NodeType.OperatorOverload:
+                            AddOperatorOverload(creationNode, result.Name, generalType, result.Body, result.ReturnType, result.Describer, result.Arguments);
+                            break;
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Invalid Statement");
+                    return;
+            }
+        }
+
+        private void CreateInterfaceMembers(Node node, InterfaceType classType, SubTypeSearcherService subTypeSearcher)
+        {
+            var nodeType = node.NodeType;
+            switch (nodeType)
+            {
+                case NodeType.Initialise:
+                case NodeType.Declaration:
+                    var entityCreationNode = (VariableCreationNode)node;
+
+                    var type = entityCreationNode.Type;
+                    var name = (IdentifierNode)entityCreationNode.Name;
+                    var describer = describerService.AnalyseDescriber((DescriberNode)entityCreationNode.Describer);
+
+                    InitialisePropertyDeclaration(entityCreationNode, name, type, describer, classType, subTypeSearcher);
+                    break;
+                case NodeType.Indexer:
+                    var creationNode = (BaseFunctionDeclarationNode)node;
+
+                    AddIndexer(creationNode, classType, subTypeSearcher, (CustomTypeNode)creationNode.Type);
+                    break;
+                case NodeType.OperatorOverload:
+                case NodeType.ExplicitDeclaration:
+                case NodeType.FunctionDeclaration:
+                case NodeType.ImplicitDeclaration:
+                    creationNode = (BaseFunctionDeclarationNode)node;
+
+                    FunctionInfo result;
+                    if (nodeType == NodeType.ConstructorDeclaration)
+                        result = GatherArguments(creationNode, subTypeSearcher);
+                    else
+                        result = GatherArguments(creationNode, subTypeSearcher, (CustomTypeNode)creationNode.Type);
+
+                    switch (nodeType)
+                    {
+                        case NodeType.FunctionDeclaration:
+                            AddDeclaration<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(new MethodDeclarationStmt(result.ReturnType, result.Name, result.Describer, result.Arguments, result.Body), classType);
                             break;
                         case NodeType.ImplicitDeclaration:
                             AddDeclaration<ImplicitCastDeclarationStmt, ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer>>(new ImplicitCastDeclarationStmt(result.ReturnType, result.Name, result.Describer, result.Arguments, result.Body), classType);
@@ -184,6 +241,26 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 default:
                     Console.WriteLine("Invalid Statement");
                     return;
+            }
+        }
+
+        private void CreateEnumMembers(EnumType enumType)
+        {
+            Node body = enumType.Skeleton.Body;
+
+            foreach (var child in body.GetChildren())
+            {
+                switch (child.NodeType)
+                {
+                    case NodeType.Variable:
+
+                        break;
+                    case NodeType.Assignment:
+                        break;
+                    default:
+                        Console.WriteLine("Invalid Statement");
+                        return;
+                }
             }
         }
 
@@ -315,11 +392,6 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
 
             return arguments;
-        }
-
-        private void CreateEnumMembers(EnumType enumType)
-        {
-
         }
     }
 }
