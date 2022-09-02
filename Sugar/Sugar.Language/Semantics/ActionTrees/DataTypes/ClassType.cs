@@ -15,7 +15,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.C
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
-    internal sealed class ClassType : DataTypeWrapper<ClassNode>, IGeneralContainer
+    internal class ClassType : DataTypeWrapper<ClassNode>, IGeneralContainer
     {
         public override DataTypeEnum TypeEnum { get => DataTypeEnum.Class; }
 

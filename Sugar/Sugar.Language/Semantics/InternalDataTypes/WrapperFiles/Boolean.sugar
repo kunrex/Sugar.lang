@@ -1,0 +1,68 @@
+﻿
+namespace Sugar
+{
+    struct Boolean
+    {
+        [private] bool: value;
+
+        [public]
+        constructor()
+        {
+            value = false;
+        }
+
+        [public]
+        constructor(bool: defaultValue)
+        {
+            value = defaultValue;
+        }
+
+        [public]
+        constructor(int: defaultValue)
+        {
+            value = defaultValue == 0 ? true : false;
+        }
+
+        [public static]
+        implicit bool(Boolean: value) => value.value;
+
+        [public static]
+        implicit Boolean(bool: value) => create Boolean(value);
+
+        [public static]
+        implicit Boolean(int: value) => create Boolean(value);
+
+        [public, static]
+        explicit char(bool: value) => value ? (char)0 : (char)1;
+
+        [public, static]
+        explicit byte(bool: value) => (byte)value;
+
+        [public, static]
+        explicit sbyte(bool: value) => (sbyte)value;
+
+        [public, static]
+        explicit short(bool: value) => (short)value;
+
+        [public, static]
+        explicit ushort(bool: value) => (ushort)value;
+
+        [public, static]
+        explicit int(bool: value) => (int)value;
+
+        [public, static]
+        explicit uint(bool: value) => (uint)value;
+
+        [public, static]
+        explicit long(bool: value) => (long)value;
+
+        [public, static]
+        explicit ulong(bool: value) => (ulong)value;
+
+        [public, static]
+        explicit string(bool: value) => value.ToString();
+
+        [public]
+        string ToString() => => value ? "true" : "false";
+    }
+}

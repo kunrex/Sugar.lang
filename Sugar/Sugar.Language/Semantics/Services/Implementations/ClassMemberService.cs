@@ -32,7 +32,6 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.C
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local.FunctionArguments;
 
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation;
-using Sugar.Language.Parsing.Nodes.NodeGroups;
 
 namespace Sugar.Language.Semantics.Services.Implementations
 {
@@ -253,9 +252,14 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 switch (child.NodeType)
                 {
                     case NodeType.Variable:
-
-                        break;
                     case NodeType.Assignment:
+                        var entityCreationNode = (VariableCreationNode)child;
+
+                        var describer = new Describer(DescriberEnum.EnumModifiers);
+                        var name = (IdentifierNode)entityCreationNode.Name;
+                        var type = defaultNameSpace.GetInternalDataType(InternalDataTypeEnum.Integer);
+
+                        InitailiseVariableDeclaration(entityCreationNode, name, type, describer, enumType);
                         break;
                     default:
                         Console.WriteLine("Invalid Statement");
@@ -264,13 +268,16 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
-        private void InitailiseVariableDeclaration(VariableCreationNode node, IdentifierNode name, Node type, Describer describer, IVariableContainer dataType, SubTypeSearcherService subTypeSearcher) 
+        private void InitailiseVariableDeclaration(VariableCreationNode node, IdentifierNode name, Node type, Describer describer, IVariableContainer dataType, SubTypeSearcherService subTypeSearcher)
+            => InitailiseVariableDeclaration(node, name, subTypeSearcher.TryFindReferencedType(type), describer, dataType);
+
+        private void InitailiseVariableDeclaration(VariableCreationNode node, IdentifierNode name, DataType type, Describer describer, IVariableContainer dataType)
         {
             VariableCreationStmt variableCreationStatement;
             if (node.NodeType == NodeType.Declaration)
-                variableCreationStatement = new GlobalVariableDeclarationStmt(subTypeSearcher.TryFindReferencedType(type), name, describer);
+                variableCreationStatement = new GlobalVariableDeclarationStmt(type, name, describer);
             else
-                variableCreationStatement = new GlobalVariableInitialisationStmt(subTypeSearcher.TryFindReferencedType(type), name, describer, (ExpressionNode)((InitializeNode)node).Value);
+                variableCreationStatement = new GlobalVariableInitialisationStmt(type, name, describer, (ExpressionNode)((InitializeNode)node).Value);
 
             AddDeclaration(variableCreationStatement, dataType);
         }

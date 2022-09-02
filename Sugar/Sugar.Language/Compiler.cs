@@ -7,54 +7,43 @@ using Sugar.Language.Parsing.Parser;
 
 using Sugar.Language.Semantics.Analysis;
 using Sugar.Language.Parsing;
+using Sugar.Language.Semantics.InternalDataTypes;
 
 namespace Sugar.Language
 {
     public sealed class Compiler
     {
         private readonly string[] sourceFiles;
+        private readonly string[] internalDataTypes;
 
-        public Compiler(string source)
+        public Compiler(string source, string[] defaultDataTypes)
         {
             sourceFiles = new string[] { source };
+            internalDataTypes = defaultDataTypes ;
         }
 
-        public Compiler(List<string> source)
+        public Compiler(List<string> source, List<string> defaultDataTypes)
         {
             sourceFiles = source.ToArray();
+            internalDataTypes = defaultDataTypes.ToArray();
         }
 
         public bool Compile()
         {
             try
             {
-                var treeCollection = new SyntaxTreeCollection();
-                foreach(var source in sourceFiles)
-                {
-                    Console.WriteLine(source);
-
-                    var tokens = new Lexer(source).Lex();
-
-                    var tree = new Parser(tokens).Parse();
-                    if (tree == null)
-                    {
-                        Console.WriteLine("Source Code Empty");
-                        continue;
-                    }
-
-                    treeCollection.Add(tree);
-                    tree.BaseNode.Print("", true);
-                }
-
-                if(treeCollection.Count == 0)
+                var parsedFiles = CreateSyntaxTree(sourceFiles);
+                if (parsedFiles.Count == 0)
                 {
                     Console.WriteLine("No Output");
                     return true;
                 }
 
+                var defaultDataTypes = CreateSyntaxTree(internalDataTypes);
+
                 Console.WriteLine("\n_____Analysed_____");
 
-                var analysisResult = new SemanticAnalyser(treeCollection).Analyse();
+                var analysisResult = new SemanticAnalyser(defaultDataTypes, parsedFiles).Analyse();
 
                 Console.WriteLine(analysisResult);
                 return true;
@@ -64,6 +53,29 @@ namespace Sugar.Language
                 Console.WriteLine($"Exception: {e.Message}");
                 return false;
             }
+        }
+
+        private SyntaxTreeCollection CreateSyntaxTree(string[] source)
+        {
+            var treeCollection = new SyntaxTreeCollection();
+            foreach (var file in source)
+            {
+                Console.WriteLine(source);
+
+                var tokens = new Lexer(file).Lex();
+
+                var tree = new Parser(tokens).Parse();
+                if (tree == null)
+                {
+                    Console.WriteLine("Source Code Empty");
+                    continue;
+                }
+
+                treeCollection.Add(tree);
+                tree.BaseNode.Print("", true);
+            }
+
+            return treeCollection;
         }
     }
 }

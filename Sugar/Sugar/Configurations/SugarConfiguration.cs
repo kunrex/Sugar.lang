@@ -6,5 +6,6 @@ namespace Sugar.Configurations
     {
         public int Version { get; set; }
         public string SourceFolder { get; set; }
+        public string WrapperFileLocation { get; set; }
     }
 }

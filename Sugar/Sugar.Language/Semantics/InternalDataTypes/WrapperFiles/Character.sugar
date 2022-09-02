@@ -4,6 +4,33 @@
     {
         [private] int: ascii;
 
+        [public]
+        constructor()
+        {
+            ascii = 0;
+        }
+
+        [public]
+        constructor(char: c)
+        {
+            ascii = (int)c;
+        }
+
+        [public]
+        constructor(int: ascii)
+        {
+            ascii = c;
+        }
+
+        [public static]
+        implicit char(Character: value) => (char)value.ascii;
+
+        [public static]
+        implicit Character(char: value) => create Character(value);
+
+        [public static]
+        implicit Character(int: value) => create Character(value);
+
         [public, static]
         implicit ushort(char: c) => (ushort)c.ascii;
 
@@ -38,6 +65,9 @@
         }
 
         [public, static]
-        explicit string(char: c) => c + "";
+        explicit string(char: c) => c.ToString();
+
+        [public]
+        string ToString() => => c + "";
     }
 }

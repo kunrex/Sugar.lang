@@ -1,4 +1,5 @@
 ﻿{
-  "Version" : 1,
-  "SourceFolder" : "/Users/kunalkashyap/Projects/Sugar.Language/Sugar/Sugar/PrimarySource"
+  "Version": 1,
+  "SourceFolder": "/Users/kunalkashyap/Projects/Sugar.Language/Sugar/Sugar/PrimarySource",
+  "WrapperFileLocation": "/Users/kunalkashyap/Projects/Sugar.Language/Sugar/Sugar.Language/Semantics/InternalDataTypes/WrapperFiles"
 }

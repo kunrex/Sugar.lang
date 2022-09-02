@@ -41,30 +41,29 @@ namespace Sugar.Language.Semantics.Analysis
     {
         private SugarPackage package;
         public SyntaxTreeCollection Collection { get; private set; }
+        public SyntaxTreeCollection InternalDataTypes { get; private set; }
 
         private DefaultNameSpaceNode defaultNameSpace;
         private CreatedNameSpaceCollectionNode createdNameSpaces;
 
-        public SemanticAnalyser(SyntaxTreeCollection _collection)
+        public SemanticAnalyser(SyntaxTreeCollection _internalDataTypes, SyntaxTreeCollection _collection)
         {
             Collection = _collection;
+            InternalDataTypes = _internalDataTypes;
         }
 
         public SugarPackage Analyse()
         {
-            var collections = new NameSpaceStructureService(Collection).Validate();
+            var collections = new NameSpaceStructureService(InternalDataTypes, Collection).Validate();
 
             defaultNameSpace = (DefaultNameSpaceNode)collections.Results[0];
             createdNameSpaces = (CreatedNameSpaceCollectionNode)collections.Results[1];
-
 
             package = new SugarPackage(defaultNameSpace, createdNameSpaces);
             var import = new ImportStatementService(defaultNameSpace, createdNameSpaces).Validate();
             defaultNameSpace.Print("", true);
             createdNameSpaces.Print("", true);
             var classMemberCreation = new ClassMemberService(defaultNameSpace, createdNameSpaces).Validate();
-
-
 
             Console.WriteLine(import);
             Console.WriteLine(classMemberCreation);

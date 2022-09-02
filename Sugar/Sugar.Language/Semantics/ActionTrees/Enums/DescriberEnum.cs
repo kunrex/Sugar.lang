@@ -30,5 +30,6 @@ namespace Sugar.Language.Semantics.ActionTrees.Enums
         MutabilityModifier = Const | Readonly,
         AccessModifiers = Public | Private | Protected,
         InheritanceModifiers = Sealed | Virtual | Abstract,
+        EnumModifiers = Static | Public | Readonly
     }
 }

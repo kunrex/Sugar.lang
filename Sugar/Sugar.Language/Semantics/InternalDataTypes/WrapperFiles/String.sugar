@@ -1,0 +1,25 @@
+﻿namespace Sugar
+{
+    class String
+    {
+        [private] string: value;
+
+        [public] int: Length { get => value.Length; }
+        [public] bool: Empty { get => value.Length == 0; }
+
+        [public]
+        constructor(string: defaultValue)
+        {
+            value = defaultValue;
+        }
+
+        [public]
+        constructor(Array<char>: characters)
+        {
+            value = characters.ToString();
+        }
+        
+        [public]
+        string ToString() => value;
+    }
+}

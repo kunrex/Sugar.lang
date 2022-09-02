@@ -67,7 +67,6 @@
     <None Remove="Semantics\ActionTrees\Interfaces\Namespaces\" />
     <None Remove="Semantics\ActionTrees\Interfaces\DataTypes\" />
     <None Remove="Semantics\ActionTrees\Enums\" />
-    <None Remove="Semantics\WrapperFiles\" />
     <None Remove="Semantics\Analysis\Structure\" />
     <None Remove="Semantics\ActionTrees\Interfaces\Describers\" />
     <None Remove="Semantics\ActionTrees\Describers\" />
@@ -99,6 +98,8 @@
     <None Remove="Semantics\ActionTrees\CreationStatements\VariableCreation\Global\" />
     <None Remove="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\" />
     <None Remove="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\FunctionArguments\" />
+    <None Remove="Semantics\InternalDatatYpes\" />
+    <None Remove="Semantics\DefaultDataType\WrapperFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -161,7 +162,6 @@
     <Folder Include="Semantics\ActionTrees\Interfaces\Collections\" />
     <Folder Include="Semantics\ActionTrees\Interfaces\DataTypes\" />
     <Folder Include="Semantics\ActionTrees\Enums\" />
-    <Folder Include="Semantics\WrapperFiles\" />
     <Folder Include="Semantics\Analysis\Structure\" />
     <Folder Include="Semantics\ActionTrees\Interfaces\Describers\" />
     <Folder Include="Semantics\ActionTrees\Describers\" />
@@ -191,9 +191,12 @@
     <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Global\" />
     <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\" />
     <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\FunctionArguments\" />
+    <Folder Include="Semantics\InternalDataTypes\" />
+    <Folder Include="Semantics\InternalDataTypes\WrapperFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />
     <Compile Remove="Parsing\Nodes\NodeGroups\NodeGroup.cs" />
+    <Compile Remove="Semantics\WrapperFiles\String.sugar" />
   </ItemGroup>
 </Project>

@@ -23,11 +23,14 @@ namespace Sugar.Language.Semantics.Services.Implementations
         private readonly CreatedNameSpaceCollectionNode createdNameSpaces;
 
         private readonly SyntaxTreeCollection collection;
+        private readonly SyntaxTreeCollection internalDataTypes;
+
         private readonly SemanticsResult semanticsResult;
 
-        public NameSpaceStructureService(SyntaxTreeCollection _collection)
+        public NameSpaceStructureService(SyntaxTreeCollection _internalDataTypes, SyntaxTreeCollection _collection)
         {
             collection = _collection;
+            internalDataTypes = _internalDataTypes;
 
             defaultNameSpace = new DefaultNameSpaceNode();
             createdNameSpaces = new CreatedNameSpaceCollectionNode();
@@ -37,13 +40,16 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         public SemanticsResult Validate()
         {
+            foreach (var tree in internalDataTypes)
+                StructureTree(tree.BaseNode, defaultNameSpace.AddInternalDataType);
+
             foreach (var tree in collection)
-                StructureTree(tree.BaseNode);
+                StructureTree(tree.BaseNode, defaultNameSpace.AddEntity);
 
             return semanticsResult.Build(new object[] { defaultNameSpace, createdNameSpaces });
         }
 
-        private void StructureTree(Node node)
+        private void StructureTree(Node node, Func<DataType, IDataTypeCollection> defaultTypeFunctionCall)
         {
             bool allowImports = true;
             var importStatements = new List<ImportNode>();
@@ -66,7 +72,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     case NodeType.Struct:
                     case NodeType.Interface:
                         allowImports = false;
-                        defaultNameSpace.AddEntity(CreateDataType((UDDataTypeNode)child, defaultNameSpace, importStatements));
+                        defaultTypeFunctionCall.Invoke(CreateDataType((UDDataTypeNode)child, defaultNameSpace, importStatements));
                         break;
                     default:
                         semanticsResult.Add(new InvalidStatementException("file", $"namespace{(allowImports ? ", import statement" : "")} or data type declaration"));
