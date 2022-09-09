@@ -5,9 +5,8 @@ using Sugar.Language.Lexing;
 using Sugar.Language.Exceptions;
 using Sugar.Language.Parsing.Parser;
 
-using Sugar.Language.Semantics.Analysis;
 using Sugar.Language.Parsing;
-using Sugar.Language.Semantics.InternalDataTypes;
+using Sugar.Language.Semantics.Analysis;
 
 namespace Sugar.Language
 {
@@ -15,12 +14,6 @@ namespace Sugar.Language
     {
         private readonly string[] sourceFiles;
         private readonly string[] internalDataTypes;
-
-        public Compiler(string source, string[] defaultDataTypes)
-        {
-            sourceFiles = new string[] { source };
-            internalDataTypes = defaultDataTypes ;
-        }
 
         public Compiler(List<string> source, List<string> defaultDataTypes)
         {
@@ -60,11 +53,8 @@ namespace Sugar.Language
             var treeCollection = new SyntaxTreeCollection();
             foreach (var file in source)
             {
-                Console.WriteLine(source);
+                var tree = new Parser(new Lexer(file).Lex()).Parse();
 
-                var tokens = new Lexer(file).Lex();
-
-                var tree = new Parser(tokens).Parse();
                 if (tree == null)
                 {
                     Console.WriteLine("Source Code Empty");

@@ -66,7 +66,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public IndexerCreationStmt TryFindIndexerCreationStatement(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<IndexerCreationStmt, IIndexerContainer>(GlobalMemberEnum.Indexer, identifier.Value);
 
-        public override bool IsDuplicateGlobalMember(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
+        public override bool IsDuplicate(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
 
         public bool IsDuplicateIndexer(DataType dataType) => globalMemberCollection.GetIndexerStatement(dataType) != null;
 

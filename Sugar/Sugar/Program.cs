@@ -16,15 +16,20 @@ namespace Sugar
             var basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
             var configuration = JsonSerializer.Deserialize<SugarConfiguration>(File.ReadAllText(Path.Combine(basePath, "Sugar", "Config.json")));
 
+            var compiler = new Compiler(ReadFiles(configuration.SourceFolder), ReadFiles(configuration.WrapperFileLocation));
+            compiler.Compile();
+        }
+
+        private static List<string> ReadFiles(string location)
+        {
             List<string> sourceFiles = new List<string>();
-            foreach (var path in Directory.GetFiles(configuration.SourceFolder))
+            foreach (var path in Directory.GetFiles(location))
             {
                 if (path.EndsWith(".sugar"))
                     sourceFiles.Add(File.ReadAllText(path));
             }
 
-            var compiler = new Compiler(sourceFiles);
-            compiler.Compile();
+            return sourceFiles;
         }
     }
 }

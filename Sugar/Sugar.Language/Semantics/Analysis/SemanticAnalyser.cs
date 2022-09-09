@@ -40,6 +40,7 @@ namespace Sugar.Language.Semantics.Analysis
     internal sealed class SemanticAnalyser
     {
         private SugarPackage package;
+
         public SyntaxTreeCollection Collection { get; private set; }
         public SyntaxTreeCollection InternalDataTypes { get; private set; }
 

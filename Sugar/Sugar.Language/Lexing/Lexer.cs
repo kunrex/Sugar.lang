@@ -94,10 +94,7 @@ namespace Sugar.Language.Lexing
                                 index++;
                             }
                             else
-                            {
-                                CloneToken(BinaryOperator.GreaterThan);
-                                CloneToken(BinaryOperator.GreaterThan);
-                            }
+                                CloneToken(BinaryOperator.RightShift);
                         }
                         else if (next == '=')
                         {

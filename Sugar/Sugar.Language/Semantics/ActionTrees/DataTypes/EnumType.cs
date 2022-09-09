@@ -24,6 +24,8 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(GlobalMemberEnum.Variable, identifier.Value);
 
+        public override bool IsDuplicate(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
+
         public override string ToString() => $"Enum Node [{name.Value}]";
     }
 }

@@ -6,63 +6,63 @@ namespace Sugar
         [private] bool: value;
 
         [public]
-        constructor()
+        constructor Boolean()
         {
             value = false;
         }
 
         [public]
-        constructor(bool: defaultValue)
+        constructor Boolean(bool: defaultValue)
         {
             value = defaultValue;
         }
 
         [public]
-        constructor(int: defaultValue)
+        constructor Boolean(int: defaultValue)
         {
             value = defaultValue == 0 ? true : false;
         }
 
-        [public static]
+        [public, static]
         implicit bool(Boolean: value) => value.value;
 
-        [public static]
+        [public, static]
         implicit Boolean(bool: value) => create Boolean(value);
 
-        [public static]
+        [public, static]
         implicit Boolean(int: value) => create Boolean(value);
 
         [public, static]
-        explicit char(bool: value) => value ? (char)0 : (char)1;
+        explicit char(bool: value) => value ? 0 as char : 1 as char;
 
         [public, static]
-        explicit byte(bool: value) => (byte)value;
+        explicit byte(bool: value) => value as byte;
 
         [public, static]
-        explicit sbyte(bool: value) => (sbyte)value;
+        explicit sbyte(bool: value) => value as sbyte;
 
         [public, static]
-        explicit short(bool: value) => (short)value;
+        explicit short(bool: value) => value as short;
 
         [public, static]
-        explicit ushort(bool: value) => (ushort)value;
+        explicit ushort(bool: value) => value as ushort;
 
         [public, static]
-        explicit int(bool: value) => (int)value;
+        explicit int(bool: value) => value as int;
 
         [public, static]
-        explicit uint(bool: value) => (uint)value;
+        explicit uint(bool: value) => value as uint;
 
         [public, static]
-        explicit long(bool: value) => (long)value;
+        explicit long(bool: value) => value as long;
 
         [public, static]
-        explicit ulong(bool: value) => (ulong)value;
+        explicit ulong(bool: value) => value as ulong;
 
         [public, static]
         explicit string(bool: value) => value.ToString();
 
         [public]
-        string ToString() => => value ? "true" : "false";
+        string ToString() => value ? "true" : "false";
     }
 }

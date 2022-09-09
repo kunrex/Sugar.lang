@@ -8,18 +8,21 @@
         [public] bool: Empty { get => value.Length == 0; }
 
         [public]
-        constructor(string: defaultValue)
+        constructor String(string: defaultValue)
         {
             value = defaultValue;
         }
 
         [public]
-        constructor(Array<char>: characters)
+        constructor String(Array<char>: characters)
         {
             value = characters.ToString();
         }
         
         [public]
         string ToString() => value;
+
+        [public, static]
+        operator string +(String: a, String: b) => a.value + b.value;
     }
 }

@@ -100,6 +100,8 @@
     <None Remove="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\FunctionArguments\" />
     <None Remove="Semantics\InternalDatatYpes\" />
     <None Remove="Semantics\DefaultDataType\WrapperFiles\" />
+    <None Remove="Exceptions\Analytics\ClassMemberCreation\Statements\" />
+    <None Remove="Semantics\WrapperFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -191,8 +193,8 @@
     <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Global\" />
     <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\" />
     <Folder Include="Semantics\ActionTrees\CreationStatements\VariableCreation\Local\FunctionArguments\" />
-    <Folder Include="Semantics\InternalDataTypes\" />
-    <Folder Include="Semantics\InternalDataTypes\WrapperFiles\" />
+    <Folder Include="Exceptions\Analytics\ClassMemberCreation\Statements\" />
+    <Folder Include="Semantics\WrapperFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

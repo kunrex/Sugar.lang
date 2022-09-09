@@ -19,7 +19,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             Skeleton = _skeleton;
         }
 
-        public virtual bool IsDuplicateGlobalMember(IdentifierNode identifier) => false;
+        public abstract bool IsDuplicate(IdentifierNode identifier);
 
         protected T AddGlobalMember<T>(GlobalMemberEnum memberEnum, ICreationStatement statement) where T : DataTypeWrapper<SkeletonNode>
         {

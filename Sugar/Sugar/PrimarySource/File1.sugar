@@ -1,4 +1,4 @@
-﻿enum a
+﻿class A
 {
-    A = 10
+    
 }

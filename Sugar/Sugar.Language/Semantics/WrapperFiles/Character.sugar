@@ -5,55 +5,55 @@
         [private] int: ascii;
 
         [public]
-        constructor()
+        constructor Character()
         {
             ascii = 0;
         }
 
         [public]
-        constructor(char: c)
+        constructor Character(char: c)
         {
-            ascii = (int)c;
+            ascii = c as int;
         }
 
         [public]
-        constructor(int: ascii)
+        constructor Character(int: ascii)
         {
             ascii = c;
         }
 
-        [public static]
-        implicit char(Character: value) => (char)value.ascii;
+        [public, static]
+        implicit char(Character: value) => value.ascii as char;
 
-        [public static]
+        [public, static]
         implicit Character(char: value) => create Character(value);
 
-        [public static]
+        [public, static]
         implicit Character(int: value) => create Character(value);
 
         [public, static]
-        implicit ushort(char: c) => (ushort)c.ascii;
+        implicit ushort(char: c) => c.ascii as ushort;
 
         [public, static]
         implicit int(char: c) => c.ascii;
 
         [public, static]
-        implicit uint(char: c) => (uint)c.ascii;
+        implicit uint(char: c) => c.ascii as uint;
 
         [public, static]
-        implicit long(char: c) => (long)c.ascii;
+        implicit long(char: c) => c.ascii as long;
 
         [public, static]
-        implicit ulong(char: c) => (ulong)c.ascii;
+        implicit ulong(char: c) => c.ascii as ulong;
 
         [public, static]
-        implicit float(char: c) => (float)c.ascii;
+        implicit float(char: c) => c.ascii as float;
 
         [public, static]
-        implicit double(char: c) => (double)c.ascii;
+        implicit double(char: c) => c.ascii as double;
 
         [public, static]
-        implicit decimal(char: c) => (decimal)c.ascii;
+        implicit decimal(char: c) => c.ascii as decimal;
 
         [public, static]
         explicit bool(char: c)
@@ -68,6 +68,6 @@
         explicit string(char: c) => c.ToString();
 
         [public]
-        string ToString() => => c + "";
+        string ToString() => c + "";
     }
 }

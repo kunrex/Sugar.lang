@@ -341,8 +341,8 @@ namespace Sugar.Language.Parsing.Parser
                 ForceMatchCurrentType(TokenType.Seperator);
                 if (TryMatchCurrent(Seperator.Comma))
                 {
-                    index += 2;
-                    continue;
+                    index++;
+                    continue; 
                 }
 
                 ForceMatchCurrent(Seperator.BoxCloseBracket);
@@ -1666,7 +1666,6 @@ namespace Sugar.Language.Parsing.Parser
             if (describer == null)
                 describer = new DescriberNode();
 
-            Console.WriteLine(describer == null);
             if (TryMatchCurrent(Keyword.Get, true))
             {
                 getNode = new GetNode(describer, ParseAccessorBody(ParseScopeType.Scope | ParseScopeType.LambdaExpression));
