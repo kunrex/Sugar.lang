@@ -11,13 +11,13 @@ namespace Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums
         Short = 2,
         UShort = 4,
 
-        Int = 8,
-        UInt = 16,
+        Integer = 8,
+        UInteger = 16,
 
         Long = 32,
         ULong = 64,
 
-        Integral = Byte | SByte | Short | UShort | Int | UInt | Long | ULong,
+        Integral = Byte | SByte | Short | UShort | Integer | UInteger | Long | ULong,
 
         Float = 128,
         Double = 256,
@@ -27,17 +27,17 @@ namespace Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums
 
         Numeric = Integral | Real,
 
-        Char = 1024,
+        Character = 1024,
         String = 2048,
 
         Boolean = 5096,
 
         Array = 10192,
 
-        NonArrays = String | Numeric | Boolean | Char,
+        NonArrays = String | Numeric | Boolean | Character,
 
         Object = Array | NonArrays,
 
-        FromCharConvertables = Char | UShort | Int | UInt | Long | ULong | Real
+        FromCharConvertables = Character | UShort | Integer | UInteger | Long | ULong | Real
     }
 }

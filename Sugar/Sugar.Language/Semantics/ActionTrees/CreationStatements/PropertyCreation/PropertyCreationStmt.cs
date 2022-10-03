@@ -9,7 +9,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation
 {
-    internal abstract class PropertyCreationStmt : CreationStatement<IPropertyContainer> 
+    internal abstract class PropertyCreationStmt : ReturnableCreationStatement<IPropertyContainer> 
     {
         public PropertyCreationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer) : base(
             _creationType,

@@ -33,6 +33,9 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.L
 
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.Statements;
+using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
+using Sugar.Language.Parsing.Nodes.Types;
+using Sugar.Language.Parsing.Nodes.Types.Enums;
 
 namespace Sugar.Language.Semantics.Services.Implementations
 {
@@ -57,8 +60,15 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         public SemanticsResult Validate()
         {
-            CreateCollectionGlobalMembers(defaultNameSpace);
-            CreateCollectionGlobalMembers(createdNameSpaces);
+            var integer = defaultNameSpace.GetInternalDataType(TypeEnum.Integer);
+            if (integer != null)
+            {
+
+                CreateGlobalMembers(integer);
+            }
+
+            //CreateCollectionGlobalMembers(defaultNameSpace);
+            //CreateCollectionGlobalMembers(createdNameSpaces);
 
             return result.Build();
         }
@@ -124,7 +134,8 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
-        private void CreateGeneralMembers<Type, TypeNode>(Node node, Type generalType, SubTypeSearcherService subTypeSearcher) where Type : DataTypeWrapper<TypeNode>, IGeneralContainer where TypeNode : UDDataTypeNode
+        //match type nodes, like how contructor nodes have their own class, check for those
+        private void CreateGeneralMembers<Type, UDDTypeNode>(Node node, Type generalType, SubTypeSearcherService subTypeSearcher) where Type : DataTypeWrapper<UDDTypeNode>, IGeneralContainer where UDDTypeNode : UDDataTypeNode
         {
             var nodeType = node.NodeType;
             switch (nodeType)
@@ -140,7 +151,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                         return;
                     }
 
-                    var type = entityCreationNode.Type;
+                    var type = (TypeNode)entityCreationNode.Type;
                     var describer = describerService.AnalyseDescriber((DescriberNode)entityCreationNode.Describer);
 
                     switch (entityCreationNode.CreationType)
@@ -173,7 +184,10 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     switch(nodeType)
                     {
                         case NodeType.FunctionDeclaration:
-                            AddDeclaration<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(new MethodDeclarationStmt(functionInfo.ReturnType, functionInfo.Name, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), generalType);
+                            /*if(functionInfo.ReturnType == null)
+                                AddDeclaration<VoidDeclarationStmt, IFunctionContainer<VoidDeclarationStmt>>(new VoidReturnableStmt(functionInfo.Name, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), generalType);
+                            else*/
+                                AddDeclaration<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt>>(new MethodDeclarationStmt(functionInfo.ReturnType, functionInfo.Name, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), generalType);
                             break;
                         case NodeType.ConstructorDeclaration:
                             AddDeclaration<ConstructorDeclarationStmt, IConstructorContainer>(new ConstructorDeclarationStmt(generalType, functionInfo.Name, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), generalType);
@@ -210,7 +224,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                         result.Add(new DuplicateGlobalDefinitionException(name.Value, classType.Name));
                     }
 
-                    var type = entityCreationNode.Type;
+                    var type = (TypeNode)entityCreationNode.Type;
                     var describer = describerService.AnalyseDescriber((DescriberNode)entityCreationNode.Describer);
 
                     InitialisePropertyDeclaration(entityCreationNode, name, type, describer, classType, subTypeSearcher);
@@ -240,7 +254,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     switch (nodeType)
                     {
                         case NodeType.FunctionDeclaration:
-                            AddDeclaration<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(new MethodDeclarationStmt(functionInfo.ReturnType, functionInfo.Name, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), classType);
+                            AddDeclaration<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt>>(new MethodDeclarationStmt(functionInfo.ReturnType, functionInfo.Name, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), classType);
                             break;
                         case NodeType.ImplicitDeclaration:
                             AddDeclaration<ImplicitCastDeclarationStmt, ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer>>(new ImplicitCastDeclarationStmt(functionInfo.ReturnType, functionInfo.Name, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), classType);
@@ -273,7 +287,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                         var describer = new Describer(DescriberEnum.EnumModifiers);
                         var name = (IdentifierNode)entityCreationNode.Name;
-                        var type = defaultNameSpace.GetInternalDataType(InternalDataTypeEnum.Integer);
+                        var type = defaultNameSpace.GetInternalDataType(TypeEnum.Integer);
 
                         InitailiseVariableDeclaration(entityCreationNode, name, type, describer, enumType);
                         break;
@@ -284,8 +298,8 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
-        private void InitailiseVariableDeclaration(VariableCreationNode node, IdentifierNode name, Node type, Describer describer, IVariableContainer dataType, SubTypeSearcherService subTypeSearcher)
-            => InitailiseVariableDeclaration(node, name, subTypeSearcher.TryFindReferencedType(type), describer, dataType);
+        private void InitailiseVariableDeclaration(VariableCreationNode node, IdentifierNode name, TypeNode type, Describer describer, IVariableContainer dataType, SubTypeSearcherService subTypeSearcher)
+            => InitailiseVariableDeclaration(node, name, FindReferencedType(subTypeSearcher, type), describer, dataType);
 
         private void InitailiseVariableDeclaration(VariableCreationNode node, IdentifierNode name, DataType type, Describer describer, IVariableContainer dataType)
         {
@@ -298,13 +312,15 @@ namespace Sugar.Language.Semantics.Services.Implementations
             AddDeclaration(variableCreationStatement, dataType);
         }
 
-        private void InitialisePropertyDeclaration(VariableCreationNode node, IdentifierNode name, Node type, Describer describer, IPropertyContainer dataType, SubTypeSearcherService subTypeSearcher)
+        private void InitialisePropertyDeclaration(VariableCreationNode node, IdentifierNode name, TypeNode type, Describer describer, IPropertyContainer dataType, SubTypeSearcherService subTypeSearcher)
         {
+            var referencedType = FindReferencedType(subTypeSearcher, type);
+
             PropertyCreationStmt property;
             if (node.NodeType == NodeType.Declaration)
-                property = InitialisePropertyDeclaration(node.Name, name, subTypeSearcher.TryFindReferencedType(type), describer);
+                property = InitialisePropertyDeclaration(node.Name, name, referencedType, describer);
             else
-                property = InitialisePropertyDeclaration(node.Name, name, subTypeSearcher.TryFindReferencedType(type), describer, (ExpressionNode)((InitializeNode)node).Value);
+                property = InitialisePropertyDeclaration(node.Name, name, referencedType, describer, (ExpressionNode)((InitializeNode)node).Value);
 
             AddDeclaration(property, dataType);
         }
@@ -346,12 +362,30 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
-        private FunctionInfo GatherArguments(BaseFunctionDeclarationNode baseFunction, SubTypeSearcherService subTypeSearcher, CustomTypeNode type) => new FunctionInfo(
-                baseFunction.Body,
-                (IdentifierNode)baseFunction.Name,
-                subTypeSearcher.TryFindReferencedType(type.CustomType),
-                describerService.AnalyseDescriber((DescriberNode)baseFunction.Describer),
-                CreateArguments(subTypeSearcher, (FunctionDeclarationArgumentsNode)baseFunction.Arguments));
+        private FunctionInfo GatherArguments(BaseFunctionDeclarationNode baseFunction, SubTypeSearcherService subTypeSearcher, TypeNode type) => new FunctionInfo(baseFunction.Body,
+                                            (IdentifierNode) baseFunction.Name,
+                                            FindReferencedType(subTypeSearcher, type),
+                                            describerService.AnalyseDescriber((DescriberNode) baseFunction.Describer),
+                                            CreateArguments(subTypeSearcher, (FunctionDeclarationArgumentsNode) baseFunction.Arguments));
+
+        private DataType FindReferencedType(SubTypeSearcherService subTypeSearcher, TypeNode type)
+        {
+            Console.WriteLine(type.Type);
+
+            switch(type.Type)
+            {
+                case TypeNodeEnum.BuiltIn:
+                    return defaultNameSpace.GetInternalDataType(type.ReturnType());
+                /*case TypeNodeEnum.Constructor:
+                    break;
+                case TypeNodeEnum.Void:
+                    break;
+                case TypeNodeEnum.Function:
+                    break;*/
+                default:
+                    return subTypeSearcher.TryFindReferencedType(((CustomTypeNode)type).CustomType);
+            }
+        }
 
         private FunctionInfo GatherArguments(BaseFunctionDeclarationNode baseFunction, SubTypeSearcherService subTypeSearcher) => new FunctionInfo(
                 baseFunction.Body,

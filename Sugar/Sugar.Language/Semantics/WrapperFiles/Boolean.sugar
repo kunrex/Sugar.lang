@@ -1,21 +1,18 @@
-﻿
-namespace Sugar
+﻿struct Boolean
 {
-    struct Boolean
+    [private] bool: value;
+
+    [public]
+    constructor Boolean()
     {
-        [private] bool: value;
+        value = false;
+    }
 
-        [public]
-        constructor Boolean()
-        {
-            value = false;
-        }
-
-        [public]
-        constructor Boolean(bool: defaultValue)
-        {
-            value = defaultValue;
-        }
+    [public]
+    constructor Boolean(bool: defaultValue)
+    {
+        value = defaultValue;
+    }
 
         [public]
         constructor Boolean(int: defaultValue)
@@ -65,4 +62,6 @@ namespace Sugar
         [public]
         string ToString() => value ? "true" : "false";
     }
-}
+
+
+    

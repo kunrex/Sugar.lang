@@ -12,8 +12,8 @@ namespace Sugar.Language.Tokens.Enums
         Short = (byte)TypeEnum.Short,
         UShort = (byte)TypeEnum.UShort,
 
-        Int = (byte)TypeEnum.Int,
-        UInt = (byte)TypeEnum.UInt,
+        Int = (byte)TypeEnum.Integer,
+        UInt = (byte)TypeEnum.UInteger,
 
         Long = (byte)TypeEnum.Long,
         ULong = (byte)TypeEnum.ULong,

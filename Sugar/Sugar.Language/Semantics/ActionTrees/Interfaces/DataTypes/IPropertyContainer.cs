@@ -8,6 +8,6 @@ namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
     internal interface IPropertyContainer : IContainer<PropertyCreationStmt, IPropertyContainer>
     {
-        public PropertyCreationStmt TryFindpropertyCreation(IdentifierNode identifier);
+        public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier);
     }
 }

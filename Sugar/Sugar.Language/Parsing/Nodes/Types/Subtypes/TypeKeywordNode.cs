@@ -30,8 +30,8 @@ namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
             SyntaxKind.Short => TypeEnum.Short,
             SyntaxKind.UShort => TypeEnum.UShort,
 
-            SyntaxKind.Int => TypeEnum.Int,
-            SyntaxKind.UInt => TypeEnum.UInt,
+            SyntaxKind.Int => TypeEnum.Integer,
+            SyntaxKind.UInt => TypeEnum.UInteger,
 
             SyntaxKind.Long => TypeEnum.Long,
             SyntaxKind.Ulong => TypeEnum.ULong,
@@ -40,12 +40,10 @@ namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
             SyntaxKind.Double => TypeEnum.Double,
             SyntaxKind.Decimal => TypeEnum.Decimal,
 
-            SyntaxKind.Char => TypeEnum.Char,
+            SyntaxKind.Char => TypeEnum.Character,
             SyntaxKind.String => TypeEnum.String,
 
-            SyntaxKind.Bool => TypeEnum.Boolean,
-
-            _ => throw new InvalidOperationException()
+            _ => TypeEnum.Boolean,
         };
     }
 }

@@ -1,6 +1,4 @@
-﻿namespace Sugar
-{
-    struct Character
+﻿struct Character
     {
         [private] int: ascii;
 
@@ -70,4 +68,3 @@
         [public]
         string ToString() => c + "";
     }
-}

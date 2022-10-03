@@ -1,28 +1,25 @@
-﻿namespace Sugar
+﻿class String
 {
-    class String
+    [private] string: value;
+
+    [public] int: Length { get => value.Length; }
+    [public] bool: Empty { get => value.Length == 0; }
+
+    [public]
+    constructor String(string: defaultValue)
     {
-        [private] string: value;
-
-        [public] int: Length { get => value.Length; }
-        [public] bool: Empty { get => value.Length == 0; }
-
-        [public]
-        constructor String(string: defaultValue)
-        {
-            value = defaultValue;
-        }
-
-        [public]
-        constructor String(Array<char>: characters)
-        {
-            value = characters.ToString();
-        }
-        
-        [public]
-        string ToString() => value;
-
-        [public, static]
-        operator string +(String: a, String: b) => a.value + b.value;
+        value = defaultValue;
     }
+
+    /*[public]
+    constructor String(Array<char>: characters)
+    {
+        value = characters.ToString();
+    }*/
+        
+    [public]
+    string ToString() => value;
+
+    [public, static]
+    operator string +(String: a, String: b) => a.value + b.value;
 }

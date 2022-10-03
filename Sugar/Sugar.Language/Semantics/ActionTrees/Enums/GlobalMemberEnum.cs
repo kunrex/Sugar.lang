@@ -7,14 +7,15 @@ namespace Sugar.Language.Semantics.ActionTrees.Enums
         Variable = 0,
         Property = 1,
 
-        Function = 2,
-        ExtensionFunction = 4,
+        Void = 2,
+        Function = 4,
+        ExtensionFunction = 8,
 
-        Indexer = 8,
-        Constructor = 16,
+        Indexer = 16,
+        Constructor = 32,
 
-        ImplicitCast = 32,
-        Explicitcast = 64,
-        OperaterOverload = 128,
+        ImplicitCast = 64,
+        Explicitcast = 128,
+        OperaterOverload = 256,
     }
 }

@@ -8,6 +8,7 @@ using Sugar.Language.Parsing.Nodes.UDDataTypes;
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes.Casts;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global;
@@ -37,7 +38,9 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Property, declaration);
 
-        public IFunctionContainer<MethodDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Function, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Function, declaration);
+
+        public IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt> AddDeclaration(GlobalVoidDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Void, declaration);
 
         public IConstructorContainer AddDeclaration(ConstructorDeclarationStmt declaration) => AddGlobalMember<ClassType>(GlobalMemberEnum.Constructor, declaration);
 
@@ -51,9 +54,11 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(GlobalMemberEnum.Variable, identifier.Value);
 
-        public PropertyCreationStmt TryFindpropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(GlobalMemberEnum.Property, identifier.Value);
+        public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(GlobalMemberEnum.Property, identifier.Value);
 
-        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt>>(GlobalMemberEnum.Function, identifier.Value);
+        public GlobalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<GlobalVoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt>>(GlobalMemberEnum.Void, identifier.Value);
+
+        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt>>(GlobalMemberEnum.Function, identifier.Value);
 
         public ConstructorDeclarationStmt TryFindConstructorDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ConstructorDeclarationStmt,IConstructorContainer>(GlobalMemberEnum.Constructor, identifier.Value);
 

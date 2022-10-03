@@ -3,7 +3,6 @@
 using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
-using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
 
@@ -20,12 +19,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
         protected readonly IdentifierNode creationName;
         public string Name { get => creationName.Value; }
 
-        protected readonly DataType creationType;
-        public DataType CreationType { get => creationType; }
-
-        public CreationStatement(DataType _creationType, IdentifierNode _creationName, Describer _describer, DescriberEnum _allowed)
+        public CreationStatement(IdentifierNode _creationName, Describer _describer, DescriberEnum _allowed)
         {
-            creationType = _creationType;
             creationName = _creationName;
 
             allowed = _allowed;

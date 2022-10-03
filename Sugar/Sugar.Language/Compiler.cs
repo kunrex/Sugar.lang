@@ -62,7 +62,6 @@ namespace Sugar.Language
                 }
 
                 treeCollection.Add(tree);
-                tree.BaseNode.Print("", true);
             }
 
             return treeCollection;

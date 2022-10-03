@@ -1,6 +1,4 @@
-﻿namespace Sugar
-{
-    struct Integer
+﻿struct Integer
     {
         [private] int: value;
 
@@ -127,4 +125,3 @@
         [public, static]
         operator int +(Integer: a) => +a.value;
     }
-}
