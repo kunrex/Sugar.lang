@@ -19,7 +19,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
         protected readonly FunctionArguments arguments;
         public FunctionArguments FunctionArguments { get => arguments; }
 
-        public FunctionCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, DescriberEnum _allowed, FunctionArguments _arguments, Node _nodeBody) : base(
+        public FunctionCreationStmt(DataType _creationType, string _name, Describer _describer, DescriberEnum _allowed, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
             _name,
             _describer,

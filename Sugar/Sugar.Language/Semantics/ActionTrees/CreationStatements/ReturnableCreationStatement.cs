@@ -14,7 +14,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
         protected readonly DataType creationType;
         public DataType CreationType { get => creationType; }
 
-        public ReturnableCreationStatement(DataType _creationType, IdentifierNode _creationName, Describer _describer, DescriberEnum _allowed) : base(_creationName,
+        public ReturnableCreationStatement(DataType _creationType, string _creationName, Describer _describer, DescriberEnum _allowed) : base(_creationName,
             _describer,
             _allowed)
         {

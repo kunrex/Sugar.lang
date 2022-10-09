@@ -16,9 +16,9 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
         private new PropertyCreationStmt nodeBody;
         public new PropertyCreationStmt NodeBody { get => nodeBody; }
 
-        public IndexerCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, PropertyCreationStmt _nodeBody) : base(
+        public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, PropertyCreationStmt _nodeBody) : base(
             _creationType,
-            _name,
+            _creationType.Name,
             _describer,
             _arguments,
             null)

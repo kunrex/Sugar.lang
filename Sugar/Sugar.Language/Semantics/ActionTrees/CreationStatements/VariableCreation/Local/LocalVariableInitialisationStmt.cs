@@ -20,6 +20,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
             Value = _value;
         }
 
-        public override string ToString() => $"Local Variable Initialisation [{creationName.Value}";
+        public override string ToString() => $"Local Variable Initialisation [{creationName}";
     }
 }

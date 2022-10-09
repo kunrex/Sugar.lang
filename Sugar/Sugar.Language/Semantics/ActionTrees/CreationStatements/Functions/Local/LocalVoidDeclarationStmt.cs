@@ -9,10 +9,10 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local
 {
-    internal sealed class LocalVoidDeclarationStmt : VoidDeclarationStmt
+    internal sealed class LocalVoidDeclarationStmt : VoidCreationStmt<LocalMethodCreationStmt, LocalVoidDeclarationStmt>
     {
         public LocalVoidDeclarationStmt(IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
-            _name,
+            _name.Value,
             _describer,
             DescriberEnum.None,
             arguments,

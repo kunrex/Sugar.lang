@@ -2,6 +2,7 @@
 
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
+using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
@@ -15,14 +16,24 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
         protected DataType to;
         protected DataType from;
 
-        public CastDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public CastDeclarationStmt(DataType _creationType, TypeKeywordNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
-            _name,
+            _name.Keyword.Value,
             _describer,
             _arguments,
             _nodeBody)
         {
             
+        }
+
+        public CastDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+            _creationType,
+            _name.Value,
+            _describer,
+            _arguments,
+            _nodeBody)
+        {
+
         }
     }
 }

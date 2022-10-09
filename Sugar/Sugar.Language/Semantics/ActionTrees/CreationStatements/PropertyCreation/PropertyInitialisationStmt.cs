@@ -23,6 +23,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
             Value = _value;
         }
 
-        public override string ToString() => $"Property Initialisation Node [{creationName.Value}, Type: {PropertyType}]";
+        public override string ToString() => $"Property Initialisation Node [{creationName}, Type: {PropertyType}]";
     }
 }

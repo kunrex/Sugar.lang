@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
-using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
@@ -13,7 +12,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal abstract class GlobalFunctionCreationStmt<Parent> : FunctionCreationStmt<Parent> where Parent : IActionTreeNode
     {
-        public GlobalFunctionCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public GlobalFunctionCreationStmt(DataType _creationType, string _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
             _name,
             _describer,

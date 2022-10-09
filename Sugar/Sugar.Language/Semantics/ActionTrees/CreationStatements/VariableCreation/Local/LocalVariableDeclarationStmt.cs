@@ -19,6 +19,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
 
         }
 
-        public override string ToString() => $"Local Variable Declaraion [{creationName.Value}";
+        public override string ToString() => $"Local Variable Declaraion [{creationName}";
     }
 }

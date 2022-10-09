@@ -11,11 +11,11 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local
 {
-    internal sealed class LocalMethodCreationStmt : FunctionCreationStmt<IFunctionContainer<LocalMethodCreationStmt>>, IMethodCreation
+    internal sealed class LocalMethodCreationStmt : FunctionCreationStmt<IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>, IMethodCreation
     {
         public LocalMethodCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
             _creationType,
-            _name,
+            _name.Value,
             _describer,
             DescriberEnum.None,
             arguments,

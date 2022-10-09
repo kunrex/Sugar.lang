@@ -14,7 +14,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.C
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
-    internal sealed class InterfaceType : DataTypeWrapper<InterfaceNode>, IPropertyContainer, IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt>, IOperatorContainer, IIndexerContainer, IImplicitContainer, IExplicitContainer
+    internal sealed class InterfaceType : DataTypeWrapper<InterfaceNode>, IPropertyContainer, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>, IOperatorContainer, IIndexerContainer, IImplicitContainer, IExplicitContainer
     {
         public override DataTypeEnum TypeEnum { get => DataTypeEnum.Interface; }
 
@@ -35,9 +35,9 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<InterfaceType>(GlobalMemberEnum.Property, declaration);
 
-        public IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(GlobalMemberEnum.Function, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(GlobalMemberEnum.Function, declaration);
 
-        public IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt> AddDeclaration(GlobalVoidDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(GlobalMemberEnum.Void, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(VoidDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(GlobalMemberEnum.Void, declaration);
 
         public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(GlobalMemberEnum.OperaterOverload, declaration);
 
@@ -49,9 +49,9 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(GlobalMemberEnum.Property, identifier.Value);
 
-        public GlobalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<GlobalVoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt>>(GlobalMemberEnum.Void, identifier.Value);
+        public VoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(GlobalMemberEnum.Void, identifier.Value);
 
-        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, GlobalVoidDeclarationStmt>>(GlobalMemberEnum.Function, identifier.Value);
+        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(GlobalMemberEnum.Function, identifier.Value);
 
         public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<OperatorOverloadDeclarationStmt, IOperatorContainer>(GlobalMemberEnum.OperaterOverload, identifier.Value);
 

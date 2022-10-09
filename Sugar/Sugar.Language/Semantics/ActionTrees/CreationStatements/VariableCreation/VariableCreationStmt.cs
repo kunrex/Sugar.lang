@@ -11,13 +11,15 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
 {
     internal abstract class VariableCreationStmt : ReturnableCreationStatement<IVariableContainer>
     {
+        protected readonly IdentifierNode identifier;
+
         public VariableCreationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, DescriberEnum _allowed) : base(
             _creationType,
-            _creationName,
+            _creationName.Value,
             _describer,
             _allowed)
         {
-            
+            identifier = _creationName;
         }
     }
 }

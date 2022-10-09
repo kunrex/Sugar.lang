@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
-using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Describers;
@@ -10,7 +9,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal abstract class VoidDeclarationStmt<Function, Void> : CreationStatement<IFunctionContainer<Function, Void>>, IMethodCreation where Function : IMethodCreation where Void : IMethodCreation
+    internal abstract class VoidCreationStmt<Function, Void> : CreationStatement<IFunctionContainer<Function, Void>>, IVoidCreation where Function : IMethodCreation where Void : IVoidCreation
     {
         protected readonly Node nodeBody;
         public Node NodeBody { get => nodeBody; }
@@ -18,7 +17,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
         protected readonly FunctionArguments arguments;
         public FunctionArguments FunctionArguments { get => arguments; }
 
-        public VoidDeclarationStmt(IdentifierNode _name, Describer _describer, DescriberEnum _allowed, FunctionArguments _arguments, Node _nodeBody) : base(
+        public VoidCreationStmt(string _name, Describer _describer, DescriberEnum _allowed, FunctionArguments _arguments, Node _nodeBody) : base(
             _name,
             _describer,
             _allowed)

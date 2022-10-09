@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Sugar.Language.Tokens.Enums;
 using Sugar.Language.Tokens.Operators;
 
 using Sugar.Language.Parsing.Nodes;
@@ -15,10 +16,11 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
     internal sealed class OperatorOverloadDeclarationStmt : GlobalFunctionCreationStmt<IOperatorContainer>
     {
         private readonly Operator operatorToOverload;
+        public Operator Operator { get => operatorToOverload; }
 
-        public OperatorOverloadDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody, Operator _operator) : base(
+        public OperatorOverloadDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody, Operator _operator) : base(
             _creationType,
-            _name,
+            _operator.OperatorType.ToString(),
             _describer,
             _arguments,
             _nodeBody)

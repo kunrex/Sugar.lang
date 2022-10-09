@@ -12,9 +12,9 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal sealed class ConstructorDeclarationStmt : GlobalFunctionCreationStmt<IConstructorContainer>
     {
-        public ConstructorDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public ConstructorDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
-            _name,
+            _creationType.Name,
             _describer,
             _arguments,
             _nodeBody)
@@ -22,6 +22,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 
         }
 
-        public override string ToString() => "Constructor Delcration Statement";
+        public override string ToString() => "Constructor Declration Statement";
     }
 }

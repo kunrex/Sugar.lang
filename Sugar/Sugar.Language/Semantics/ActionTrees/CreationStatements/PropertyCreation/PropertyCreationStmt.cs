@@ -11,13 +11,15 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
 {
     internal abstract class PropertyCreationStmt : ReturnableCreationStatement<IPropertyContainer> 
     {
+        protected readonly IdentifierNode identifier;
+
         public PropertyCreationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer) : base(
             _creationType,
-            _creationName,
+            _creationName.Value,
             _describer,
             DescriberEnum.AccessModifiers | DescriberEnum.Static | DescriberEnum.InheritanceModifiers | DescriberEnum.Override)
         {
-            
+            identifier = _creationName;
         }
     }
 }

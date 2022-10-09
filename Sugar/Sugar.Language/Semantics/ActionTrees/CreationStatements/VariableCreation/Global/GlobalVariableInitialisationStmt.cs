@@ -28,6 +28,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
             Value = _value;
         }
 
-        public override string ToString() => $"Global Variable Initialisation [{creationName.Value}";
+        public override string ToString() => $"Global Variable Initialisation [{creationName}";
     }
 }

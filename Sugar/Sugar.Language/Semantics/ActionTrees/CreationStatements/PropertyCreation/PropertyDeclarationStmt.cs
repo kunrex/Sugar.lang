@@ -46,6 +46,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
             }
         }
 
-        public override string ToString() => $"Property Declaration Node [{creationName.Value}, Type: {PropertyType}]";
+        public override string ToString() => $"Property Declaration Node [{creationName}, Type: {PropertyType}]";
     }
 }
