@@ -9,13 +9,10 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.Services.Implementations.Structures
 {
-    internal struct FunctionInfo
+    internal struct FunctionInfo 
     {
         private readonly Node body;
         public Node Body { get => body; }
-
-        private readonly IdentifierNode name;
-        public IdentifierNode Name { get => name; }
 
         private readonly DataType returnType;
         public DataType ReturnType { get => returnType; }
@@ -26,10 +23,9 @@ namespace Sugar.Language.Semantics.Services.Implementations.Structures
         private readonly FunctionArguments arguments;
         public FunctionArguments Arguments { get => arguments; }
 
-        public FunctionInfo(Node _body, IdentifierNode _name, DataType _returnType, Describer _describer, FunctionArguments _arguments)
+        public FunctionInfo(Node _body, DataType _returnType, Describer _describer, FunctionArguments _arguments)
         {
             body = _body;
-            name = _name;
             describer = _describer;
 
             arguments = _arguments;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
@@ -10,6 +11,8 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
     internal sealed class DefaultNameSpaceNode : BaseNameSpaceNode
     {
         private readonly Dictionary<string, DataType> internalDataTypes;
+
+        public IList<DataType> InternalDataTypes { get => internalDataTypes.Values.ToList(); }
 
         public DefaultNameSpaceNode() : base()
         {

@@ -23,7 +23,7 @@
         [public, static]
         implicit char(Integer: i) => i.value as char;
 
-        [public, static]
+        /*[public, static]
         implicit byte(Integer: i) => i.value as byte;
 
         [public, static]
@@ -51,7 +51,7 @@
         implicit double(Integer: i) => i.value as double;
 
         [public, static]
-        implicit decimal(Integer: i) => i.value as decimal;
+        implicit decimal(Integer: i) => i.value as decimal;*/
 
         [public, static]
         explicit bool(Integer: i)

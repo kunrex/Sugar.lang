@@ -21,58 +21,62 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public StructType(IdentifierNode _name, List<ImportNode> _imports, StructNode _skeleton) : base(_name,
                     _imports,
-                    GlobalMemberEnum.Indexer |
-                    GlobalMemberEnum.Variable |
-                    GlobalMemberEnum.Property |
-                    GlobalMemberEnum.Function |
-                    GlobalMemberEnum.Constructor |
-                    GlobalMemberEnum.ImplicitCast |
-                    GlobalMemberEnum.Explicitcast |
-                    GlobalMemberEnum.OperaterOverload,
+                    MemberEnum.Indexer |
+                    MemberEnum.Variable |
+                    MemberEnum.Property |
+                    MemberEnum.Function |
+                    MemberEnum.Constructor |
+                    MemberEnum.ImplicitCast |
+                    MemberEnum.ExplicitCast |
+                    MemberEnum.OperaterOverload,
                     _skeleton)
         {
 
         }
 
-        public IVariableContainer AddDeclaration(VariableCreationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.Variable, declaration);
+        public IVariableContainer AddDeclaration(VariableCreationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Variable, declaration);
 
-        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.Property, declaration);
+        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Property, declaration);
 
-        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.Function, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Function, declaration);
 
-        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(VoidDeclarationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.Void, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(VoidDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Void, declaration);
 
-        public IConstructorContainer AddDeclaration(ConstructorDeclarationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.Constructor, declaration);
+        public IConstructorContainer AddDeclaration(ConstructorDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Constructor, declaration);
 
-        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.OperaterOverload, declaration);
+        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.OperaterOverload, declaration);
 
-        public IIndexerContainer AddDeclaration(IndexerCreationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.Indexer, declaration);
+        public IIndexerContainer AddDeclaration(IndexerCreationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Indexer, declaration);
 
-        public ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.ImplicitCast, declaration);
+        public ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.ImplicitCast, declaration);
 
-        public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType>(GlobalMemberEnum.Explicitcast, declaration);
+        public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.ExplicitCast, declaration);
 
-        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(GlobalMemberEnum.Variable, identifier.Value);
+        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(MemberEnum.Variable, identifier.Value);
 
-        public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(GlobalMemberEnum.Property, identifier.Value);
+        public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(MemberEnum.Property, identifier.Value);
 
-        public VoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(GlobalMemberEnum.Void, identifier.Value);
+        public VoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Void, identifier.Value);
 
-        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(GlobalMemberEnum.Function, identifier.Value);
+        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Function, identifier.Value);
 
-        public ConstructorDeclarationStmt TryFindConstructorDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ConstructorDeclarationStmt, IConstructorContainer>(GlobalMemberEnum.Constructor, identifier.Value);
+        public ConstructorDeclarationStmt TryFindConstructorDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ConstructorDeclarationStmt, IConstructorContainer>(MemberEnum.Constructor, identifier.Value);
 
-        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<OperatorOverloadDeclarationStmt, IOperatorContainer>(GlobalMemberEnum.OperaterOverload, identifier.Value);
+        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<OperatorOverloadDeclarationStmt, IOperatorContainer>(MemberEnum.OperaterOverload, identifier.Value);
 
-        public ImplicitCastDeclarationStmt TryFindImplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ImplicitCastDeclarationStmt, IImplicitContainer>(GlobalMemberEnum.ImplicitCast, identifier.Value);
+        public ImplicitCastDeclarationStmt TryFindImplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ImplicitCastDeclarationStmt, IImplicitContainer>(MemberEnum.ImplicitCast, identifier.Value);
 
-        public ExplicitCastDeclarationStmt TryFindExplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ExplicitCastDeclarationStmt, IExplicitContainer>(GlobalMemberEnum.Explicitcast, identifier.Value);
+        public ExplicitCastDeclarationStmt TryFindExplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ExplicitCastDeclarationStmt, IExplicitContainer>(MemberEnum.ExplicitCast, identifier.Value);
 
-        public IndexerCreationStmt TryFindIndexerCreationStatement(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<IndexerCreationStmt, IIndexerContainer>(GlobalMemberEnum.Indexer, identifier.Value);
+        public IndexerCreationStmt TryFindIndexerCreationStatement(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<IndexerCreationStmt, IIndexerContainer>(MemberEnum.Indexer, identifier.Value);
 
         public override bool IsDuplicate(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
 
         public bool IsDuplicateIndexer(DataType dataType) => globalMemberCollection.GetIndexerStatement(dataType) != null;
+
+        public bool IsDuplicateImplicitCast(DataType dataType) => globalMemberCollection.GetImplicitDeclaration(dataType) != null;
+
+        public bool IsDuplicateExplicitCast(DataType dataType) => globalMemberCollection.GetExplicitDeclaration(dataType) != null;
 
         public override string ToString() => $"Struct Node [{name.Value}]";
     }

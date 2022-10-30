@@ -3,27 +3,44 @@
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.PropertyIdentifiers;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    internal sealed class IndexerCreationStmt : GlobalFunctionCreationStmt<IIndexerContainer>
+    internal sealed class IndexerCreationStmt : GlobalFunctionCreationStmt<IIndexerContainer>, IProperty
     {
-        private new PropertyCreationStmt nodeBody;
-        public new PropertyCreationStmt NodeBody { get => nodeBody; }
+        private readonly PropertyGetIdentifier get;
+        public PropertyGetIdentifier GetExpression { get => get; }
 
-        public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, PropertyCreationStmt _nodeBody) : base(
+        private readonly PropertySetIdentifier set;
+        public PropertySetIdentifier SetExpression { get => set; }
+
+        public PropertyTypeEnum PropertyType { get; private set; }
+
+        public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _get, Node _set) : base(
             _creationType,
             _creationType.Name,
             _describer,
             _arguments,
             null)
         {
-            nodeBody = _nodeBody;
+            if (get != null)
+            {
+                get = new PropertyGetIdentifier(_get);
+                PropertyType = PropertyTypeEnum.Get;
+            }
+
+            if (set != null)
+            {
+                set = new PropertySetIdentifier(_set, _creationType);
+                PropertyType = PropertyType == PropertyTypeEnum.Get ? PropertyTypeEnum.GetSet : PropertyTypeEnum.Set;
+            }
         }
 
         public override string ToString() => $"Indexer Declaration Node";

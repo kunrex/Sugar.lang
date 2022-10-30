@@ -1,18 +1,20 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal abstract class VoidCreationStmt<Function, Void> : CreationStatement<IFunctionContainer<Function, Void>>, IVoidCreation where Function : IMethodCreation where Void : IVoidCreation
+    internal abstract class VoidCreationStmt<Function, Void> : CreationStatement<IFunctionContainer<Function, Void>>, IFunction, IVoidCreation where Function : IMethodCreation where Void : IVoidCreation
     {
-        protected readonly Node nodeBody;
-        public Node NodeBody { get => nodeBody; }
+        protected readonly Scope scope;
+        public Scope Scope { get => scope; }
 
         protected readonly FunctionArguments arguments;
         public FunctionArguments FunctionArguments { get => arguments; }
@@ -22,8 +24,26 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
             _describer,
             _allowed)
         {
-            nodeBody = _nodeBody;
             arguments = _arguments;
+            scope = new Scope(_nodeBody);
         }
+
+        public IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt> AddDeclaration(LocalMethodCreationStmt declaration)
+        {
+            scope.AddDeclaration(declaration);
+
+            return this;
+        }
+
+        public IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt> AddDeclaration(LocalVoidDeclarationStmt declaration)
+        {
+            scope.AddDeclaration(declaration);
+
+            return this;
+        }
+
+        public LocalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => scope.TryFindMethodDeclaration(identifier);
+
+        public LocalMethodCreationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => scope.TryFindFunctionDeclaration(identifier);
     }
 }

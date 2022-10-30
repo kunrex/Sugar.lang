@@ -38,6 +38,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
         public DataType TryFindReferencedType(Node type)
         {
             dataTypes.Clear();
+            dataTypes.Enqueue(dataType);
             foreach(var item in dataType.ReferencedTypes)
                 dataTypes.Enqueue(item);
 

@@ -2,20 +2,24 @@
 
 namespace Sugar.Language.Semantics.ActionTrees.Enums
 {
-    internal enum GlobalMemberEnum : ushort
+    internal enum MemberEnum : ushort
     {
-        Variable = 0,
-        Property = 1,
+        Variable = 1,
+        Property = 2,
 
-        Void = 2,
-        Function = 4,
-        ExtensionFunction = 8,
+        Void = 4,
+        Function = 8,
+        ExtensionFunction = 16,
 
-        Indexer = 16,
-        Constructor = 32,
+        Indexer = 32,
+        Constructor = 64,
 
-        ImplicitCast = 64,
-        Explicitcast = 128,
-        OperaterOverload = 256,
+        ImplicitCast = 128,
+        ExplicitCast = 256,
+        OperaterOverload = 512,
+
+        Properties = Indexer | Property,
+        DataTypeMembers = Indexer | ImplicitCast | ExplicitCast,
+        Functions = Void | Function | ExtensionFunction | Constructor | ImplicitCast | ExplicitCast
     }
 }

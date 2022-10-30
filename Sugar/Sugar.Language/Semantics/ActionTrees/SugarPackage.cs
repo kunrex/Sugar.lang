@@ -28,5 +28,10 @@ namespace Sugar.Language.Semantics.ActionTrees
         public INameSpaceCollection AddEntity(CreatedNameSpaceNode dataType) => throw new NotImplementedException();
 
         public CreatedNameSpaceNode TryFindNameSpace(IdentifierNode identifier) => throw new NotImplementedException();
+
+        public void Print(string indent, bool last)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

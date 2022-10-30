@@ -16,24 +16,14 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
         protected DataType to;
         protected DataType from;
 
-        public CastDeclarationStmt(DataType _creationType, TypeKeywordNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public CastDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
-            _name.Keyword.Value,
+            _creationType.Name,
             _describer,
             _arguments,
             _nodeBody)
         {
             
-        }
-
-        public CastDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
-            _creationType,
-            _name.Value,
-            _describer,
-            _arguments,
-            _nodeBody)
-        {
-
         }
     }
 }

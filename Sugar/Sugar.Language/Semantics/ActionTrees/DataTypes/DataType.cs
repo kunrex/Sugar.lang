@@ -53,12 +53,12 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             }
         }
 
-        protected readonly GlobalMemberEnum allowedGlobalMemberDeclarations;
-        public GlobalMemberEnum AllowedGlobalMemberDeclarations { get => allowedGlobalMemberDeclarations; }
+        protected readonly MemberEnum allowedGlobalMemberDeclarations;
+        public MemberEnum AllowedGlobalMemberDeclarations { get => allowedGlobalMemberDeclarations; }
 
-        protected readonly GlobalMemberCollection globalMemberCollection;
+        protected readonly MemberCollection globalMemberCollection;
 
-        public DataType(IdentifierNode _name, List<ImportNode> _imports, GlobalMemberEnum _allowed)
+        public DataType(IdentifierNode _name, List<ImportNode> _imports, MemberEnum _allowed)
         {
             name = _name;
             allowedGlobalMemberDeclarations = _allowed;
@@ -68,7 +68,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             referencedTypes = new List<DataType>();
             referencedNameSpaces = new List<CreatedNameSpaceNode>();
 
-            globalMemberCollection = new GlobalMemberCollection(allowedGlobalMemberDeclarations);
+            globalMemberCollection = new MemberCollection(allowedGlobalMemberDeclarations);
         }
 
         public DataType GetSubDataType(int index) => subTypes[index];

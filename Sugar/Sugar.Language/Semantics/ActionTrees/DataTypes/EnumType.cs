@@ -15,14 +15,14 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
     {
         public override DataTypeEnum TypeEnum { get => DataTypeEnum.Enum; }
 
-        public EnumType(IdentifierNode _name, List<ImportNode> _imports, EnumNode _skeleton) : base(_name, _imports, GlobalMemberEnum.Variable, _skeleton)
+        public EnumType(IdentifierNode _name, List<ImportNode> _imports, EnumNode _skeleton) : base(_name, _imports, MemberEnum.Variable, _skeleton)
         {
 
         }
 
-        public IVariableContainer AddDeclaration(VariableCreationStmt declaration) => AddGlobalMember<EnumType>(GlobalMemberEnum.Variable, declaration);
+        public IVariableContainer AddDeclaration(VariableCreationStmt declaration) => AddGlobalMember<EnumType>(MemberEnum.Variable, declaration);
 
-        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(GlobalMemberEnum.Variable, identifier.Value);
+        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(MemberEnum.Variable, identifier.Value);
 
         public override bool IsDuplicate(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
 

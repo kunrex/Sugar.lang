@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Values;
@@ -14,18 +15,20 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
     {
         public SkeletonNode Skeleton { get; protected set; }
 
-        public DataTypeWrapper(IdentifierNode _name, List<ImportNode> _imports, GlobalMemberEnum _allowed, SkeletonNode _skeleton) : base(_name, _imports, _allowed)
+        public DataTypeWrapper(IdentifierNode _name, List<ImportNode> _imports, MemberEnum _allowed, SkeletonNode _skeleton) : base(_name, _imports, _allowed)
         {
             Skeleton = _skeleton;
         }
 
         public abstract bool IsDuplicate(IdentifierNode identifier);
 
-        protected T AddGlobalMember<T>(GlobalMemberEnum memberEnum, ICreationStatement statement) where T : DataTypeWrapper<SkeletonNode>
+        protected T AddGlobalMember<T>(MemberEnum memberEnum, ICreationStatement statement) where T : DataTypeWrapper<SkeletonNode>
         {
             globalMemberCollection.Add(memberEnum, statement);
 
             return (T)this;
         }
+
+        public IEnumerable<ICreationStatement> GetAllMembers(MemberEnum memberEnum) => globalMemberCollection[memberEnum];
     }
 }

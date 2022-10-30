@@ -32,7 +32,7 @@
         [public, static]
         explicit char(bool: value) => value ? 0 as char : 1 as char;
 
-        [public, static]
+        /*[public, static]
         explicit byte(bool: value) => value as byte;
 
         [public, static]
@@ -54,7 +54,7 @@
         explicit long(bool: value) => value as long;
 
         [public, static]
-        explicit ulong(bool: value) => value as ulong;
+        explicit ulong(bool: value) => value as ulong;*/
 
         [public, static]
         explicit string(bool: value) => value.ToString();

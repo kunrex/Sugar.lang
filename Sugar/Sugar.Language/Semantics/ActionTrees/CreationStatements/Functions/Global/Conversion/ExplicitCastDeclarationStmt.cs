@@ -1,8 +1,6 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
-using Sugar.Language.Parsing.Nodes.Values;
-using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
@@ -13,19 +11,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal sealed class ExplicitCastDeclarationStmt : CastDeclarationStmt<IExplicitContainer>
     {
-        public ExplicitCastDeclarationStmt(DataType _creationType, TypeKeywordNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public ExplicitCastDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
-            _name,
-            _describer,
-            _arguments,
-            _nodeBody)
-        {
-
-        }
-
-        public ExplicitCastDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
-            _creationType,
-            _name,
             _describer,
             _arguments,
             _nodeBody)

@@ -103,6 +103,7 @@
     <None Remove="Exceptions\Analytics\ClassMemberCreation\Statements\" />
     <None Remove="Semantics\WrapperFiles\" />
     <None Remove="Semantics\ActionTrees\CreationStatements\Functions\Global\Extensions\" />
+    <None Remove="Semantics\ActionTrees\CreationStatements\PropertyCreation\PropertyIdentifiers\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -197,6 +198,7 @@
     <Folder Include="Exceptions\Analytics\ClassMemberCreation\Statements\" />
     <Folder Include="Semantics\WrapperFiles\" />
     <Folder Include="Semantics\ActionTrees\CreationStatements\Functions\Global\Extensions\" />
+    <Folder Include="Semantics\ActionTrees\CreationStatements\PropertyCreation\PropertyIdentifiers\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />
