@@ -1,8 +1,8 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
-using Sugar.Language.Parsing.Nodes.Values;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
@@ -12,6 +12,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal sealed class ConstructorDeclarationStmt : GlobalFunctionCreationStmt<IConstructorContainer>
     {
+        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.Constructor; }
+
         public ConstructorDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
             _creationType.Name,

@@ -22,18 +22,19 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
         public IDataTypeCollection AddInternalDataType(DataType dataType)
         {
             internalDataTypes.Add(dataType.Name, dataType);
+            dataType.SetParent(this);
 
             return this;
         }
 
         public DataType GetInternalDataType(TypeEnum dataTypeEnum) => internalDataTypes[dataTypeEnum.ToString()];
 
-        public override string ToString() => $"Default Name Space";
-
         protected override void PrintChildren(string indent)
         {
             for (int i = 0; i < dataTypes.Count; i++)
                 dataTypes[i].Print(indent, i == dataTypes.Count - 1);
         }
+
+        public override string ToString() => $"Default Name Space";
     }
 }

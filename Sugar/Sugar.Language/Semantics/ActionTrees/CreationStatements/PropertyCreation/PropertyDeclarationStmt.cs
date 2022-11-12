@@ -18,6 +18,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
         protected readonly PropertySetIdentifier set;
         public override PropertySetIdentifier SetExpression { get => set; }
 
+        public override CreationTypeEnum CreationEnumType { get => (CreationTypeEnum)PropertyType; }
+
         public PropertyDeclarationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, Node _get, Node _set) : base(
             _creationType,
             _creationName,

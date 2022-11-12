@@ -13,6 +13,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Loca
 {
     internal sealed class LocalMethodCreationStmt : FunctionCreationStmt<IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>, IMethodCreation
     {
+        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.LocalFunction; }
+
         public LocalMethodCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
             _creationType,
             _name.Value,
@@ -23,7 +25,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Loca
         {
 
         }
-
+      
         public override string ToString() => $"Local Function Declaration Node";
     }
 }

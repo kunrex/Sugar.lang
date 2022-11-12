@@ -11,6 +11,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Loca
 {
     internal sealed class LocalVoidDeclarationStmt : VoidCreationStmt<LocalMethodCreationStmt, LocalVoidDeclarationStmt>
     {
+        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.LocalFunction; }
+
         public LocalVoidDeclarationStmt(IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
             _name.Value,
             _describer,

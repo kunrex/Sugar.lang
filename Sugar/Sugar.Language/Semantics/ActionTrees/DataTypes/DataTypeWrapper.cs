@@ -7,6 +7,7 @@ using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.UDDataTypes;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
@@ -22,11 +23,12 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public abstract bool IsDuplicate(IdentifierNode identifier);
 
-        protected T AddGlobalMember<T>(MemberEnum memberEnum, ICreationStatement statement) where T : DataTypeWrapper<SkeletonNode>
+        protected DataTypeSkeleton AddGlobalMember<DataTypeSkeleton, ParentType>(MemberEnum memberEnum, IParentableCreationStatement<ParentType> statement, ParentType parent) where DataTypeSkeleton : DataTypeWrapper<SkeletonNode> where ParentType : IActionTreeNode
         {
             globalMemberCollection.Add(memberEnum, statement);
+            statement.SetParent(parent);
 
-            return (T)this;
+            return (DataTypeSkeleton)this;
         }
 
         public IEnumerable<ICreationStatement> GetAllMembers(MemberEnum memberEnum) => globalMemberCollection[memberEnum];

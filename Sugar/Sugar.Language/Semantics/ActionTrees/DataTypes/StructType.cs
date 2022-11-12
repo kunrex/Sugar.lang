@@ -34,25 +34,25 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         }
 
-        public IVariableContainer AddDeclaration(VariableCreationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Variable, declaration);
+        public IVariableContainer AddDeclaration(GlobalVariableDeclarationStmt declaration) => AddGlobalMember<StructType, IVariableContainer>(MemberEnum.Variable, declaration, this);
 
-        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Property, declaration);
+        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<StructType, IPropertyContainer>(MemberEnum.Property, declaration, this);
 
-        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Function, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<StructType, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Function, declaration, this);
 
-        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(VoidDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Void, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(VoidDeclarationStmt declaration) => AddGlobalMember<StructType, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Void, declaration, this);
 
-        public IConstructorContainer AddDeclaration(ConstructorDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Constructor, declaration);
+        public IConstructorContainer AddDeclaration(ConstructorDeclarationStmt declaration) => AddGlobalMember<StructType, IConstructorContainer>(MemberEnum.Constructor, declaration, this);
 
-        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.OperaterOverload, declaration);
+        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<StructType, IOperatorContainer>(MemberEnum.OperaterOverload, declaration, this);
 
-        public IIndexerContainer AddDeclaration(IndexerCreationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.Indexer, declaration);
+        public IIndexerContainer AddDeclaration(IndexerCreationStmt declaration) => AddGlobalMember<StructType, IIndexerContainer>(MemberEnum.Indexer, declaration, this);
 
-        public ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.ImplicitCast, declaration);
+        public ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType, IImplicitContainer>(MemberEnum.ImplicitCast, declaration, this);
 
-        public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType>(MemberEnum.ExplicitCast, declaration);
+        public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<StructType, IExplicitContainer>(MemberEnum.ExplicitCast, declaration, this);
 
-        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(MemberEnum.Variable, identifier.Value);
+        public GlobalVariableDeclarationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<GlobalVariableDeclarationStmt, IVariableContainer>(MemberEnum.Variable, identifier.Value);
 
         public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(MemberEnum.Property, identifier.Value);
 

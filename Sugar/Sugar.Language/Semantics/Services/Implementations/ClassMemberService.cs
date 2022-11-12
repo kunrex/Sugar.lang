@@ -289,13 +289,13 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         private void InitailiseVariableDeclaration(VariableCreationNode node, IdentifierNode name, DataType type, Describer describer, IVariableContainer dataType)
         {
-            VariableCreationStmt variableCreationStatement;
+            GlobalVariableDeclarationStmt declaration;
             if (node.NodeType == NodeType.Declaration)
-                variableCreationStatement = new GlobalVariableDeclarationStmt(type, name, describer);
+                declaration = new GlobalVariableDeclarationStmt(type, name, describer);
             else
-                variableCreationStatement = new GlobalVariableInitialisationStmt(type, name, describer, (ExpressionNode)((InitializeNode)node).Value);
+                declaration = new GlobalVariableInitialisationStmt(type, name, describer, (ExpressionNode)((InitializeNode)node).Value);
 
-            AddDeclaration(variableCreationStatement, dataType);
+            AddDeclaration(declaration, dataType);
         }
 
         private void InitialisePropertyDeclaration(VariableCreationNode node, IdentifierNode name, TypeNode type, Describer describer, IPropertyContainer dataType, SubTypeSearcherService subTypeSearcher)

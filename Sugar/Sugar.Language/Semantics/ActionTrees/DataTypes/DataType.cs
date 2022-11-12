@@ -12,7 +12,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
-    internal abstract class DataType : ParentableActionTreeNode<IDataTypeCollection>, IDataTypeCollection
+    internal abstract class DataType : ActionTreeNode<IDataTypeCollection>, IDataTypeCollection
     {
         public abstract DataTypeEnum TypeEnum { get; }
 
@@ -87,6 +87,8 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
         {
             subTypes.Add(datatypeToAdd);
             referencedTypes.Add(datatypeToAdd);
+
+            datatypeToAdd.SetParent(this);
 
             return this;
         }

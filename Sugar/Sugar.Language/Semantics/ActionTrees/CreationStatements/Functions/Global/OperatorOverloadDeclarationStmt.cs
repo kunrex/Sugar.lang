@@ -1,15 +1,15 @@
 ﻿using System;
 
-using Sugar.Language.Tokens.Enums;
 using Sugar.Language.Tokens.Operators;
 
 using Sugar.Language.Parsing.Nodes;
-using Sugar.Language.Parsing.Nodes.Values;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
+
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
@@ -17,6 +17,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
     {
         private readonly Operator operatorToOverload;
         public Operator Operator { get => operatorToOverload; }
+
+        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.OperatorOverload; }
 
         public OperatorOverloadDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody, Operator _operator) : base(
             _creationType,

@@ -33,19 +33,19 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         }
 
-        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<InterfaceType>(MemberEnum.Property, declaration);
+        public IPropertyContainer AddDeclaration(PropertyCreationStmt declaration) => AddGlobalMember<InterfaceType, IPropertyContainer>(MemberEnum.Property, declaration, this);
 
-        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(MemberEnum.Function, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(MethodDeclarationStmt declaration) => AddGlobalMember<InterfaceType, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Function, declaration, this);
 
-        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(VoidDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(MemberEnum.Void, declaration);
+        public IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> AddDeclaration(VoidDeclarationStmt declaration) => AddGlobalMember<InterfaceType, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Void, declaration, this);
 
-        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(MemberEnum.OperaterOverload, declaration);
+        public IOperatorContainer AddDeclaration(OperatorOverloadDeclarationStmt declaration) => AddGlobalMember<InterfaceType, IOperatorContainer>(MemberEnum.OperaterOverload, declaration, this);
 
-        public IIndexerContainer AddDeclaration(IndexerCreationStmt declaration) => AddGlobalMember<InterfaceType>(MemberEnum.Indexer, declaration);
+        public IIndexerContainer AddDeclaration(IndexerCreationStmt declaration) => AddGlobalMember<InterfaceType, IIndexerContainer>(MemberEnum.Indexer, declaration, this);
 
-        public ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(MemberEnum.ImplicitCast, declaration);
+        public ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer> AddDeclaration(ImplicitCastDeclarationStmt declaration) => AddGlobalMember<InterfaceType, IImplicitContainer>(MemberEnum.ImplicitCast, declaration, this);
 
-        public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<InterfaceType>(MemberEnum.ExplicitCast, declaration);
+        public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<InterfaceType, IExplicitContainer>(MemberEnum.ExplicitCast, declaration, this);
 
         public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(MemberEnum.Property, identifier.Value);
 

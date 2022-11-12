@@ -5,11 +5,14 @@ using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation
 {
-    internal class GlobalVariableDeclarationStmt : VariableCreationStmt
+    internal class GlobalVariableDeclarationStmt : VariableCreationStmt<GlobalVariableDeclarationStmt, IVariableContainer>
     {
+        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.GlobalVariable; }
+
         public GlobalVariableDeclarationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer) : base(
             _creationType,
             _creationName,

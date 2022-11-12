@@ -34,6 +34,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
         public INameSpaceCollection AddEntity(CreatedNameSpaceNode namespaceToAdd)
         {
             namespaces.Add(namespaceToAdd);
+            namespaceToAdd.SetParent(this);
 
             return this;
         }

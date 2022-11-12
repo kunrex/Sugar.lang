@@ -6,7 +6,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
 {
-    internal abstract class CreationStatement<Parent> : ParentableActionTreeNode<Parent>, ICreationStatement where Parent : IActionTreeNode 
+    internal abstract class CreationStatement<Parent> : ActionTreeNode<Parent>, IParentableCreationStatement<Parent> where Parent : IActionTreeNode 
     {
         protected readonly Describer describer;
         public Describer Describer { get => Describer; }
@@ -16,6 +16,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
 
         protected readonly string creationName;
         public string Name { get => creationName; }
+
+        public abstract CreationTypeEnum CreationEnumType { get; }
 
         public CreationStatement(string _creationName, Describer _describer, DescriberEnum _allowed)
         {

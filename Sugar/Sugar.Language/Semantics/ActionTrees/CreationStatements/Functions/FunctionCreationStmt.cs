@@ -10,10 +10,11 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal abstract class FunctionCreationStmt<Parent> :  ReturnableCreationStatement<Parent>, IFunction where Parent : IActionTreeNode
+    internal abstract class FunctionCreationStmt<Parent> : ReturnableCreationStatement<Parent>, IFunction where Parent : IActionTreeNode
     {
         protected readonly Scope scope;
         public Scope Scope { get => scope; }
@@ -28,7 +29,16 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
             _allowed)
         {
             arguments = _arguments;
+
             scope = new Scope(_nodeBody);
+            scope.SetParent(this);
+        }
+
+        public ILocalVariableContainer AddDeclaration(LocalVariableDeclarationStmt declaration)
+        {
+            scope.AddDeclaration(declaration);
+
+            return this;
         }
 
         public IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt> AddDeclaration(LocalMethodCreationStmt declaration)
@@ -48,5 +58,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
         public LocalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => scope.TryFindMethodDeclaration(identifier);
 
         public LocalMethodCreationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => scope.TryFindFunctionDeclaration(identifier);
+
+        public LocalVariableDeclarationStmt TryFindVariableCreation(IdentifierNode identifier) => scope.TryFindVariableCreation(identifier);
     }
 }

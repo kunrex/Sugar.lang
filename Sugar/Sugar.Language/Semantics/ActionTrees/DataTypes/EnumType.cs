@@ -20,9 +20,9 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         }
 
-        public IVariableContainer AddDeclaration(VariableCreationStmt declaration) => AddGlobalMember<EnumType>(MemberEnum.Variable, declaration);
+        public IVariableContainer AddDeclaration(GlobalVariableDeclarationStmt declaration) => AddGlobalMember<EnumType, IVariableContainer>(MemberEnum.Variable, declaration, this);
 
-        public VariableCreationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VariableCreationStmt, IVariableContainer>(MemberEnum.Variable, identifier.Value);
+        public GlobalVariableDeclarationStmt TryFindVariableCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<GlobalVariableDeclarationStmt, IVariableContainer>(MemberEnum.Variable, identifier.Value);
 
         public override bool IsDuplicate(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
 

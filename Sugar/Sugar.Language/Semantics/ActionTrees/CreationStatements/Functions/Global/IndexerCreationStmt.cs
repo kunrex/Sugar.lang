@@ -1,13 +1,11 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
-using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
-using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.PropertyIdentifiers;
 
@@ -22,6 +20,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
         public PropertySetIdentifier SetExpression { get => set; }
 
         public PropertyTypeEnum PropertyType { get; private set; }
+
+        public override CreationTypeEnum CreationEnumType { get => (CreationTypeEnum)PropertyType; }
 
         public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _get, Node _set) : base(
             _creationType,

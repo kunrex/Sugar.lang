@@ -3,6 +3,7 @@
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
@@ -16,6 +17,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
         public DataType ParentType { get => parentType; }
 
         private readonly IdentifierNode identifier;
+
+        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.ExtensionFunction; }
 
         public ExtensionMethodDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody, DataType _parentType) : base(
            _creationType,

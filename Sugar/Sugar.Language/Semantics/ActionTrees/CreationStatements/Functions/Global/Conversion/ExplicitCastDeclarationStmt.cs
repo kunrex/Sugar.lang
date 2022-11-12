@@ -2,6 +2,7 @@
 
 using Sugar.Language.Parsing.Nodes;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes.Casts;
@@ -11,6 +12,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal sealed class ExplicitCastDeclarationStmt : CastDeclarationStmt<IExplicitContainer>
     {
+        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.ExplicitCast; }
+
         public ExplicitCastDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,
             _describer,

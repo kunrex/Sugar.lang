@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
+using System.Collections.Generic;
 using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
@@ -14,17 +14,13 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 
         private readonly List<CreatedNameSpaceNode> subNamespaces;
 
+        public int NameSpaceCount { get => subNamespaces.Count; }
+
         public CreatedNameSpaceNode(IdentifierNode _name) : base()
         {
             name = _name;
             subNamespaces = new List<CreatedNameSpaceNode>();
         }
-
-        public int NameSpaceCount { get => subNamespaces.Count; }
-
-        public CreatedNameSpaceNode GetSubNameSpace(int index) => subNamespaces[index];
-
-        public override string ToString() => $"Created Name Space [{name.Value}]";
 
         public CreatedNameSpaceNode TryFindNameSpace(IdentifierNode identifier)
         {
@@ -38,9 +34,12 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
         public INameSpaceCollection AddEntity(CreatedNameSpaceNode namespaceToAdd)
         {
             subNamespaces.Add(namespaceToAdd);
+            namespaceToAdd.SetParent(this);
 
             return this;
         }
+
+        public CreatedNameSpaceNode GetSubNameSpace(int index) => subNamespaces[index];
 
         protected override void PrintChildren(string indent)
         {
@@ -51,10 +50,6 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
                 dataTypes[i].Print(indent, i == dataTypes.Count - 1);
         }
 
-        protected override void SetChildrenParent()
-        {
-            foreach (var child in subNamespaces)
-                child.SetParent(this);
-        }
+        public override string ToString() => $"Created Name Space [{name.Value}]";
     }
 }

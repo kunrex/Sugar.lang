@@ -1,14 +1,11 @@
 ﻿using System;
 
-using Sugar.Language.Parsing.Nodes;
-
-using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
-using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal interface IFunction : IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>
+    internal interface IFunction : IScopeParent
     {
         public Scope Scope { get; }
 
