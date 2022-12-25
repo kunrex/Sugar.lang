@@ -15,6 +15,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
         private readonly LocalVariableDeclarationStmt value;
         public LocalVariableDeclarationStmt Value { get => value; }
 
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.PropertySet; }
+
         public PropertySetIdentifier(Node _body, DataType _creationType) : base(_body)
         {
             value = new LocalVariableDeclarationStmt(_creationType, IdentifierNode.ValueIdentifier, new Describer(DescriberEnum.Const));

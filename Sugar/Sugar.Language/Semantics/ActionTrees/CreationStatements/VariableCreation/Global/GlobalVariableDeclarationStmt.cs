@@ -11,7 +11,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
 {
     internal class GlobalVariableDeclarationStmt : VariableCreationStmt<GlobalVariableDeclarationStmt, IVariableContainer>
     {
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.GlobalVariable; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.GlobalVariable; }
 
         public GlobalVariableDeclarationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer) : base(
             _creationType,

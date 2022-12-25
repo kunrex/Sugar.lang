@@ -16,7 +16,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
     internal sealed class InterfaceType : DataTypeWrapper<InterfaceNode>, IPropertyContainer, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>, IOperatorContainer, IIndexerContainer, IImplicitContainer, IExplicitContainer
     {
-        public override DataTypeEnum TypeEnum { get => DataTypeEnum.Interface; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Interface; }
 
         public InterfaceType(IdentifierNode _name, List<ImportNode> _imports, InterfaceNode _skeleton) : base(_name,
                     _imports,

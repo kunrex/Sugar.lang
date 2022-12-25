@@ -17,8 +17,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
         protected readonly string creationName;
         public string Name { get => creationName; }
 
-        public abstract CreationTypeEnum CreationEnumType { get; }
-
         public CreationStatement(string _creationName, Describer _describer, DescriberEnum _allowed)
         {
             creationName = _creationName;

@@ -11,9 +11,9 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local
 {
-    internal sealed class LocalMethodCreationStmt : FunctionCreationStmt<IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>, IMethodCreation
+    internal sealed class LocalMethodCreationStmt : FunctionCreationStmt<IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>, ILocalFunction, IMethodCreation
     {
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.LocalFunction; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.LocalFunction; }
 
         public LocalMethodCreationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
             _creationType,

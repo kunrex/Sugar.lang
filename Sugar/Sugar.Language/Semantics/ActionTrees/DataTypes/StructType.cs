@@ -17,7 +17,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
     internal sealed class StructType : DataTypeWrapper<StructNode>, IGeneralContainer
     {
-        public override DataTypeEnum TypeEnum { get => DataTypeEnum.Struct; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Struct; }
 
         public StructType(IdentifierNode _name, List<ImportNode> _imports, StructNode _skeleton) : base(_name,
                     _imports,

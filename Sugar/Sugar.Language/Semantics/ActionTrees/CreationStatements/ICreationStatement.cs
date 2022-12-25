@@ -9,7 +9,5 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
     internal interface ICreationStatement : IActionTreeNode, IDescribable
     {
         public string Name { get; }
-
-        public CreationTypeEnum CreationEnumType { get; }
     }
 }

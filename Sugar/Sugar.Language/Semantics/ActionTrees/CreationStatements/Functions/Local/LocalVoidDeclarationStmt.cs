@@ -9,9 +9,9 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local
 {
-    internal sealed class LocalVoidDeclarationStmt : VoidCreationStmt<LocalMethodCreationStmt, LocalVoidDeclarationStmt>
+    internal sealed class LocalVoidDeclarationStmt : VoidCreationStmt<LocalMethodCreationStmt, LocalVoidDeclarationStmt>, ILocalFunction
     {
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.LocalFunction; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.LocalFunction; }
 
         public LocalVoidDeclarationStmt(IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
             _name.Value,

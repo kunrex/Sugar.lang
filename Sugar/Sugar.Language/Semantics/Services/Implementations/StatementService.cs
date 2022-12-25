@@ -34,6 +34,9 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.L
 using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements;
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
+using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.SubTypeSearching;
+using Sugar.Language.Parsing.Nodes.Functions.Calling;
+using Sugar.Language.Exceptions.Analytics.Referencing;
 
 namespace Sugar.Language.Semantics.Services.Implementations
 {
@@ -66,8 +69,8 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         private void Validate(StructType dataType)
         {
-            var subTypeSearcher = new SubTypeSearcherService(dataType, defaultNameSpace, createdNameSpaces);
-            var functions = dataType.GetAllMembers(MemberEnum.Functions);
+            var subTypeSearcher = new TypeSearcherService(dataType, defaultNameSpace);
+            var functions = dataType.GetAllMembers(MemberEnum.Void);
 
             foreach (var function in functions)
             {
@@ -104,14 +107,14 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 }
             }
 
-            foreach(var function in functions)
+            foreach (var function in functions)
             {
                 var converted = (IFunction)function;
 
                 var scope = converted.Scope;
                 var body = scope.Body;
-
-                if(body.NodeType == NodeType.Scope)
+    
+                if (body.NodeType == NodeType.Scope)
                     foreach(var child in scope.Body.GetChildren())
                     {
                         switch(child.NodeType)
@@ -127,17 +130,15 @@ namespace Sugar.Language.Semantics.Services.Implementations
                                 var assignment = (AssignmentNode)child;
 
                                 var value = assignment.Value;
-
+                                var variable = ReferenceEntity(value, scope, subTypeSearcher);
+                                Console.WriteLine(variable == null);
                                 break;
                         }
                     }
             }
         }
 
-        //hi future me, yeah im kinda happy rn :'D
-        //okie anyway, i implemented the new parenting thing, creation type enum and all of that
-        //so kindly move onto checking if a variable currently exists or not :)
-        private void CreateLocalMembers(Scope parent, SubTypeSearcherService subTypeSearcher)
+        private void CreateLocalMembers(Scope parent, TypeSearcherService subTypeSearcher)
         {
             var body = parent.Body;
 
@@ -146,10 +147,11 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     switch (child.NodeType)
                     {
                         case NodeType.Scope:
-                            var scope = new Scope(child, parent);
+                            var scope = new Scope(child);
                             CreateLocalMembers(scope, subTypeSearcher);
 
                             parent.AddScope(scope);
+                            scope.SetParent(parent);
                             break;
                         case NodeType.FunctionDeclaration:
                             CreateLocalFunction((FunctionDeclarationNode)child, parent, subTypeSearcher);
@@ -157,10 +159,13 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     }
         }
 
-        private void CreatLocalVariable(DeclarationNode declaration, Scope scope, SubTypeSearcherService subTypeSearcher)
+        private void CreatLocalVariable(DeclarationNode declaration, Scope scope, TypeSearcherService subTypeSearcher)
         {
             var name = (IdentifierNode)declaration.Name;
             var type = FindReferencedType(subTypeSearcher, (TypeNode)declaration.Type);
+            if (type == null)
+                return;
+
             var describer = describerService.AnalyseDescriber((DescriberNode)declaration.Describer);
 
             switch(declaration.NodeType)
@@ -174,123 +179,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
-        private IParentableCreationStatement ReferenceVariable(Node name, IScopeParent parent, SubTypeSearcherService subTypeSearcher)
-        {
-            IdentifierNode immedeate;
-            if (name.NodeType == NodeType.Dot)
-                immedeate = (IdentifierNode)((DotExpression)name).LHS;
-            else
-                immedeate = (IdentifierNode)name;
-
-            LocalVariableDeclarationStmt declaration = null;
-            while (true)
-            {
-                var result = parent.TryFindVariableCreation(immedeate);
-
-                if (result == null)
-                {
-                    parent = parent.Parent;
-
-                    if (parent == null)
-                        break;
-                }
-                else
-                {
-                    declaration = result;
-                    break;
-                }
-            }
-
-            if (declaration == null)
-                return null;
-            else if (name.NodeType == NodeType.Variable)
-                return declaration;
-            else
-                return ReferenceVariable(name, declaration.CreationType);
-        }
-
-        //basically, referencing variables recursivley should work now, do some clean up here cause its pretty ugly
-        //theres gonna be a bunch of errors when you compile telling you to implement CreationType in all CreationStatements so umm yeah fix that lmao
-        //yk the current implementation is pretty shit, you should defintly sit down for some time and think this through, i mean the idea is solid just the way its implement isn't
-        private GlobalVariableDeclarationStmt ReferenceVariable(Node name, DataType dataType)
-        {
-            GlobalVariableDeclarationStmt declaration = null;
-            name = ((DotExpression)name).RHS;
-
-            switch (name.NodeType)
-            {
-                case NodeType.Variable:
-                    return declaration;
-                default:
-                    //x.y.z
-                    var current = ((DotExpression)name).RHS;
-
-                    while (true)
-                    {
-                        switch (current.NodeType)
-                        {
-                            case NodeType.Dot:
-                                var dot = (DotExpression)current;
-                                var lhs = (IdentifierNode)dot.LHS;
-
-                                switch (dataType.TypeEnum)
-                                {
-                                    case DataTypeEnum.Class:
-                                    case DataTypeEnum.Struct:
-                                        IGeneralContainer generalContainer = (IGeneralContainer)dataType;
-
-                                        var variable = generalContainer.TryFindVariableCreation(lhs);
-                                        if(variable == null)
-                                        {
-                                            //check property
-
-                                            if(variable == null)//if its still null
-                                                return null;
-                                        }
-
-                                        declaration = variable;
-                                        current = dot.RHS;
-                                        break;
-                                    case DataTypeEnum.Interface:
-                                        //check property
-
-                                        break;
-                                }
-                                break;
-                            default:
-                                var identifier = (IdentifierNode)current;
-
-                                switch (dataType.TypeEnum)
-                                {
-                                    case DataTypeEnum.Class:
-                                    case DataTypeEnum.Struct:
-                                        IGeneralContainer generalContainer = (IGeneralContainer)dataType;
-
-                                        var variable = generalContainer.TryFindVariableCreation(identifier);
-                                        if (variable == null)
-                                        {
-                                            //check property
-
-                                           
-                                        }
-
-                                        if (variable == null)//if its still null
-                                            return null;
-                                        break;
-                                    case DataTypeEnum.Interface:
-                                        //check property
-
-                                        break;
-                                }
-                                return declaration;
-                        }
-                    }
-            }
-        }
-
-        //then you can move onto orderely creation of variables and storing which variables have currently been created
-        //after that expressions can be evaluated, allowed operators, type mismatches and all that good stuff can be checked since everything is accessible
-        private void CreateLocalFunction(FunctionDeclarationNode function, IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt> parent, SubTypeSearcherService subTypeSearcher)
+        private void CreateLocalFunction(FunctionDeclarationNode function, IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt> parent, TypeSearcherService subTypeSearcher)
         {
             var name = (IdentifierNode)function.Name;
             var functionInfo = GatherArguments(function, subTypeSearcher, (TypeNode)function.Type);
@@ -314,27 +203,53 @@ namespace Sugar.Language.Semantics.Services.Implementations
             CreateLocalMembers(localFunction.Scope, subTypeSearcher);
         }
 
-        private FunctionInfo GatherArguments(BaseFunctionDeclarationNode baseFunction, SubTypeSearcherService subTypeSearcher, TypeNode type) => new FunctionInfo(baseFunction.Body,
+        private FunctionInfo GatherArguments(BaseFunctionDeclarationNode baseFunction, TypeSearcherService subTypeSearcher, TypeNode type) => new FunctionInfo(baseFunction.Body,
                                     FindReferencedType(subTypeSearcher, type),
                                     new Describer(0),
                                     CreateArguments(subTypeSearcher, (FunctionDeclarationArgumentsNode)baseFunction.Arguments));
 
-        private DataType FindReferencedType(SubTypeSearcherService subTypeSearcher, TypeNode type)
+        private DataType FindReferencedType(TypeSearcherService subTypeSearcher, TypeNode type)
         {
             switch (type.Type)
             {
                 case TypeNodeEnum.BuiltIn:
                     return defaultNameSpace.GetInternalDataType(type.ReturnType());
                 case TypeNodeEnum.Constructor:
-                    return subTypeSearcher.TryFindReferencedType((CustomTypeNode)((ConstructorTypeNode)type).ConstructorReturnType);
+                    return FindReference(((ConstructorTypeNode)type).ConstructorReturnType);
                 case TypeNodeEnum.Void:
                     return null;
                 default:
-                    return subTypeSearcher.TryFindReferencedType(((CustomTypeNode)type).CustomType);
+                    return FindReference(((CustomTypeNode)type).CustomType);
+            }
+
+            DataType FindReference(Node type)
+            {
+                var results = subTypeSearcher.ReferenceDataTypeCollection(type);
+
+                int count = results.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    var result = results.Dequeue();
+
+                    if (result.Remaining != null && result.ResultEnum != ActionNodeEnum.Namespace)
+                        results.Enqueue(result);
+                }
+
+                switch (results.Count)
+                {
+                    case 0:
+                        result.Add(new NoReferenceToTypeException(type.ToString(), "", 0));
+                        return null;
+                    case 1:
+                        return (DataType)results.Dequeue().Result;
+                    default:
+                        result.Add(new AmbigiousReferenceException(type.ToString(), "", 0));
+                        return null;
+                }
             }
         }
 
-        private FunctionArguments CreateArguments(SubTypeSearcherService subTypeSearcher, FunctionDeclarationArgumentsNode argumentsNode)
+        private FunctionArguments CreateArguments(TypeSearcherService subTypeSearcher, FunctionDeclarationArgumentsNode argumentsNode)
         {
             var arguments = new FunctionArguments();
 
@@ -342,7 +257,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
             {
                 var child = (FunctionDeclarationArgumentNode)argumentsNode[i];
 
-                IFunctionArgument argument;
+                FunctionArgumentDeclarationStmt argument;
                 var name = (IdentifierNode)child.Name;
                 var describer = describerService.AnalyseDescriber((DescriberNode)child.Describer);
 
@@ -352,10 +267,14 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     continue;
                 }
 
+                var type = FindReferencedType(subTypeSearcher, (TypeNode)child.Type);
+                if (type == null)
+                    continue;
+
                 if (child.DefaultValue == null)
-                    argument = new FunctionArgumentDeclarationStmt(FindReferencedType(subTypeSearcher, (TypeNode)child.Type), name, describer);
+                    argument = new FunctionArgumentDeclarationStmt(type, name, describer);
                 else
-                    argument = new FunctionArgumentInitialisationStmt(FindReferencedType(subTypeSearcher, (TypeNode)child.Type), name, describer, (ExpressionNode)child.DefaultValue);
+                    argument = new FunctionArgumentInitialisationStmt(type, name, describer, (ExpressionNode)child.DefaultValue);
 
                 arguments.Add(name.Value, argument);
             }
@@ -363,30 +282,290 @@ namespace Sugar.Language.Semantics.Services.Implementations
             return arguments;
         }
 
-        /*private VariableCreationStmt ReferenceFinalVariable(Node node, IVariableContainer start)
+        private IReturnableCreationStatement ReferenceEntity(Node name, Scope scope, TypeSearcherService searcherService)
         {
-            IVariableContainer current = start;
+            switch (name.NodeType)
+            {
+                case NodeType.Variable:
+                    return ReferenceInClassVariable((IdentifierNode)name, scope);
+                case NodeType.FunctionCall:
+                    var function = ReferenceInClassFunction((FunctionCallNode)name, scope, searcherService);
+                    switch(function.ActionNodeType)
+                    {
+                        case ActionNodeEnum.LocalFunction:
+                        case ActionNodeEnum.GlobalFunction:
+                        case ActionNodeEnum.ExtensionFunction:
+                            return (IReturnableCreationStatement)function;
+                    }
+                    break;
+                case NodeType.Dot:
+                    var dot = (DotExpression)name;
+                    var rhs = dot.RHS;
+
+                    switch(dot.RHS.NodeType)
+                    {
+                        case NodeType.Variable:
+                            var entity = ReferenceInClassVariable((IdentifierNode)rhs, scope);
+
+                            if (entity == null)
+                                return null;
+                            return ReferenceExternalVariable(entity, dot.LHS, scope, searcherService);
+                        case NodeType.FunctionCall:
+                            function = ReferenceInClassFunction((FunctionCallNode)name, scope, searcherService);
+                            if (function == null)
+                                return null;
+
+                            switch (function.ActionNodeType)
+                            {
+                                case ActionNodeEnum.LocalFunction:
+                                case ActionNodeEnum.GlobalFunction:
+                                case ActionNodeEnum.ExtensionFunction:
+                                    return ReferenceExternalVariable((IReturnableCreationStatement)function, dot.LHS, scope, searcherService);
+                            }
+                            break;
+                    }
+                    break;
+            }
+
+            return ReferenceExternalVariable(name, scope, searcherService);
+        }
+
+        //this should work but its ugly, refractor it a bit
+        private IReturnableCreationStatement ReferenceExternalVariable(IReturnableCreationStatement start, Node name, Scope scope, TypeSearcherService searcherService)
+        {
+            var current = name;
+            var type = start.CreationType;
+            IReferencableEntity entity = null;
+
+            while (true)
+            {
+                switch(current.NodeType)
+                {
+                    case NodeType.Variable:
+                        var identifier = (IdentifierNode)current;
+
+                        switch (type.ActionNodeType)
+                        {
+                            case ActionNodeEnum.Enum:
+                                return TryFindVariable((IVariableContainer)type, identifier);
+                            case ActionNodeEnum.Interface:
+                                return TryFindProperty((IGeneralContainer)type, identifier);
+                            case ActionNodeEnum.Class:
+                            case ActionNodeEnum.Struct:
+                                entity = TryFindVariable((IGeneralContainer)type, identifier);
+
+                                if (entity == null)
+                                    return TryFindProperty((IGeneralContainer)type, identifier);
+
+                                return entity;
+                        }
+                        break;
+                    case NodeType.FunctionCall:
+                        var functionCall = (FunctionCallNode)current;
+                        return TryFindFunction((IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>)type, (IdentifierNode)functionCall.Value, functionCall);
+                    case NodeType.Dot:
+                        var dot = (DotExpression)current;
+
+                        switch (dot.RHS.NodeType)
+                        {
+                            case NodeType.Variable:
+                                var rhs = (IdentifierNode)dot.RHS;
+                                switch (type.ActionNodeType)
+                                {
+                                    case ActionNodeEnum.Enum:
+                                        entity = TryFindVariable((IVariableContainer)type, rhs);
+                                        break;
+                                    case ActionNodeEnum.Interface:
+                                        entity = TryFindProperty((IGeneralContainer)type, rhs);
+                                        break;
+                                    case ActionNodeEnum.Class:
+                                    case ActionNodeEnum.Struct:
+                                        entity = TryFindVariable((IGeneralContainer)type, rhs);
+
+                                        if (entity == null)
+                                            entity = TryFindProperty((IGeneralContainer)type, rhs);
+                                        break;
+                                }
+
+                                if (entity == null)
+                                    return null;
+
+                                current = dot.LHS;
+                                type = entity.CreationType;
+                                break;
+                            case NodeType.FunctionCall:
+                                functionCall = (FunctionCallNode)dot.RHS;
+                                var function = TryFindFunction((IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>)type, (IdentifierNode)functionCall.Value, functionCall);
+
+                                if (function == null)
+                                    return null;
+
+                                current = dot.LHS;
+                                type = function.CreationType;
+                                break;
+                        }
+                        break;
+                }
+
+                IReferencableEntity TryFindVariable(IVariableContainer container, IdentifierNode identifier) => container.TryFindVariableCreation(identifier);
+                IReferencableEntity TryFindProperty(IPropertyContainer container, IdentifierNode identifier) => container.TryFindPropertyCreation(identifier);
+                MethodDeclarationStmt TryFindFunction(IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> container, IdentifierNode identifier, FunctionCallNode callNode)
+                {
+                    switch (type.ActionNodeType)
+                    {
+                        case ActionNodeEnum.Class:
+                        case ActionNodeEnum.Struct:
+                        case ActionNodeEnum.Interface:
+                            var function = container.TryFindFunctionDeclaration(identifier);
+
+                            if (function == null)
+                                return null;
+                            if (!ValidateFunctionArguments(function, callNode, scope, searcherService))
+                                return null;
+
+                            return function;
+                    }
+
+                    return null;
+                }
+            }
+        }
+
+        private IReturnableCreationStatement ReferenceExternalVariable(Node name, Scope scope, TypeSearcherService searcherService)
+        {
+            var results = searcherService.ReferenceDataTypeCollection(name);
+            var final = new List<IReturnableCreationStatement>();
+
+            int count = results.Count;
+            for(int i = 0; i < count; i++)
+            {
+                var current = results.Dequeue();
+
+                var reference = ReferenceExternalVariable(current.Remaining, scope, searcherService);
+                if (reference != null)
+                    final.Add(reference);
+            }
+
+            switch(final.Count)
+            {
+                case 0:
+                    result.Add(new NoReferenceToTypeException("", "", 0));
+                    return null;
+                case 1:
+                    return final[0];
+                default:
+                    result.Add(new AmbigiousReferenceException("", "", 0));
+                    return null;
+            }
+        }
+
+        private IReferencableEntity ReferenceInClassVariable(IdentifierNode name, Scope scope)
+        {
+            IFunction current = (IFunction)scope.Parent;
 
             while(true)
             {
-                switch(node.NodeType)
+                var creationStatement = current.TryFindVariableCreation(name);
+
+                if (creationStatement != null)
+                    return creationStatement;
+                else
                 {
-                    case Parsing.Nodes.Enums.NodeType.Dot:
-                        break;
-                    case Parsing.Nodes.Enums.NodeType.Variable:
-                        var identifer = (IdentifierNode)node;
-                        Console.WriteLine(identifer.Value);
+                    var parent = scope.Parent;
+                    switch(parent.ActionNodeType)
+                    {
+                        case ActionNodeEnum.LocalFunction:
+                            var localFunction = (ILocalFunction)parent;
+                            var argument = localFunction.TryFindFunctionArgument(name);
 
-                        var variable = current.TryFindVariableCreation(identifer);
-                        if (variable == null)
-                        {
-                            Console.WriteLine("null");
-                            return null;
-                        }
+                            if (argument != null)
+                                return argument;
+                            current = (IFunction)localFunction.Parent;
+                            break;
+                        default:
+                            var globalFunction = (IGlobalFunction)parent;
+                            argument = globalFunction.TryFindFunctionArgument(name);
 
-                        return variable;
+                            if (globalFunction != null)
+                                return argument;
+
+                            var type = (IVariableContainer)globalFunction.Parent;
+                            var global = type.TryFindVariableCreation(name);
+                            return global;
+                    }
                 }
             }
-        }*/
+        }
+
+        private IFunction ReferenceInClassFunction(FunctionCallNode callNode, Scope scope, TypeSearcherService searcher)
+        {
+            IFunction current = (IFunction)scope.Parent;
+
+            var name = (IdentifierNode)callNode.Value;
+
+            while (true)
+            {
+                var creationStatement = current.TryFindFunctionDeclaration(name);
+
+                if (creationStatement != null)
+                {
+                    if (ValidateFunctionArguments(creationStatement, callNode, scope, searcher))
+                        return creationStatement;
+                }
+
+                var parent = scope.Parent;
+                switch (parent.ActionNodeType)
+                {
+                    case ActionNodeEnum.LocalFunction:
+                        current = (IFunction)parent;
+                        break;
+                    default:
+                        var type = ((IGlobalFunction)parent).Parent;
+                        var global = type.TryFindFunctionDeclaration(name);
+                        if (global == null)
+                        {
+                            var globalVoid = type.TryFindMethodDeclaration(name);
+
+                            return globalVoid;
+                        }
+
+                        return global;
+                }
+            }
+        }
+
+        private bool ValidateFunctionArguments(IFunction functionCall, FunctionCallNode callNode, Scope scope, TypeSearcherService searcherService)
+        {
+            int i;
+            for(i = 0; i < functionCall.FunctionArguments.Count; i++)
+            {
+                if(i >= callNode.Arguments.ChildCount)
+                {
+                    result.Add(new FunctionArgumentsNotFoundException(functionCall.Name));
+                    return false;
+                }
+
+                var arg = callNode.Arguments[i];
+
+                var reference = ReferenceEntity(arg, scope, searcherService);
+                if(reference == null)
+                    continue;
+
+                var argument = functionCall.FunctionArguments[i];
+                if(argument.CreationType != reference.CreationType)//check for possible comparisons as well
+                {
+                    result.Add(new FunctionArgumentTypeMismatchException(functionCall.Name, argument.Name));
+                    continue;
+                }
+            }
+
+            if(i < callNode.ChildCount)
+            {
+                result.Add(new FunctionArgumentsNotFoundException(functionCall.Name));
+                return false;
+            }
+
+            return i == callNode.ChildCount;
+        }
     }
 }

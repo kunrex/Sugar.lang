@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
 
 using Sugar.Language.Exceptions.Analytics.Processing;
@@ -9,6 +10,7 @@ namespace Sugar.Language.Semantics.ActionTrees
     internal abstract class ActionTreeNode<ParentType> : IParentableActionTreeNode<ParentType>, IPrintable where ParentType : IActionTreeNode
     {
         public ParentType Parent { get; private set; }
+        public abstract ActionNodeEnum ActionNodeType { get; }
 
         public void SetParent(ParentType parent)
         {

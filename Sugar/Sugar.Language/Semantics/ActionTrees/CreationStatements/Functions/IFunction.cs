@@ -1,14 +1,19 @@
 ﻿using System;
 
+using Sugar.Language.Parsing.Nodes.Values;
+
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local.FunctionArguments;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal interface IFunction : IScopeParent
+    internal interface IFunction : IScopeParent, INameable
     {
         public Scope Scope { get; }
 
         public FunctionArguments FunctionArguments { get; }
+
+        public FunctionArgumentDeclarationStmt TryFindFunctionArgument(IdentifierNode identifier);
     }
 }

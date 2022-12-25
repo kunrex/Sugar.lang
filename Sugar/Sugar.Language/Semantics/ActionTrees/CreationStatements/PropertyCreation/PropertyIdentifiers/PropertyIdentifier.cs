@@ -3,6 +3,7 @@
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
 
@@ -12,6 +13,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
     {
         protected readonly Scope scope;
         public Scope Scope { get => scope; }
+
+        public abstract ActionNodeEnum ActionNodeType { get; }
 
         public PropertyIdentifier(Node _body)
         {

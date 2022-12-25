@@ -9,7 +9,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation
 {
-    internal abstract class VariableCreationStmt<Statement, Parent> : ReturnableCreationStatement<Parent> where Parent : IContainer<Statement, Parent> where Statement : VariableCreationStmt<Statement, Parent>
+    internal abstract class VariableCreationStmt<Statement, Parent> : ReturnableCreationStatement<Parent>, IVariableCreationStmt where Parent : IContainer<Statement, Parent> where Statement : VariableCreationStmt<Statement, Parent>
     {
         protected readonly IdentifierNode identifier;
 

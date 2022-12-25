@@ -13,7 +13,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
     internal sealed class EnumType : DataTypeWrapper<EnumNode>, IVariableContainer
     {
-        public override DataTypeEnum TypeEnum { get => DataTypeEnum.Enum; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Enum; }
 
         public EnumType(IdentifierNode _name, List<ImportNode> _imports, EnumNode _skeleton) : base(_name, _imports, MemberEnum.Variable, _skeleton)
         {

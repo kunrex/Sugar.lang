@@ -7,7 +7,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 
 namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 {
-    internal sealed class CreatedNameSpaceNode : BaseNameSpaceNode, INameSpaceCollection
+    internal sealed class CreatedNameSpaceNode : BaseNameSpaceNode, INameSpaceCollection, INameable
     {
         private readonly IdentifierNode name;
         public string Name { get => name.Value; }

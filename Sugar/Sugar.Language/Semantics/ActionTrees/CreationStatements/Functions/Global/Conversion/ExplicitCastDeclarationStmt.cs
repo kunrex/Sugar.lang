@@ -12,7 +12,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal sealed class ExplicitCastDeclarationStmt : CastDeclarationStmt<IExplicitContainer>
     {
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.ExplicitCast; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.ExplicitCast; }
 
         public ExplicitCastDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,

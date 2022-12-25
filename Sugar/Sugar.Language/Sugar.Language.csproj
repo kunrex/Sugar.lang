@@ -105,6 +105,8 @@
     <None Remove="Semantics\ActionTrees\CreationStatements\Functions\Global\Extensions\" />
     <None Remove="Semantics\ActionTrees\CreationStatements\PropertyCreation\PropertyIdentifiers\" />
     <None Remove="Exceptions\Analytics\General\" />
+    <None Remove="Semantics\Services\Structure\" />
+    <None Remove="Exceptions\Analytics\Referncing\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -201,6 +203,8 @@
     <Folder Include="Semantics\ActionTrees\CreationStatements\Functions\Global\Extensions\" />
     <Folder Include="Semantics\ActionTrees\CreationStatements\PropertyCreation\PropertyIdentifiers\" />
     <Folder Include="Exceptions\Analytics\Processing\" />
+    <Folder Include="Semantics\Services\Structure\" />
+    <Folder Include="Exceptions\Analytics\Referencing\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

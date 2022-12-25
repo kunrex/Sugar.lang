@@ -11,6 +11,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local.FunctionArguments;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
@@ -54,6 +55,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 
             return this;
         }
+
+        public FunctionArgumentDeclarationStmt TryFindFunctionArgument(IdentifierNode identifier) => arguments[identifier.Value];
 
         public LocalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => scope.TryFindMethodDeclaration(identifier);
 

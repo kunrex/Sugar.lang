@@ -17,7 +17,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
     internal class ClassType : DataTypeWrapper<ClassNode>, IGeneralContainer
     {
-        public override DataTypeEnum TypeEnum { get => DataTypeEnum.Class; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Class; }
 
         public ClassType(IdentifierNode _name, List<ImportNode> _imports, ClassNode _skeleton) : base(_name, _imports,
                     MemberEnum.Indexer |

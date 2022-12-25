@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Sugar.Language.Parsing.Nodes.Values;
+
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
-using Sugar.Language.Parsing.Nodes.Values;
 
 namespace Sugar.Language.Semantics.ActionTrees
 {
@@ -16,6 +18,8 @@ namespace Sugar.Language.Semantics.ActionTrees
         public CreatedNameSpaceCollectionNode CreatedNameSpaces { get => createdNameSpaces; }
 
         public int NameSpaceCount { get => 2; }
+
+        public ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Package; }
 
         public SugarPackage(DefaultNameSpaceNode _defaultNameSpaceNode, CreatedNameSpaceCollectionNode _createdNameSpaces)
         {

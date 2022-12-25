@@ -11,7 +11,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
 {
     internal class LocalVariableDeclarationStmt : VariableCreationStmt<LocalVariableDeclarationStmt, ILocalVariableContainer>
     {
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.LocalVariable; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.LocalVariable; }
 
         public LocalVariableDeclarationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, DescriberEnum _addOn = 0) : base(
             _creationType,

@@ -11,11 +11,11 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    internal sealed class MethodDeclarationStmt : GlobalFunctionCreationStmt<IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>, IMethodCreation
+    internal sealed class MethodDeclarationStmt : GlobalFunctionCreationStmt<IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>, IGlobalFunction, IMethodCreation
     {
         private readonly IdentifierNode identifier;
 
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.GlobalFunction; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.GlobalFunction; }
 
         public MethodDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,

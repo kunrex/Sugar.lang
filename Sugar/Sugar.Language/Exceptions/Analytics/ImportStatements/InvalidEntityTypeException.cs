@@ -8,7 +8,7 @@ namespace Sugar.Language.Exceptions.Analytics.ImportStatements
 {
     internal sealed class InvalidEntityTypeException : ImportStatementException
     {
-        public InvalidEntityTypeException(ImportNode _importNode, DataTypeEnum type, DataTypeEnum expected) : base(_importNode, $"'{ToString(_importNode)} is a {type} and not a(n) {expected}")
+        public InvalidEntityTypeException(ImportNode _importNode, ActionNodeEnum type, ActionNodeEnum expected) : base(_importNode, $"'{ToString(_importNode)} is a {type} and not a(n) {expected}")
         {
 
         }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
@@ -11,6 +12,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
     internal sealed class DefaultNameSpaceNode : BaseNameSpaceNode
     {
         private readonly Dictionary<string, DataType> internalDataTypes;
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.DefaultNameSpace; }
 
         public IList<DataType> InternalDataTypes { get => internalDataTypes.Values.ToList(); }
 

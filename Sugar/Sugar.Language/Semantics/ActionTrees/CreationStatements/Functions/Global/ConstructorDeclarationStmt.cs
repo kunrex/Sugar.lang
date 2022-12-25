@@ -12,7 +12,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal sealed class ConstructorDeclarationStmt : GlobalFunctionCreationStmt<IConstructorContainer>
     {
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.Constructor; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Constructor; }
 
         public ConstructorDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
             _creationType,

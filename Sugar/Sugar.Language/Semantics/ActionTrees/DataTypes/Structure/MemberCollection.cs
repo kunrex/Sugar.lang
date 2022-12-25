@@ -32,13 +32,11 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes.Structure
             {
                 ushort i = 1;
                 ushort check = (ushort)index, converted = check;
-                while (index != 0)
+                while (check != 0)
                 {
                     if ((converted & i) == i && collection.ContainsKey((MemberEnum)i))
                         foreach (var value in collection[index])
                             yield return value;
-                    else
-                        yield return null;
 
                     i *= 2;
                     check >>= 1;

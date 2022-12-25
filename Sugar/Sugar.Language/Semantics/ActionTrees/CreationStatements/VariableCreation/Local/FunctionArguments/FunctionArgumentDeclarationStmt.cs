@@ -12,8 +12,9 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
     internal class FunctionArgumentDeclarationStmt : LocalVariableDeclarationStmt, IFunctionArgument
     {
         public virtual ExpressionNode Value { get => null; }
+        public IdentifierNode Identifier { get => identifier; }
 
-        public override CreationTypeEnum CreationEnumType { get => CreationTypeEnum.FunctionArgument; }
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.FunctionArgument; }
 
         public FunctionArgumentDeclarationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer) : base(
             _creationType,

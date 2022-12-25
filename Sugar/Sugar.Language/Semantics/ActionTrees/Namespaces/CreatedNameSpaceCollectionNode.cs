@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Values;
-
+using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 
@@ -14,11 +14,12 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 
         public int NameSpaceCount { get => namespaces.Count; }
 
+        public ActionNodeEnum ActionNodeType { get => ActionNodeEnum.NameSpaceCollection; }
+
         public CreatedNameSpaceCollectionNode()
         {
             namespaces = new List<CreatedNameSpaceNode>();
         }
-
 
         public CreatedNameSpaceNode GetSubNameSpace(int index) => namespaces[index];
 

@@ -21,6 +21,8 @@ namespace Sugar.Language.Semantics.ActionTrees
         private readonly List<Scope> subScopes;
         private readonly MemberCollection memberCollection;
 
+        public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Scope; }
+
         public Scope(Node _body)
         {
             body = _body;

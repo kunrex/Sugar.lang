@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Statements;
 
@@ -12,9 +11,9 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
-    internal abstract class DataType : ActionTreeNode<IDataTypeCollection>, IDataTypeCollection
+    internal abstract class DataType : ActionTreeNode<IDataTypeCollection>, IDataTypeCollection, INameable
     {
-        public abstract DataTypeEnum TypeEnum { get; }
+        public override ActionNodeEnum ActionNodeType { get; }
 
         protected readonly IdentifierNode name;
         public string Name { get => name.Value; }
@@ -93,19 +92,22 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             return this;
         }
 
-        public void ReferenceDataType(DataType dataTypes) => referencedTypes.Add(dataTypes);
-
-        public void ReferenceNameSpace(CreatedNameSpaceNode createdNameSpaces) => referencedNameSpaces.Add(createdNameSpaces);
-
-        public void ReferenceParentNameSpaces()
+        public void ReferenceDataType(DataType dataTypes)
         {
-            var parent = (CreatedNameSpaceNode)Parent;
+            foreach (var type in referencedTypes)
+                if (type == dataTypes)
+                    return;
 
-            while (parent != null)
-            {
-                referencedNameSpaces.Add(parent);
-                parent = (CreatedNameSpaceNode)parent.Parent;
-            }
+            referencedTypes.Add(dataTypes);
+        }
+
+        public void ReferenceNameSpace(CreatedNameSpaceNode createdNameSpaces)
+        {
+            foreach (var nameSpace in referencedNameSpaces)
+                if (nameSpace == createdNameSpaces)
+                    return;
+
+            referencedNameSpaces.Add(createdNameSpaces);
         }
 
         protected override void PrintChildren(string indent)

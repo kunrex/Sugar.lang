@@ -57,17 +57,10 @@ namespace Sugar.Language.Semantics.Services.Implementations
             for (int i = 0; i < dataTypeCollection.DataTypeCount; i++)
             {
                 var dataType = dataTypeCollection.GetSubDataType(i);
-                ValidateDataType(dataType);
+                ValidateImportStatements(dataType.ReferencedImports, dataType);
 
                 ValidateDataTypeCollection(dataType);
             }
-        }
-
-        private void ValidateDataType(DataType dataType)
-        {
-            ValidateImportStatements(dataType.ReferencedImports, dataType);
-
-            dataType.ReferenceParentNameSpaces();
         }
 
         private void ValidateImportStatements(IEnumerable<ImportNode> referencedNameSpaces, DataType dataType)
@@ -190,7 +183,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
             if (nodeGroups == null)
             {
                 if (importNode.EntityType != UDDataType.Namespace)
-                    semanticsResult.Add(new InvalidEntityTypeException(importNode, DataTypeEnum.Namespace, (DataTypeEnum)importNode.EntityType));
+                    semanticsResult.Add(new InvalidEntityTypeException(importNode, ActionNodeEnum.Namespace, (ActionNodeEnum)importNode.EntityType));
 
                 dataType.ReferenceNameSpace(result);
             }
@@ -250,8 +243,8 @@ namespace Sugar.Language.Semantics.Services.Implementations
         {
             if (nodeGroups == null)
             {
-                if ((UDDataType)result.TypeEnum != importNode.EntityType)
-                    semanticsResult.Add(new InvalidEntityTypeException(importNode, result.TypeEnum, (DataTypeEnum)importNode.EntityType));
+                if ((UDDataType)result.ActionNodeType != importNode.EntityType)
+                    semanticsResult.Add(new InvalidEntityTypeException(importNode, result.ActionNodeType, (ActionNodeEnum)importNode.EntityType));
 
                 dataType.ReferenceDataType(result);
             }
