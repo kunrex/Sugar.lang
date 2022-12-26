@@ -2,7 +2,7 @@
     {
         void x()
         {
-            int: x;
+            print("");
             x = x + 1;
         }
         

@@ -373,7 +373,6 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     results.Enqueue(result);
             }
 
-            Console.WriteLine(results.Count);
             switch (results.Count)
             {
                 case 0:

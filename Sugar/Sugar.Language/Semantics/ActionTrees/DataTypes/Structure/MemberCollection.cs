@@ -35,7 +35,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes.Structure
                 while (check != 0)
                 {
                     if ((converted & i) == i && collection.ContainsKey((MemberEnum)i))
-                        foreach (var value in collection[index])
+                        foreach (var value in collection[(MemberEnum)i])
                             yield return value;
 
                     i *= 2;

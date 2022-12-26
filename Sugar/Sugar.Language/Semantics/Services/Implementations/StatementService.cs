@@ -37,6 +37,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.SubTypeSearching;
 using Sugar.Language.Parsing.Nodes.Functions.Calling;
 using Sugar.Language.Exceptions.Analytics.Referencing;
+using System.Linq;
 
 namespace Sugar.Language.Semantics.Services.Implementations
 {
@@ -113,11 +114,11 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                 var scope = converted.Scope;
                 var body = scope.Body;
-    
+
                 if (body.NodeType == NodeType.Scope)
                     foreach(var child in scope.Body.GetChildren())
                     {
-                        switch(child.NodeType)
+                        switch (child.NodeType)
                         {
                             case NodeType.Scope:
                             case NodeType.FunctionDeclaration:
@@ -131,7 +132,6 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                                 var value = assignment.Value;
                                 var variable = ReferenceEntity(value, scope, subTypeSearcher);
-                                Console.WriteLine(variable == null);
                                 break;
                         }
                     }

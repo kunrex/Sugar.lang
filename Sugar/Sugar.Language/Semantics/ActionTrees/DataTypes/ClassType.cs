@@ -20,6 +20,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Class; }
 
         public ClassType(IdentifierNode _name, List<ImportNode> _imports, ClassNode _skeleton) : base(_name, _imports,
+                    MemberEnum.Void |
                     MemberEnum.Indexer |
                     MemberEnum.Variable |
                     MemberEnum.Property |

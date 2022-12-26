@@ -21,6 +21,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
         public InterfaceType(IdentifierNode _name, List<ImportNode> _imports, InterfaceNode _skeleton) : base(_name,
                     _imports,
                     MemberEnum.Indexer |
+                    MemberEnum.Indexer |
                     MemberEnum.Variable |
                     MemberEnum.Property |
                     MemberEnum.Function |

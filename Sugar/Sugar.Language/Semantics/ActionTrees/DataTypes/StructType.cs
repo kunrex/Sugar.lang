@@ -21,6 +21,8 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public StructType(IdentifierNode _name, List<ImportNode> _imports, StructNode _skeleton) : base(_name,
                     _imports,
+                    MemberEnum.Void |
+                    MemberEnum.Indexer |
                     MemberEnum.Indexer |
                     MemberEnum.Variable |
                     MemberEnum.Property |

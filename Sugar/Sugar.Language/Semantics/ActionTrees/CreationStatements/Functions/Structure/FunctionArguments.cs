@@ -19,12 +19,18 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Stru
 
         public FunctionArgumentDeclarationStmt this[int key]
         {
-            get => arguments.ElementAt(key).Value;
+            get
+            {
+                if(key > 0 && key <= arguments.Count)
+                    return arguments.ElementAt(key).Value;
+
+                return null;
+            }
         }
 
         public FunctionArgumentDeclarationStmt this[string key]
         {
-            get => arguments[key];
+            get => arguments.ContainsKey(key) ? arguments[key] : null;
         }
 
         public void Add(string key, FunctionArgumentDeclarationStmt value) => arguments.Add(key, value);
