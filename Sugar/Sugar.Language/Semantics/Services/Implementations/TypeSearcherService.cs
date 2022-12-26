@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Types;
 using Sugar.Language.Parsing.Nodes.Enums;
 using Sugar.Language.Parsing.Nodes.Values;
+using Sugar.Language.Parsing.Nodes.Types.Enums;
 using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 
 using Sugar.Language.Semantics.ActionTrees;
 using Sugar.Language.Semantics.ActionTrees.Enums;
+using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 using Sugar.Language.Semantics.Services.Structure;
 using Sugar.Language.Semantics.Services.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
@@ -21,18 +24,35 @@ namespace Sugar.Language.Semantics.Services.Implementations
         private readonly DataType dataType;
 
         private readonly DefaultNameSpaceNode defaultNameSpace;
+        private readonly CreatedNameSpaceCollectionNode createdNameSpaceCollection;
 
         private readonly Queue<DataType> dataTypes;
         private readonly Queue<CreatedNameSpaceNode> nameSpaces;
 
-        public TypeSearcherService(DataType _dataType, DefaultNameSpaceNode _defaultNameSpaces)
+        public TypeSearcherService(DataType _dataType, DefaultNameSpaceNode _defaultNameSpaces, CreatedNameSpaceCollectionNode _createdNameSpaceCollection)
         {
             dataType = _dataType;
 
             defaultNameSpace = _defaultNameSpaces;
+            createdNameSpaceCollection = _createdNameSpaceCollection;
 
             dataTypes = new Queue<DataType>();
             nameSpaces = new Queue<CreatedNameSpaceNode>();
+        }
+
+        public Queue<SearchResult<IDataTypeCollection>> ReferenceDataTypeCollection(TypeNode type)
+        {
+            switch (type.Type)
+            {
+                case TypeNodeEnum.BuiltIn:
+                    var queue = new Queue<SearchResult<IDataTypeCollection>>();
+                    queue.Enqueue(new SearchResult<IDataTypeCollection>(defaultNameSpace.GetInternalDataType(type.ReturnType())));
+                    return queue;
+                case TypeNodeEnum.Constructor:
+                    return ReferenceDataTypeCollection(((ConstructorTypeNode)type).ConstructorReturnType);
+                default:
+                    return ReferenceDataTypeCollection(((CustomTypeNode)type).CustomType);
+            }
         }
 
         //should work, just check the algo once pls
@@ -45,20 +65,25 @@ namespace Sugar.Language.Semantics.Services.Implementations
             else
                 immediate = (IdentifierNode)((DotExpression)type).LHS;
 
-            //check for default data type as a parent
-            var nameSpace = CheckParent<DataType, CreatedNameSpaceNode, IDataTypeCollection>(dataType, ActionNodeEnum.Namespace, TryFindDataType);
-            var baseNode = CheckParent<CreatedNameSpaceNode, CreatedNameSpaceCollectionNode, INameSpaceCollection>(nameSpace, ActionNodeEnum.NameSpaceCollection, TryFindNameSpace);
+            dataTypes.Clear();
+            nameSpaces.Clear();
 
-            var baseNameSpace = baseNode.TryFindNameSpace(immediate);
+            if (dataType.Parent.ActionNodeType != ActionNodeEnum.DefaultNameSpace)
+            {
+                var nameSpace = CheckParent<DataType, CreatedNameSpaceNode, IDataTypeCollection>(dataType, ActionNodeEnum.Namespace, TryFindDataType);
+                CheckParent<CreatedNameSpaceNode, CreatedNameSpaceCollectionNode, INameSpaceCollection>(nameSpace, ActionNodeEnum.NameSpaceCollection, TryFindNameSpace);
+
+                if (immediate.Value == dataType.Name)
+                    dataTypes.Enqueue(dataType);
+            }
+
+            var baseNameSpace = createdNameSpaceCollection.TryFindNameSpace(immediate);
             if (baseNameSpace != null)
                 nameSpaces.Enqueue(baseNameSpace);
 
             var baseDataType = defaultNameSpace.TryFindDataType(immediate);
             if (baseDataType != null)
                 dataTypes.Enqueue(baseDataType);
-
-            if (immediate.Value == dataType.Name)
-                dataTypes.Enqueue(dataType);
 
             foreach (var referenced in dataType.ReferncedNameSpaces)
                 TryFindNameSpace(referenced, immediate);
@@ -98,13 +123,13 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 {
                     case NodeType.Dot:
                         var dot = (DotExpression)start;
-                        var rhs = (IdentifierNode)dot.RHS;
+                        var lhs = (IdentifierNode)dot.LHS;
 
-                        switch(rhs.NodeType)
+                        switch(lhs.NodeType)
                         {
                             case NodeType.Variable:
-                                Match(rhs, dot.RHS);
-                                start = dot.LHS;
+                                Match(lhs, dot.RHS);
+                                start = dot.RHS;
                                 break;
                             case NodeType.FunctionCall:
                                 OnFunctionCall();

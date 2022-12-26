@@ -1,4 +1,6 @@
-﻿class A
+﻿import X.Y;
+
+class A
 {
-    Integer: A;
+    X.Y.B: x;
 }

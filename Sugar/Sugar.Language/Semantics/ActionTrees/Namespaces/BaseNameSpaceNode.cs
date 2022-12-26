@@ -32,7 +32,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             return this;
         }
 
-        public DataType TryFindDataType(IdentifierNode identifier) 
+        public virtual DataType TryFindDataType(IdentifierNode identifier) 
         {
             foreach (var type in dataTypes)
                 if (type.Name == identifier.Value)

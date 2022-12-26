@@ -69,7 +69,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         private void Validate(StructType dataType)
         {
-            var subTypeSearcher = new TypeSearcherService(dataType, defaultNameSpace);
+            var subTypeSearcher = new TypeSearcherService(dataType, defaultNameSpace, createdNameSpaces);
             var functions = dataType.GetAllMembers(MemberEnum.Void);
 
             foreach (var function in functions)

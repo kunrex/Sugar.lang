@@ -98,7 +98,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 CreateEnumMembers((EnumType)dataType);
             else
             {
-                var subTypeSearcher = new TypeSearcherService(dataType, defaultNameSpace);
+                var subTypeSearcher = new TypeSearcherService(dataType, defaultNameSpace, createdNameSpaces);
 
                 switch(dataType.ActionNodeType)
                 {
@@ -359,42 +359,31 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         private DataType FindReferencedType(TypeSearcherService subTypeSearcher, TypeNode type)
         {
-            switch(type.Type)
+            if (type.Type == TypeNodeEnum.Void)
+                return null;
+
+            var results = subTypeSearcher.ReferenceDataTypeCollection(type);
+
+            int count = results.Count;
+            for (int i = 0; i < count; i++)
             {
-                case TypeNodeEnum.BuiltIn:
-                    return defaultNameSpace.GetInternalDataType(type.ReturnType());
-                case TypeNodeEnum.Constructor:
-                    return FindReference(((ConstructorTypeNode)type).ConstructorReturnType);
-                case TypeNodeEnum.Void:
-                    return null;
-                default:
-                    return FindReference(((CustomTypeNode)type).CustomType);
+                var result = results.Dequeue();
+
+                if (result.Remaining == null && result.ResultEnum != ActionNodeEnum.Namespace)
+                    results.Enqueue(result);
             }
 
-            DataType FindReference(Node type)
+            Console.WriteLine(results.Count);
+            switch (results.Count)
             {
-                var results = subTypeSearcher.ReferenceDataTypeCollection(type);
-
-                int count = results.Count;
-                for(int i = 0; i < count; i++)
-                {
-                    var result = results.Dequeue();
-
-                    if (result.Remaining != null && result.ResultEnum != ActionNodeEnum.Namespace)
-                        results.Enqueue(result);
-                }
-
-                switch(results.Count)
-                {
-                    case 0:
-                        result.Add(new NoReferenceToTypeException(type.ToString(), "", 0));
-                        return null;
-                    case 1:
-                        return (DataType)results.Dequeue().Result;
-                    default:
-                        result.Add(new AmbigiousReferenceException(type.ToString(), "", 0));
-                        return null;
-                }
+                case 0:
+                    result.Add(new NoReferenceToTypeException(type.ToString(),"", 0));
+                    return null;
+                case 1:
+                    return (DataType)results.Dequeue().Result;
+                default:
+                    result.Add(new AmbigiousReferenceException(type.ToString(), "", 0));
+                    return null;
             }
         }
 

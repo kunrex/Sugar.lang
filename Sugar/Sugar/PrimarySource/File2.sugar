@@ -1,1 +1,7 @@
-﻿
+﻿namespace X.Y
+{
+    class B
+    {
+
+    }
+}
