@@ -6,7 +6,7 @@ using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
 
 namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation
 {
-    internal sealed class InitializeNode : DeclarationNode, ICreationNode_Value
+    internal class InitializeNode : DeclarationNode, ICreationNode_Value
     {
         public override NodeType NodeType => NodeType.Initialise;
 

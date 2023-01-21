@@ -8,5 +8,10 @@ namespace Sugar.Language.Exceptions.Analytics.ClassMemberCreation.Statements
         {
 
         }
+
+        public DuplicateGlobalDefinitionException(string duplicate) : base($"a defintion for '{duplicate}' already exists in this scope", 0)
+        {
+
+        }
     }
 }

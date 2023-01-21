@@ -8,7 +8,7 @@ using Sugar.Language.Parsing.Nodes.Interfaces.Expressions;
 
 namespace Sugar.Language.Parsing.Nodes.Expressions.Operative
 {
-    internal sealed class UnaryExpression : ExpressionNode, IUnaryExpression
+    internal sealed class UnaryExpression : ExpressionNode, IUnaryOperative
     {
         public Operator Operator { get; private set; }
         public override NodeType NodeType => NodeType.Unary;

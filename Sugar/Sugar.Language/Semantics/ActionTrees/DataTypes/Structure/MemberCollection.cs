@@ -30,17 +30,21 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes.Structure
         {
             get
             {
+                var statements = new List<ICreationStatement>();
+
                 ushort i = 1;
                 ushort check = (ushort)index, converted = check;
                 while (check != 0)
                 {
                     if ((converted & i) == i && collection.ContainsKey((MemberEnum)i))
                         foreach (var value in collection[(MemberEnum)i])
-                            yield return value;
+                            statements.Add(value);
 
                     i *= 2;
                     check >>= 1;
                 }
+
+                return statements;
             }
         }
 

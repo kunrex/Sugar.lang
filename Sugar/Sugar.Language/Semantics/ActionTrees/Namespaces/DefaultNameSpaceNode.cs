@@ -7,6 +7,7 @@ using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 using Sugar.Language.Parsing.Nodes.Values;
+using Sugar.Language.Tokens.Enums;
 
 namespace Sugar.Language.Semantics.ActionTrees.Namespaces
 {
@@ -39,7 +40,8 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
             return base.TryFindDataType(identifier);
         }
 
-        public DataType GetInternalDataType(TypeEnum dataTypeEnum) => internalDataTypes[dataTypeEnum.ToString()];
+        public DataType GetInternalDataType(TypeEnum dataTypeEnum) => GetInternalDataType((ConstantType)dataTypeEnum);
+        public DataType GetInternalDataType(ConstantType dataTypeEnum) => internalDataTypes[dataTypeEnum.ToString()];
 
         protected override void PrintChildren(string indent)
         {

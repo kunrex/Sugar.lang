@@ -1,14 +1,9 @@
 ﻿using System;
 
-using Sugar.Language.Tokens.Enums;
-
 namespace Sugar.Language.Tokens.Constants.Numeric.Real
 {
     internal abstract class RealConstant : Constant, IValueComparisonToken
     {
-        public abstract RealType RealType { get; }
-        public override ConstantType ConstantType => ConstantType.Real;
-
         public RealConstant(string _value, int _index) : base(_value)
         {
             Index = _index;

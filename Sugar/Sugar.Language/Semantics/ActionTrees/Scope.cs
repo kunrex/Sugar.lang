@@ -34,6 +34,7 @@ namespace Sugar.Language.Semantics.ActionTrees
         public Scope AddScope(Scope subScope)
         {
             subScopes.Add(subScope);
+            subScope.SetParent(this);
 
             return this;
         }

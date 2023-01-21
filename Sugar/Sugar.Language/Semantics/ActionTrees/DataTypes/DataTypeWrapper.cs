@@ -30,7 +30,5 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
             return (DataTypeSkeleton)this;
         }
-
-        public IEnumerable<ICreationStatement> GetAllMembers(MemberEnum memberEnum) => globalMemberCollection[memberEnum];
     }
 }

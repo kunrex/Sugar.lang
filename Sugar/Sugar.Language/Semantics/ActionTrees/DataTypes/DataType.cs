@@ -6,6 +6,7 @@ using Sugar.Language.Parsing.Nodes.Statements;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements;
 using Sugar.Language.Semantics.ActionTrees.DataTypes.Structure;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
 
@@ -91,6 +92,8 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
             return this;
         }
+
+        public IEnumerable<ICreationStatement> GetAllMembers(MemberEnum memberEnum) => globalMemberCollection[memberEnum];
 
         public void ReferenceDataType(DataType dataTypes)
         {

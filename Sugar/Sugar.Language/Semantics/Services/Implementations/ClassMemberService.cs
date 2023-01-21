@@ -1,12 +1,13 @@
 ﻿using System;
 
+using Sugar.Language.Tokens.Enums;
+
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Enums;
 using Sugar.Language.Parsing.Nodes.Types;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Describers;
 using Sugar.Language.Parsing.Nodes.Types.Enums;
-using Sugar.Language.Parsing.Nodes.Expressions;
 using Sugar.Language.Parsing.Nodes.UDDataTypes;
 using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 using Sugar.Language.Parsing.Nodes.Functions.Properties;
@@ -37,6 +38,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.L
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.Statements;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.SubTypeSearching;
+using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.OperatorOverloads;
 
 namespace Sugar.Language.Semantics.Services.Implementations
 {
@@ -169,6 +171,11 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     var operatorOverload = (OperatorOverloadFunctionDeclarationNode)node;
 
                     var functionInfo = GatherArguments(operatorOverload, subTypeSearcher, (TypeNode)operatorOverload.Type);
+
+                    if (operatorOverload.Operator.Type == TokenType.UnaryOperator && functionInfo.Arguments.Count != 1)
+                        result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
+                    else if (functionInfo.Arguments.Count != 2)
+                        result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
                     AddDeclaration<OperatorOverloadDeclarationStmt, IOperatorContainer>(new OperatorOverloadDeclarationStmt(functionInfo.ReturnType, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body, operatorOverload.Operator), generalType);
                     break;
                 case NodeType.ExplicitDeclaration:
@@ -300,7 +307,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
             if (node.NodeType == NodeType.Declaration)
                 declaration = new GlobalVariableDeclarationStmt(type, name, describer);
             else
-                declaration = new GlobalVariableInitialisationStmt(type, name, describer, (ExpressionNode)((InitializeNode)node).Value);
+                declaration = new GlobalVariableInitialisationStmt(type, name, describer, ((InitializeNode)node).Value);
 
             AddDeclaration(declaration, dataType);
         }
@@ -315,12 +322,12 @@ namespace Sugar.Language.Semantics.Services.Implementations
             if (node.NodeType == NodeType.Declaration)
                 property = InitialisePropertyDeclaration(node.Name, name, referencedType, describer);
             else
-                property = InitialisePropertyDeclaration(node.Name, name, referencedType, describer, (ExpressionNode)((InitializeNode)node).Value);
+                property = InitialisePropertyDeclaration(node.Name, name, referencedType, describer, ((InitializeNode)node).Value);
 
             AddDeclaration(property, dataType);
         }
 
-        private PropertyCreationStmt InitialisePropertyDeclaration(Node propertyNode, IdentifierNode name, DataType dataType, Describer describer, ExpressionNode expressionValue = null)
+        private PropertyCreationStmt InitialisePropertyDeclaration(Node propertyNode, IdentifierNode name, DataType dataType, Describer describer, Node expressionValue = null)
         {
             PropertyCreationStmt propertyCreationNode;
 
@@ -490,7 +497,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 if (child.DefaultValue == null)
                     argument = new FunctionArgumentDeclarationStmt(type, name, describer);
                 else
-                    argument = new FunctionArgumentInitialisationStmt(type, name, describer, (ExpressionNode)child.DefaultValue);
+                    argument = new FunctionArgumentInitialisationStmt(type, name, describer, child.DefaultValue);
 
                 arguments.Add(name.Value, argument);
             }

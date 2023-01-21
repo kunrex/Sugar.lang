@@ -1,9 +1,8 @@
 ﻿using System;
-
 namespace Sugar.Language.Parsing.Nodes.Interfaces.Expressions
 {
-    internal interface IUnaryExpression 
+    internal interface IUnaryOperative : IUnaryExpression, IBasicOperative
     {
-        public Node Operhand { get; }
+
     }
 }

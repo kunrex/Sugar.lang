@@ -2,8 +2,8 @@
 
 namespace Sugar.Language.Parsing.Nodes.Interfaces.Expressions
 {
-    internal interface IUnaryExpression 
+    internal interface IBinaryOperative : IBinaryExpression, IBasicOperative
     {
-        public Node Operhand { get; }
+
     }
 }

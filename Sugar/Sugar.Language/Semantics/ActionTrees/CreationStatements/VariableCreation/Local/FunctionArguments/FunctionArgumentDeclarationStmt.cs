@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes.Values;
-using Sugar.Language.Parsing.Nodes.Expressions;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
@@ -11,7 +10,6 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreati
 {
     internal class FunctionArgumentDeclarationStmt : LocalVariableDeclarationStmt, IFunctionArgument
     {
-        public virtual ExpressionNode Value { get => null; }
         public IdentifierNode Identifier { get => identifier; }
 
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.FunctionArgument; }

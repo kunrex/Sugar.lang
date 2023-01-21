@@ -107,6 +107,7 @@
     <None Remove="Exceptions\Analytics\General\" />
     <None Remove="Semantics\Services\Structure\" />
     <None Remove="Exceptions\Analytics\Referncing\" />
+    <None Remove="Exceptions\Analytics\ClassMemberCreation\OperatorOverloads\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -205,6 +206,7 @@
     <Folder Include="Exceptions\Analytics\Processing\" />
     <Folder Include="Semantics\Services\Structure\" />
     <Folder Include="Exceptions\Analytics\Referencing\" />
+    <Folder Include="Exceptions\Analytics\ClassMemberCreation\OperatorOverloads\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

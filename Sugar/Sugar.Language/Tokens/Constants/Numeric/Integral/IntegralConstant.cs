@@ -1,14 +1,9 @@
 ﻿using System;
 
-using Sugar.Language.Tokens.Enums;
-
 namespace Sugar.Language.Tokens.Constants.Numeric.Integral
 {
     internal abstract class IntegralConstant : Constant, IValueComparisonToken
     {
-        public abstract IntegerType IntegerType { get; }
-        public override ConstantType ConstantType => ConstantType.Integer;
-
         public IntegralConstant(string _value, int _index) : base(_value)
         {
             Index = _index;

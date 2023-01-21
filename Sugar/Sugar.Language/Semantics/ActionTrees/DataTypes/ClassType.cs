@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Sugar.Language.Tokens.Operators;
+
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.UDDataTypes;
@@ -62,7 +64,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public ConstructorDeclarationStmt TryFindConstructorDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ConstructorDeclarationStmt,IConstructorContainer>(MemberEnum.Constructor, identifier.Value);
 
-        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<OperatorOverloadDeclarationStmt, IOperatorContainer>(MemberEnum.OperaterOverload, identifier.Value);
+        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op) => globalMemberCollection.GetCreationStatement<OperatorOverloadDeclarationStmt, IOperatorContainer>(MemberEnum.OperaterOverload, op.OperatorType.ToString());
 
         public ImplicitCastDeclarationStmt TryFindImplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ImplicitCastDeclarationStmt, IImplicitContainer>(MemberEnum.ImplicitCast, identifier.Value);
 

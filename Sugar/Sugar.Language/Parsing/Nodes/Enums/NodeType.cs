@@ -86,7 +86,8 @@ namespace Sugar.Language.Parsing.Nodes.Enums
 
         Parent,
 
+        Input,
         Action,
-        Function
+        Function,
     }
 }
