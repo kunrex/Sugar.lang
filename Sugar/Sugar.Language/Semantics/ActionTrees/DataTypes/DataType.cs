@@ -9,6 +9,7 @@ using Sugar.Language.Semantics.ActionTrees.Namespaces;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements;
 using Sugar.Language.Semantics.ActionTrees.DataTypes.Structure;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.Collections;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes.Casts;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 {
@@ -112,6 +113,10 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
             referencedNameSpaces.Add(createdNameSpaces);
         }
+
+        public bool StrictCompareTo(DataType external) => external == this;
+
+        public virtual bool CompareTo(DataType external) => StrictCompareTo(external);
 
         protected override void PrintChildren(string indent)
         {

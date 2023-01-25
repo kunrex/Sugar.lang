@@ -3,10 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
-using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements;
-using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global;
-using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes.Structure
 {
@@ -46,61 +43,6 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes.Structure
 
                 return statements;
             }
-        }
-
-        public bool IsDuplicateCreationStatement(string name)
-        {
-            foreach (var value in collection.Values)
-                foreach (var statement in value)
-                    if (statement.Name == name)
-                        return true;
-
-            return false;
-        }
-
-        public T GetCreationStatement<T, Parent>(MemberEnum memberType, string name) where T : CreationStatement<Parent> where Parent : IActionTreeNode
-        {
-            if ((memberType & MemberEnum.DataTypeMembers) != memberType)
-            {
-                foreach (var value in collection[memberType])
-                    if (value.Name == name)
-                        return (T)value;
-            }
-
-            return null;
-        }
-
-        public IndexerCreationStmt GetIndexerStatement(DataType type) 
-        {
-            var name = type.Name;
-
-            foreach (var value in collection[MemberEnum.Indexer])
-                if (value.Name == name)
-                    return (IndexerCreationStmt)value;
-
-            return null;
-        }
-
-        public ExplicitCastDeclarationStmt GetExplicitDeclaration(DataType type)
-        {
-            var name = type.Name;
-
-            foreach (var value in collection[MemberEnum.Indexer])
-                if (value.Name == name)
-                    return (ExplicitCastDeclarationStmt)value;
-
-            return null;
-        }
-
-        public ImplicitCastDeclarationStmt GetImplicitDeclaration(DataType type)
-        {
-            var name = type.Name;
-
-            foreach (var value in collection[MemberEnum.Indexer])
-                if (value.Name == name)
-                    return (ImplicitCastDeclarationStmt)value;
-
-            return null;
         }
 
         public void Add(MemberEnum key, ICreationStatement value)

@@ -1,7 +1,9 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes.Values;
+
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
@@ -9,7 +11,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
     {
         public IFunctionContainer<Function, Void> AddDeclaration(Void declaration);
 
-        public Void TryFindMethodDeclaration(IdentifierNode identifier);
-        public Function TryFindFunctionDeclaration(IdentifierNode identifier);
+        public Void TryFindMethodDeclaration(IdentifierNode identifier, FunctionArguments arguments);
+        public Function TryFindFunctionDeclaration(IdentifierNode identifier, FunctionArguments arguments);
     }
 }

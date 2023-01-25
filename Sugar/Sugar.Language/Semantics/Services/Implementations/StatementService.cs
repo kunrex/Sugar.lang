@@ -409,30 +409,43 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                     return null;
                 case NodeType.Binary:
+                    //alright basically, every where we create functions we dont check for duplicates based in argument types
+                    //you need to fix that, in class member service and here for local functions also
+                    //you need to do the same for operator overloading and cast decalartions with their own special checks
+                    //in unary operator, the parameter must be the type containing the overload
+                    //in binary, one of the parameters must be the type containing the overload
+                    //in cast, either the return type or the parameter must be the type containing the declartion
+                    //after that for evlauting binary expressions, any of the 2 types in the expression can contain the required operator
+                    //check in each and then return the suitable, fif the same exists in both, return an error
                     var binary = (BinaryExpression)expression;
 
                     var rhs = ResolveOperhand(binary.RHS, scope, searcherService);
                     var lhs = ResolveOperhand(binary.RHS, scope, searcherService);
 
-                    IOperatorContainer other;
+                    IOperatorContainer other, basic;
                     if (binary.Operator.LeftAssociative)
                     {
-                        overload = lhs.TryFindOperatorOverloadDeclaration(binary.Operator);
+                        basic = lhs;
                         other = rhs;
                     }
                     else
                     {
-                        overload = rhs.TryFindOperatorOverloadDeclaration(binary.Operator);
+                        basic = rhs;
                         other = lhs;
                     }
+
+                    overload = basic.TryFindOperatorOverloadDeclaration(binary.Operator);
 
                     if (overload == null)
                     {
                         //exception
                     }
-                    else if (overload.FunctionArguments[0].CreationType != other)
+                    else 
                     {
-                        //exception
+                        if (overload.FunctionArguments[0].CreationType != basic)
+                        {
+                            if(overload.FunctionArguments[1].CreationType != )
+                        }
                     }
                     else
                         return overload.CreationType;
@@ -528,6 +541,25 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
 
             return null;
+        }
+
+        private void ResolveDataTypeConversion(DataType type1, DataType type2)
+        {
+            
+        }
+
+        private bool TryImplicityConvert(DataType type, DataType to)
+        {
+            var conversions = type.GetAllMembers(MemberEnum.ImplicitCast);
+            foreach (var conversion in conversions)
+            {
+                var converted = (ExplicitCastDeclarationStmt)conversion;
+
+                if (converted.CreationType == to)
+                    return true;
+            }
+
+            return false;
         }
 
         private IReferencableEntity ReferenceInClassVariable(IdentifierNode name, Scope scope)

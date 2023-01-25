@@ -39,6 +39,7 @@ using Sugar.Language.Exceptions.Analytics.ClassMemberCreation;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.Statements;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.SubTypeSearching;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.OperatorOverloads;
+using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.Casting;
 
 namespace Sugar.Language.Semantics.Services.Implementations
 {
@@ -143,7 +144,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     var entityCreationNode = (VariableCreationNode)node;
 
                     var name = (IdentifierNode)entityCreationNode.Name;
-                    if(generalType.IsDuplicate(name))
+                    if(generalType.DuplicateVariableDeclaration(name))
                     {
                         result.Add(new DuplicateGlobalDefinitionException(name.Value, generalType.Name));
                         return;
@@ -172,21 +173,43 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                     var functionInfo = GatherArguments(operatorOverload, subTypeSearcher, (TypeNode)operatorOverload.Type);
 
-                    if (operatorOverload.Operator.Type == TokenType.UnaryOperator && functionInfo.Arguments.Count != 1)
-                        result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
-                    else if (functionInfo.Arguments.Count != 2)
-                        result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
+                    switch(operatorOverload.Operator.Type)
+                    {
+                        case TokenType.UnaryOperator:
+                            if(functionInfo.Arguments.Count != 1)
+                                result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
+                            break;
+                        case TokenType.BinaryOperator:
+                            if(functionInfo.Arguments.Count != 2)
+                                result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
+
+                            var found = false;
+                            for (int i = 0; i < functionInfo.Arguments.Count; i++)
+                                if (functionInfo.Arguments[i].CreationType == generalType)
+                                {
+                                    found = true;
+                                    break;
+                                }
+
+                            if (!found)
+                            {
+                                result.Add(new BinaryOperationArgumentException(0));
+                                return;
+                            }
+                            break;
+                    }
+
                     AddDeclaration<OperatorOverloadDeclarationStmt, IOperatorContainer>(new OperatorOverloadDeclarationStmt(functionInfo.ReturnType, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body, operatorOverload.Operator), generalType);
                     break;
                 case NodeType.ExplicitDeclaration:
                     var explicitCast = (ExplicitCastDeclarationNode)node;
 
-                    AddExplicitCastDelcration(explicitCast, generalType, subTypeSearcher, (TypeNode)explicitCast.Type);
+                    AddExplicitCastDelcration(generalType, explicitCast, generalType, subTypeSearcher, (TypeNode)explicitCast.Type);
                     break;
                 case NodeType.ImplicitDeclaration:
                     var implicitCast = (ImplicitCastDeclarationNode)node;
 
-                    AddImplicitCastDelcration(implicitCast, generalType, subTypeSearcher, (TypeNode)implicitCast.Type);
+                    AddImplicitCastDelcration(generalType, implicitCast, generalType, subTypeSearcher, (TypeNode)implicitCast.Type);
                     break;
                 case NodeType.ConstructorDeclaration:
                     var constructor = (BaseFunctionDeclarationNode)node;
@@ -220,7 +243,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     var entityCreationNode = (VariableCreationNode)node;
 
                     var name = (IdentifierNode)entityCreationNode.Name;
-                    if(interfaceType.IsDuplicate(name))
+                    if(interfaceType.DuplicateVariableDeclaration(name))
                     {
                         result.Add(new DuplicateGlobalDefinitionException(name.Value, interfaceType.Name));
                     }
@@ -244,12 +267,12 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 case NodeType.ExplicitDeclaration:
                     var explicitCast = (ExplicitCastDeclarationNode)node;
 
-                    AddExplicitCastDelcration(explicitCast, interfaceType, subTypeSearcher, (TypeNode)explicitCast.Type);
+                    AddExplicitCastDelcration(interfaceType, explicitCast, interfaceType, subTypeSearcher, (TypeNode)explicitCast.Type);
                     break;
                 case NodeType.ImplicitDeclaration:
                     var implicitCast = (ImplicitCastDeclarationNode)node;
 
-                    AddImplicitCastDelcration(implicitCast, interfaceType, subTypeSearcher, (TypeNode)implicitCast.Type);
+                    AddImplicitCastDelcration(interfaceType, implicitCast, interfaceType, subTypeSearcher, (TypeNode)implicitCast.Type);
                     break;
                 case NodeType.FunctionDeclaration:
                     var function = (FunctionDeclarationNode)node;
@@ -281,13 +304,19 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                         var describer = new Describer(DescriberEnum.EnumModifiers);
                         var name = (IdentifierNode)entityCreationNode.Name;
-                        var type = defaultNameSpace.GetInternalDataType(TypeEnum.Integer);
 
+                        if(enumType.TryFindVariableCreation(name) != null)
+                        {
+                            result.Add(new DuplicateGlobalDefinitionException(name.Value, enumType.Name));
+                            continue;
+                        }
+
+                        var type = defaultNameSpace.GetInternalDataType(TypeEnum.Integer);
                         InitailiseVariableDeclaration(entityCreationNode, name, type, describer, enumType);
                         break;
                     default:
-                        Console.WriteLine("Invalid Statement");
-                        return;
+                        result.Add(new InvalidStatementException("INvalid statement for enum.", "variable Creation Expcected"));
+                        break;
                 }
             }
         }
@@ -430,7 +459,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
-        private void AddExplicitCastDelcration(ExplicitCastDeclarationNode baseFunction, IExplicitContainer explicitContainer, TypeSearcherService subTypeSearcher, TypeNode type) 
+        private void AddExplicitCastDelcration(DataType parent, ExplicitCastDeclarationNode baseFunction, IExplicitContainer explicitContainer, TypeSearcherService subTypeSearcher, TypeNode type) 
         {
             var returnType = FindReferencedType(subTypeSearcher, type);
 
@@ -440,10 +469,19 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 return;
 
             var functionInfo = GatherArguments(baseFunction, subTypeSearcher);
-            AddDeclaration<ExplicitCastDeclarationStmt, ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer>>(new ExplicitCastDeclarationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), explicitContainer);
+            if (functionInfo.Arguments.Count != 1)
+                result.Add(new CastDeclarationArgumentsException(0));
+            else
+            {
+                var arg = functionInfo.Arguments[0].CreationType;
+                if((arg != parent && returnType != parent) || arg == returnType)
+                    result.Add(new CastDeclarationException(0));
+                else
+                    AddDeclaration<ExplicitCastDeclarationStmt, ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer>>(new ExplicitCastDeclarationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), explicitContainer);
+            }
         }
 
-        private void AddImplicitCastDelcration(ImplicitCastDeclarationNode baseFunction, IImplicitContainer explicitContainer, TypeSearcherService subTypeSearcher, TypeNode type)
+        private void AddImplicitCastDelcration(DataType parent, ImplicitCastDeclarationNode baseFunction, IImplicitContainer explicitContainer, TypeSearcherService subTypeSearcher, TypeNode type)
         {
             var returnType = FindReferencedType(subTypeSearcher, type);
 
@@ -453,7 +491,16 @@ namespace Sugar.Language.Semantics.Services.Implementations
                 return;
 
             var functionInfo = GatherArguments(baseFunction, subTypeSearcher);
-            AddDeclaration<ImplicitCastDeclarationStmt, ICastContainer<ImplicitCastDeclarationStmt, IImplicitContainer>>(new ImplicitCastDeclarationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), explicitContainer);
+            if (functionInfo.Arguments.Count != 1)
+                result.Add(new CastDeclarationArgumentsException(0));
+            else
+            {
+                var arg = functionInfo.Arguments[0].CreationType;
+                if ((arg != parent && returnType != parent) || arg == returnType)
+                    result.Add(new CastDeclarationException(0));
+                else
+                    AddDeclaration<ExplicitCastDeclarationStmt, ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer>>(new ExplicitCastDeclarationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body), explicitContainer);
+            }
         }
 
         private void AddDeclaration<CreationStatementType, Container>(CreationStatementType declaration, Container container) where CreationStatementType : ICreationStatement where Container : IContainer<CreationStatementType, Container>

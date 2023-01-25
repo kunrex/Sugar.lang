@@ -12,6 +12,7 @@ using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes.Casts;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
@@ -50,27 +51,21 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public ICastContainer<ExplicitCastDeclarationStmt, IExplicitContainer> AddDeclaration(ExplicitCastDeclarationStmt declaration) => AddGlobalMember<InterfaceType, IExplicitContainer>(MemberEnum.ExplicitCast, declaration, this);
 
-        public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<PropertyCreationStmt, IPropertyContainer>(MemberEnum.Property, identifier.Value);
+        public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => TryFindIdentifiedMember<PropertyCreationStmt, IPropertyContainer>(identifier, MemberEnum.Properties);
 
-        public VoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<VoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Void, identifier.Value);
+        public VoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier, FunctionArguments arguments) => TryFindIdentifiedArgumentedMember<VoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(identifier, arguments, MemberEnum.Void);
 
-        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(MemberEnum.Function, identifier.Value);
+        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier, FunctionArguments arguments) => TryFindIdentifiedArgumentedMember<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(identifier, arguments, MemberEnum.Function);
 
-        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op) => globalMemberCollection.GetCreationStatement<OperatorOverloadDeclarationStmt, IOperatorContainer>(MemberEnum.OperaterOverload, op.OperatorType.ToString());
+        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op, DataType operhand) => TryFindOperatorOverload(op, operhand);
 
-        public ImplicitCastDeclarationStmt TryFindImplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ImplicitCastDeclarationStmt, IImplicitContainer>(MemberEnum.ImplicitCast, identifier.Value);
+        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op, DataType operhand1, DataType operhand2) => TryFindOperatorOverload(op, operhand1, operhand2);
 
-        public ExplicitCastDeclarationStmt TryFindExplicitCastDeclaration(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<ExplicitCastDeclarationStmt, IExplicitContainer>(MemberEnum.ExplicitCast, identifier.Value);
+        public ImplicitCastDeclarationStmt TryFindImplicitCastDeclaration(DataType external) => TryFindCast<ImplicitCastDeclarationStmt, IImplicitContainer>(external, MemberEnum.ImplicitCast);
 
-        public IndexerCreationStmt TryFindIndexerCreationStatement(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<IndexerCreationStmt, IIndexerContainer>(MemberEnum.Indexer, identifier.Value);
+        public ExplicitCastDeclarationStmt TryFindExplicitCastDeclaration(DataType external) => TryFindCast<ExplicitCastDeclarationStmt, IExplicitContainer>(external, MemberEnum.ExplicitCast);
 
-        public override bool IsDuplicate(IdentifierNode identifier) => globalMemberCollection.IsDuplicateCreationStatement(identifier.Value);
-
-        public bool IsDuplicateIndexer(DataType dataType) => globalMemberCollection.GetIndexerStatement(dataType) != null;
-
-        public bool IsDuplicateImplicitCast(DataType dataType) => globalMemberCollection.GetImplicitDeclaration(dataType) != null;
-
-        public bool IsDuplicateExplicitCast(DataType dataType) => globalMemberCollection.GetExplicitDeclaration(dataType) != null;
+        public IndexerCreationStmt TryFindIndexerCreationStatement(DataType external, FunctionArguments arguments) => TryFindIndexer(external, arguments);
 
         public override string ToString() => $"Interface Node [{name.Value}]";
     }
