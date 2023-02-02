@@ -38,7 +38,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         FunctionCall,
         ArgumentCall,
         ConstructorCall,
-        FunctionDeclaration,
+        MethodDeclaration,
         ArgumentDeclaration,
         ConstructorDeclaration,
 

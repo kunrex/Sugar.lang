@@ -2,7 +2,7 @@
 
 namespace Sugar.Language.Semantics.Services.Interfaces
 {
-    internal interface IClassMemeberService : IValidatableService<IClassMemeberService>
+    internal interface ILocalBinderService : IValidatableService<ILocalBinderService>
     {
 
     }

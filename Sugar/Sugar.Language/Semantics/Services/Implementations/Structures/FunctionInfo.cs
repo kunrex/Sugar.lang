@@ -16,14 +16,15 @@ namespace Sugar.Language.Semantics.Services.Implementations.Structures
 
         private readonly DataType returnType;
         public DataType ReturnType { get => returnType; }
+        public bool IsReturnableFunction { get => returnType != null; }
 
         private readonly Describer describer;
         public Describer Describer { get => describer; }
 
-        private readonly FunctionArguments arguments;
-        public FunctionArguments Arguments { get => arguments; }
+        private readonly FunctionDeclArgs arguments;
+        public FunctionDeclArgs Arguments { get => arguments; }
 
-        public FunctionInfo(Node _body, DataType _returnType, Describer _describer, FunctionArguments _arguments)
+        public FunctionInfo(Node _body, DataType _returnType, Describer _describer, FunctionDeclArgs _arguments)
         {
             body = _body;
             describer = _describer;

@@ -15,7 +15,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.GlobalVoid; }
 
-        public VoidDeclarationStmt(IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public VoidDeclarationStmt(IdentifierNode _name, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody) : base(
             _name.Value,
             _describer,
             _arguments,

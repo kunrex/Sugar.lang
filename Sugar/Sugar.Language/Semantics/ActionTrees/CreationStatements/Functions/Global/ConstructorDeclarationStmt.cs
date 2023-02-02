@@ -10,11 +10,11 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    internal sealed class ConstructorDeclarationStmt : GlobalFunctionCreationStmt<IConstructorContainer>
+    internal sealed class ConstructorDeclarationStmt : GlobalMethodCreationStmt<IConstructorContainer>
     {
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.Constructor; }
 
-        public ConstructorDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public ConstructorDeclarationStmt(DataType _creationType, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody) : base(
             _creationType,
             _creationType.Name,
             _describer,

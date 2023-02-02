@@ -263,7 +263,7 @@ namespace Sugar.Language.Parsing.Parser
                     index--;
                     toReturn = ParseDeclaration(describer, type);
 
-                    if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.FunctionDeclaration))
+                    if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.MethodDeclaration))
                         return toReturn;
                     break;
                 case TokenType.Keyword:
@@ -295,7 +295,7 @@ namespace Sugar.Language.Parsing.Parser
                         case KeywordType.Type:
                             toReturn = ParseDeclaration(describer);
 
-                            if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.FunctionDeclaration))
+                            if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.MethodDeclaration))
                                 return toReturn;
                             break;
                         default:
@@ -422,7 +422,7 @@ namespace Sugar.Language.Parsing.Parser
                         case KeywordType.Type:
                             toReturn = ParseDeclaration(new DescriberNode());
 
-                            if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.FunctionDeclaration))
+                            if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.MethodDeclaration))
                                 return toReturn;
                             break;
                         case KeywordType.Function:
@@ -479,7 +479,7 @@ namespace Sugar.Language.Parsing.Parser
                 case NodeType.Type:
                     toReturn = ParseDeclaration(new DescriberNode(), variable as TypeNode);
 
-                    if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.FunctionDeclaration))
+                    if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.MethodDeclaration))
                         return toReturn;
                     break;
                 case NodeType.Indexer:
@@ -498,7 +498,7 @@ namespace Sugar.Language.Parsing.Parser
                         default:
                             toReturn = ParseDeclaration(new DescriberNode(), new CustomTypeNode(variable));
 
-                            if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.FunctionDeclaration))
+                            if (MatchFunctionPropertyDeclaration(toReturn.NodeType == NodeType.MethodDeclaration))
                                 return toReturn;
                             break;
                     }

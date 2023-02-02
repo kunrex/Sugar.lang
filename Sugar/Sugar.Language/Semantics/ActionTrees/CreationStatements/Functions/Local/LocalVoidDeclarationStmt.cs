@@ -13,7 +13,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Loca
     {
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.LocalFunction; }
 
-        public LocalVoidDeclarationStmt(IdentifierNode _name, Describer _describer, FunctionArguments arguments, Node _nodeBody) : base(
+        public LocalVoidDeclarationStmt(IdentifierNode _name, Describer _describer, FunctionDeclArgs arguments, Node _nodeBody) : base(
             _name.Value,
             _describer,
             DescriberEnum.None,

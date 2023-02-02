@@ -2,39 +2,36 @@
 using System.Linq;
 using System.Collections.Generic;
 
+using Sugar.Language.Semantics.ActionTrees.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local.FunctionArguments;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure
 {
-    internal sealed class FunctionArguments 
+    internal abstract class FunctionArguments<Key, ArgumentBase> : IFunctionArguments where ArgumentBase : IFunctionArgument
     {
-        public int Count { get => arguments.Count; }
+        public int Count { get => Arguments.Count; }
 
-        private readonly Dictionary<string, FunctionArgumentDeclarationStmt> arguments;
+        protected Dictionary<Key, ArgumentBase> Arguments { get; private set; }
 
         public FunctionArguments()
         {
-            arguments = new Dictionary<string, FunctionArgumentDeclarationStmt>();
+            Arguments = new Dictionary<Key, ArgumentBase>();
         }
 
-        public FunctionArgumentDeclarationStmt this[int key]
+        public DataType this[int key]
         {
             get
             {
-                if(key > 0 && key <= arguments.Count)
-                    return arguments.ElementAt(key).Value;
+                if(key > 0 && key <= Arguments.Count)
+                    return Arguments.ElementAt(key).Value.CreationType;
 
                 return null;
             }
         }
 
-        public FunctionArgumentDeclarationStmt this[string key]
-        {
-            get => arguments.ContainsKey(key) ? arguments[key] : null;
-        }
-
-        public void Add(string key, FunctionArgumentDeclarationStmt value) => arguments.Add(key, value);
-
-        public bool ContainsArgument(string name) => arguments.ContainsKey(name);
+        public void Add(Key key, ArgumentBase value) => Arguments.Add(key, value);
+ 
+        public bool ContainsArgument(Key name) => Arguments.ContainsKey(name);
     }
 }

@@ -10,7 +10,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal abstract class GlobalVoidDeclarationStmt<Function, Void> : VoidCreationStmt<Function, Void> where Function : IMethodCreation where Void : IVoidCreation
     {
-        public GlobalVoidDeclarationStmt(string _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public GlobalVoidDeclarationStmt(string _name, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody) : base(
             _name,
             _describer,
             DescriberEnum.Static | DescriberEnum.AccessModifiers | DescriberEnum.InheritanceModifiers | DescriberEnum.Override,

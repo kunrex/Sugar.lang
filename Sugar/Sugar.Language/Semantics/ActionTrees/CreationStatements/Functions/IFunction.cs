@@ -12,7 +12,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
     {
         public Scope Scope { get; }
 
-        public FunctionArguments FunctionArguments { get; }
+        public FunctionDeclArgs FunctionArguments { get; }
 
         public FunctionArgumentDeclarationStmt TryFindFunctionArgument(IdentifierNode identifier);
     }

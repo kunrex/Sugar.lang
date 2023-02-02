@@ -5,6 +5,7 @@ using Sugar.Language.Parsing;
 using Sugar.Language.Semantics.ActionTrees;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
 using Sugar.Language.Semantics.Services.Implementations;
+using Sugar.Language.Semantics.Services.Implementations.Binding;
 
 namespace Sugar.Language.Semantics.Analysis
 {
@@ -35,9 +36,9 @@ namespace Sugar.Language.Semantics.Analysis
             var import = new ImportStatementService(defaultNameSpace, createdNameSpaces).Validate();
             defaultNameSpace.Print("", true);
             createdNameSpaces.Print("", true);
-            var classMemberCreation = new ClassMemberService(defaultNameSpace, createdNameSpaces).Validate();
+            var classMemberCreation = new GlobalBinderService(defaultNameSpace, createdNameSpaces).Validate();
 
-            var statementValidation = new StatementService(defaultNameSpace, createdNameSpaces).Validate();
+            var statementValidation = new LocalBinderService(defaultNameSpace, createdNameSpaces).Validate();
 
             Console.WriteLine(import);
             Console.WriteLine(classMemberCreation);

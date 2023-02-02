@@ -47,11 +47,10 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             return null;
         }
 
-        protected ReturnType TryFindIdentifiedArgumentedMember<ReturnType, Parent>(IdentifierNode identifier, FunctionArguments arguments, MemberEnum memberType) where ReturnType : CreationStatement<Parent>, IFunction where Parent : IActionTreeNode
+        protected ReturnType TryFindIdentifiedArgumentedMember<ReturnType, Parent>(IdentifierNode identifier, IFunctionArguments arguments, MemberEnum memberType) where ReturnType : CreationStatement<Parent>, IFunction where Parent : IActionTreeNode
         {
             var members = globalMemberCollection[memberType];
 
-            bool found;
             var name = identifier.Value;
             foreach (var function in members)
                 if (function.Name == name)
@@ -65,8 +64,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             return null;
         }
 
-
-        protected IndexerCreationStmt TryFindIndexer(DataType external, FunctionArguments arguments)
+        protected IndexerCreationStmt TryFindIndexer(DataType external, IFunctionArguments arguments)
         {
             var indexers = globalMemberCollection[MemberEnum.Indexer];
 
@@ -74,6 +72,8 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             {
                 var converted = (IndexerCreationStmt)indexer;
 
+                if (!converted.CreationType.StrictCompareTo(external))
+                    continue;
                 if (CheckArguments(converted, arguments))
                     return converted;
             }
@@ -81,16 +81,13 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
             return null;
         }
 
-        private bool CheckArguments<GlobalMemberType>(GlobalMemberType converted, FunctionArguments arguments) where GlobalMemberType : IFunction
+        private bool CheckArguments<GlobalMemberType>(GlobalMemberType converted, IFunctionArguments arguments) where GlobalMemberType : IFunction
         {
             var found = true;
 
             for (int i = 0; i < converted.FunctionArguments.Count; i++)
             {
-                var callArgs = arguments[i];
-                var declArgs = converted.FunctionArguments[i];
-
-                if (!callArgs.CreationType.CompareTo(declArgs.CreationType))
+                if (!arguments[i].CompareTo(converted.FunctionArguments[i]))
                 {
                     found = false;
                     break;
@@ -129,7 +126,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
                 {
                     var converted = (OperatorOverloadDeclarationStmt)operatrOverload;
 
-                    if (converted.FunctionArguments[0].CreationType.StrictCompareTo(operhand1))
+                    if (converted.FunctionArguments[0].StrictCompareTo(operhand1))
                         return converted;
                 }
 
@@ -146,8 +143,8 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
                 {
                     var converted = (OperatorOverloadDeclarationStmt)operatrOverload;
 
-                    var arg1 = converted.FunctionArguments[0].CreationType;
-                    var arg2 = converted.FunctionArguments[1].CreationType;
+                    var arg1 = converted.FunctionArguments[0];
+                    var arg2 = converted.FunctionArguments[1];
 
                     if (arg1 == this)
                     {

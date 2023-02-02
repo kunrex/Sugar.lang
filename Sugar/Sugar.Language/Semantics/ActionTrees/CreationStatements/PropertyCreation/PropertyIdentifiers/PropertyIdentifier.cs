@@ -4,6 +4,7 @@ using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
 
@@ -35,9 +36,9 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
             return this;
         }
 
-        public LocalMethodCreationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => scope.TryFindFunctionDeclaration(identifier);
+        public LocalVoidDeclarationStmt TryFindVoidDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => scope.TryFindVoidDeclaration(identifier, arguments);
 
-        public LocalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => scope.TryFindMethodDeclaration(identifier);
+        public LocalMethodCreationStmt TryFindMethodDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => scope.TryFindMethodDeclaration(identifier, arguments);
 
         public abstract void Print(string indent, bool last);
     }

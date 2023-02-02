@@ -10,9 +10,9 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    internal abstract class GlobalFunctionCreationStmt<Parent> : FunctionCreationStmt<Parent> where Parent : IActionTreeNode
+    internal abstract class GlobalMethodCreationStmt<Parent> : MethodCreationStmt<Parent> where Parent : IActionTreeNode
     {
-        public GlobalFunctionCreationStmt(DataType _creationType, string _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public GlobalMethodCreationStmt(DataType _creationType, string _name, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody) : base(
             _creationType,
             _name,
             _describer,

@@ -8,6 +8,6 @@ namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
     internal interface IIndexerContainer : IContainer<IndexerCreationStmt, IIndexerContainer>
     {
-        public IndexerCreationStmt TryFindIndexerCreationStatement(DataType external, FunctionArguments arguments);
+        public IndexerCreationStmt TryFindIndexerCreationStatement(DataType external, IFunctionArguments arguments);
     }
 }

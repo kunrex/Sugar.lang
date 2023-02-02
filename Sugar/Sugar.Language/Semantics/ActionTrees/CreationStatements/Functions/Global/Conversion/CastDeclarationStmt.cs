@@ -9,12 +9,12 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion
 {
-    internal abstract class CastDeclarationStmt<Parent> : GlobalFunctionCreationStmt<Parent> where Parent : IActionTreeNode
+    internal abstract class CastDeclarationStmt<Parent> : GlobalMethodCreationStmt<Parent> where Parent : IActionTreeNode
     {
         public DataType To { get => CreationType; }
-        public DataType From { get => FunctionArguments[0].CreationType; }
+        public DataType From { get => FunctionArguments[0]; }
 
-        public CastDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public CastDeclarationStmt(DataType _creationType, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody) : base(
             _creationType,
             _creationType.Name,
             _describer,

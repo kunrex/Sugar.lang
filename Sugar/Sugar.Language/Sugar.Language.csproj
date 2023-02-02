@@ -109,6 +109,7 @@
     <None Remove="Exceptions\Analytics\Referncing\" />
     <None Remove="Exceptions\Analytics\ClassMemberCreation\OperatorOverloads\" />
     <None Remove="Exceptions\Analytics\ClassMemberCreation\Casting\" />
+    <None Remove="Semantics\Services\Implementations\Binding\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -209,6 +210,7 @@
     <Folder Include="Exceptions\Analytics\Referencing\" />
     <Folder Include="Exceptions\Analytics\ClassMemberCreation\OperatorOverloads\" />
     <Folder Include="Exceptions\Analytics\ClassMemberCreation\Casting\" />
+    <Folder Include="Semantics\Services\Implementations\Binding\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

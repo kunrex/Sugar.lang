@@ -11,7 +11,6 @@ using Sugar.Language.Parsing.Nodes.Describers;
 using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.Types.Enums;
 using Sugar.Language.Parsing.Nodes.Expressions;
-using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 using Sugar.Language.Parsing.Nodes.Functions.Calling;
 using Sugar.Language.Parsing.Nodes.Expressions.Operative;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations;
@@ -41,29 +40,21 @@ using Sugar.Language.Exceptions.Analytics.ClassMemberCreation;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.Statements;
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation.SubTypeSearching;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion;
+using Sugar.Language.Parsing.Nodes.Functions.Calling.Structure;
+using Sugar.Language.Semantics.Services.Implementations.Structures;
 
-namespace Sugar.Language.Semantics.Services.Implementations
+namespace Sugar.Language.Semantics.Services.Implementations.Binding
 {
-    internal sealed class StatementService : IStatementService
+    internal sealed class LocalBinderService : BinderService<ILocalBinderService>
     {
-        private readonly DefaultNameSpaceNode defaultNameSpace;
-        private readonly CreatedNameSpaceCollectionNode createdNameSpaces;
+        protected override string StepName { get => "Local Binding"; }
 
-        private readonly SemanticsResult result;
-
-        private readonly DescriberService describerService;
-
-        public StatementService(DefaultNameSpaceNode _default, CreatedNameSpaceCollectionNode _collection)
+        public LocalBinderService(DefaultNameSpaceNode _defaultNameSpace, CreatedNameSpaceCollectionNode _createdNameSpaces) : base(_defaultNameSpace, _createdNameSpaces)
         {
-            defaultNameSpace = _default;
-            createdNameSpaces = _collection;
-
-            describerService = new DescriberService();
-
-            result = new SemanticsResult("Statement Validation");
+            
         }
 
-        public SemanticsResult Validate()
+        public override SemanticsResult Validate()
         {
             var integer = defaultNameSpace.GetInternalDataType(Analysis.BuiltInTypes.Enums.TypeEnum.Integer);
             Validate((StructType)integer);
@@ -168,7 +159,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                             parent.AddScope(scope);
                             break;
-                        case NodeType.FunctionDeclaration:
+                        case NodeType.MethodDeclaration:
                             CreateLocalFunction((FunctionDeclarationNode)child, parent, searcherService);
                             break;
                     }
@@ -211,9 +202,11 @@ namespace Sugar.Language.Semantics.Services.Implementations
         private void CreateLocalFunction(FunctionDeclarationNode function, Scope parent, TypeSearcherService subTypeSearcher)
         {
             var name = (IdentifierNode)function.Name;
-            if (parent.TryFindFunctionDeclaration(name) == null)
+            var arguments = CreateArguments(subTypeSearcher, parent, (FunctionDeclarationArgumentsNode)function.Arguments);
+
+            if (parent.TryFindMethodDeclaration(name, arguments) == null)
             {
-                if(parent.TryFindMethodDeclaration(name) != null)
+                if(parent.TryFindVoidDeclaration(name, arguments) != null)
                 {
                     result.Add(new DuplicateGlobalDefinitionException(name.Value));
                     return;
@@ -226,10 +219,8 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
 
             var type = (TypeNode)function.Type;
-
             var describer = new Describer(DescriberEnum.None);
-            var arguments = CreateArguments(subTypeSearcher, parent, (FunctionDeclarationArgumentsNode)function.Arguments);
-
+  
             IFunction localFunction;
             if (type.Type == TypeNodeEnum.Void)
             {
@@ -253,9 +244,9 @@ namespace Sugar.Language.Semantics.Services.Implementations
             CreateLocalMembers(localFunction.Scope, subTypeSearcher);
         }
 
-        private FunctionArguments CreateArguments(TypeSearcherService searcherService, Scope scope, FunctionDeclarationArgumentsNode argumentsNode)
+        private FunctionDeclArgs CreateArguments(TypeSearcherService searcherService, Scope scope, FunctionDeclarationArgumentsNode argumentsNode)
         {
-            var arguments = new FunctionArguments();
+            var arguments = new FunctionDeclArgs();
 
             for (int i = 0; i < argumentsNode.ChildCount; i++)
             {
@@ -294,45 +285,6 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
 
             return arguments;
-        }
-
-        private DataType FindReferencedType(TypeSearcherService searcherService, TypeNode type)
-        {
-            switch (type.Type)
-            {
-                case TypeNodeEnum.BuiltIn:
-                    return defaultNameSpace.GetInternalDataType(type.ReturnType());
-                case TypeNodeEnum.Constructor:
-                    return FindReferencedType(searcherService, ((ConstructorTypeNode)type).ConstructorReturnType);
-                default:
-                    return FindReferencedType(searcherService, ((CustomTypeNode)type).CustomType);
-            }
-        }
-
-        private DataType FindReferencedType(TypeSearcherService searcherService, Node type)
-        {
-            var results = searcherService.ReferenceDataTypeCollection(type);
-
-            int count = results.Count;
-            for (int i = 0; i < count; i++)
-            {
-                var result = results.Dequeue();
-
-                if (result.Remaining != null && result.ResultEnum != ActionNodeEnum.Namespace)
-                    results.Enqueue(result);
-            }
-
-            switch (results.Count)
-            {
-                case 0:
-                    result.Add(new NoReferenceToTypeException(type.ToString(), "", 0));
-                    return null;
-                case 1:
-                    return (DataType)results.Dequeue().Result;
-                default:
-                    result.Add(new AmbigiousReferenceException(type.ToString(), "", 0));
-                    return null;
-            }
         }
 
         //implement each kind of evaluable you can encounter (this, default, input, etc)
@@ -394,13 +346,13 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     var unary = (UnaryExpression)expression;
 
                     var operhand = ResolveOperhand(unary.Operhand, scope, searcherService);
-                    var overload = operhand.TryFindOperatorOverloadDeclaration(unary.Operator);
+                    var overload = operhand.TryFindOperatorOverloadDeclaration(unary.Operator, (DataType)operhand);
 
                     if(overload == null)
                     {
                         //exception
                     }
-                    else if (overload.FunctionArguments[0].CreationType != operhand)
+                    else if (overload.FunctionArguments[0] != operhand)
                     {
                         //exception
                     }
@@ -434,17 +386,17 @@ namespace Sugar.Language.Semantics.Services.Implementations
                         other = lhs;
                     }
 
-                    overload = basic.TryFindOperatorOverloadDeclaration(binary.Operator);
+                    overload = basic.TryFindOperatorOverloadDeclaration(binary.Operator, (DataType)rhs, (DataType)lhs);
 
                     if (overload == null)
                     {
                         //exception
                     }
-                    else 
+                    else if (overload.FunctionArguments[0] != basic)
                     {
-                        if (overload.FunctionArguments[0].CreationType != basic)
+                        if (overload.FunctionArguments[1] != other)
                         {
-                            if(overload.FunctionArguments[1].CreationType != )
+                            //exception
                         }
                     }
                     else
@@ -528,7 +480,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
         private IReturnableCreationStatement ResolveConstructorCall(ConstructorCallNode constructorCall, Scope scope, TypeSearcherService searcherService)
         {
-            var type = FindReferencedType(searcherService, constructorCall.Value);
+            var type = FindReferencedType(searcherService, (TypeNode)constructorCall.Value);
             if (type == null)
                 return null;
 
@@ -600,6 +552,12 @@ namespace Sugar.Language.Semantics.Services.Implementations
             }
         }
 
+        //basically you need to check for arguments matching while calling functions
+        //its kinda painful cause FunctionArguments is primarly used in declarations, this is calling
+        //create a base class that FUnctionArguments will derive from contating only the data type, like BaseFunctionArguments
+        //and maybe call FunctionArguments DeclarationArguments
+        //from there the code should be the same in other classes
+        //here go through the call node and crate a CallArguments and find the matching overload
         private IFunction ReferenceInClassFunction(FunctionCallNode callNode, Scope scope, TypeSearcherService searcher)
         {
             var current = (IFunction)scope.Parent;
@@ -607,7 +565,8 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
             while (true)
             {
-                var creationStatement = current.TryFindFunctionDeclaration(name);
+                var arguments = CreateArguments(searcher, scope, (FunctionDeclarationArgumentsNode)callNode.Arguments);
+                var creationStatement = current.TryFindMethodDeclaration(name, arguments);
 
                 if (creationStatement != null)
                 {
@@ -623,9 +582,9 @@ namespace Sugar.Language.Semantics.Services.Implementations
                         break;
                     default:
                         var type = ((IGlobalFunction)parent).Parent;
-                        var global = type.TryFindFunctionDeclaration(name);
+                        var global = type.TryFindMethodDeclaration(name, arguments);
                         if (global == null)
-                            return type.TryFindMethodDeclaration(name);
+                            return type.TryFindMethodDeclaration(name, arguments);
 
                         return global;
                 }
@@ -674,7 +633,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                         return ResolveEntity((IdentifierNode)current);
                     case NodeType.FunctionCall:
                         var functionCall = (FunctionCallNode)current;
-                        return TryFindFunction((IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>)type, (IdentifierNode)functionCall.Value, functionCall);
+                        return TryFindMethod((IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>)type, (IdentifierNode)functionCall.Value, functionCall);
                     case NodeType.Dot:
                         var dot = (DotExpression)current;
 
@@ -689,7 +648,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                                 break;
                             case NodeType.FunctionCall:
                                 functionCall = (FunctionCallNode)dot.LHS;
-                                var function = TryFindFunction((IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>)type, (IdentifierNode)functionCall.Value, functionCall);
+                                var function = TryFindMethod((IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>)type, (IdentifierNode)functionCall.Value, functionCall);
                                 if (function == null)
                                     return null;
 
@@ -724,14 +683,15 @@ namespace Sugar.Language.Semantics.Services.Implementations
 
                 IReferencableEntity TryFindProperty(IPropertyContainer container, IdentifierNode identifier) => container.TryFindPropertyCreation(identifier);
 
-                MethodDeclarationStmt TryFindFunction(IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> container, IdentifierNode identifier, FunctionCallNode callNode)
+                MethodDeclarationStmt TryFindMethod(IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt> container, IdentifierNode identifier, FunctionCallNode callNode)
                 {
                     switch (type.ActionNodeType)
                     {
                         case ActionNodeEnum.Class:
                         case ActionNodeEnum.Struct:
                         case ActionNodeEnum.Interface:
-                            var function = container.TryFindFunctionDeclaration(identifier);
+                            var arguments = CreateArguments(searcherService, scope, (FunctionDeclarationArgumentsNode)callNode.Arguments);
+                            var function = container.TryFindMethodDeclaration(identifier, arguments);
 
                             if (function == null)
                                 return null;
@@ -744,6 +704,68 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     return null;
                 }
             }
+        }
+
+        private FunctionDeclArgs CreateFunctionArguments(TypeSearcherService subTypeSearcher, FunctionDeclarationArgumentsNode argumentsNode)
+        {
+            var arguments = new FunctionDeclArgs();
+
+            for (int i = 0; i < argumentsNode.ChildCount; i++)
+            {
+                var child = (FunctionDeclarationArgumentNode)argumentsNode[i];
+
+                FunctionArgumentDeclarationStmt argument;
+                var name = (IdentifierNode)child.Name;
+                var describer = describerService.AnalyseDescriber((DescriberNode)child.Describer);
+
+                if (!describer.ValidateAccessor(DescriberEnum.ReferenceModifiers))
+                {
+                    result.Add(new InvalidDescriberException(name.Value, DescriberEnum.ReferenceModifiers, describer));
+                    continue;
+                }
+
+                var type = FindReferencedType(subTypeSearcher, (TypeNode)child.Type);
+                if (type == null)
+                    continue;
+
+                if (child.DefaultValue == null)
+                    argument = new FunctionArgumentDeclarationStmt(type, name, describer);
+                else
+                    argument = new FunctionArgumentInitialisationStmt(type, name, describer, child.DefaultValue);
+
+                arguments.Add(name.Value, argument);
+            }
+
+            return arguments;
+        }
+
+        private FunctionCallArgs CreateFunctionArguments(TypeSearcherService subTypeSearcher, Scope scope, FunctionCallArgumentsNode argumentsNode)
+        {
+            var arguments = new FunctionCallArgs();
+
+            for (int i = 0; i < argumentsNode.ChildCount; i++)
+            {
+                var child = (FunctionCallArgumentNode)argumentsNode[i];
+
+                
+                var describer = describerService.AnalyseDescriber((DescriberNode)child.Describer);
+
+                if (!describer.ValidateAccessor(DescriberEnum.ReferenceModifiers))
+                {
+                    result.Add(new InvalidDescriberException($"Function Argument [{i + 1}]", DescriberEnum.ReferenceModifiers, describer));
+                    continue;
+                }
+
+                var evaluated = ResolveEvaluable(child.Value, scope, subTypeSearcher);
+                if (evaluated == null)
+                    continue;
+
+                var argument = new FunctionCallArgument(evaluated, describer);
+                
+                arguments.Add(i, argument);
+            }
+
+            return arguments;
         }
 
         private bool ValidateFunctionArguments(IFunction functionCall, BaseFunctionCallNode callNode, Scope scope, TypeSearcherService searcherService)
@@ -764,7 +786,7 @@ namespace Sugar.Language.Semantics.Services.Implementations
                     continue;
 
                 var argument = functionCall.FunctionArguments[i];
-                if(argument.CreationType != reference)//check for possible comparisons as well
+                if(argument != reference)//check for possible comparisons as well
                 {
                     result.Add(new FunctionArgumentTypeMismatchException(functionCall.Name, argument.Name));
                     continue;

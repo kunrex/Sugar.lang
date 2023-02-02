@@ -14,7 +14,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
     {
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.ImplicitCast; }
 
-        public ImplicitCastDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody) : base(
+        public ImplicitCastDeclarationStmt(DataType _creationType, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody) : base(
            _creationType,
            _describer,
            _arguments,

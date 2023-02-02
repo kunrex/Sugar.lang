@@ -9,7 +9,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes
 {
     internal interface IOperatorContainer : IContainer<OperatorOverloadDeclarationStmt, IOperatorContainer>
     {
-        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op, DataType operhand);
+        public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op, DataType operhand1);
         public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op, DataType operhand1, DataType operhand2);
     }
 }

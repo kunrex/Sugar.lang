@@ -5,6 +5,7 @@ using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Describers;
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
@@ -18,10 +19,10 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
         protected readonly Scope scope;
         public Scope Scope { get => scope; }
 
-        protected readonly FunctionArguments arguments;
-        public FunctionArguments FunctionArguments { get => arguments; }
+        protected readonly FunctionDeclArgs arguments;
+        public FunctionDeclArgs FunctionArguments { get => arguments; }
 
-        public VoidCreationStmt(string _name, Describer _describer, DescriberEnum _allowed, FunctionArguments _arguments, Node _nodeBody) : base(
+        public VoidCreationStmt(string _name, Describer _describer, DescriberEnum _allowed, FunctionDeclArgs _arguments, Node _nodeBody) : base(
             _name,
             _describer,
             _allowed)
@@ -54,10 +55,10 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 
         public FunctionArgumentDeclarationStmt TryFindFunctionArgument(IdentifierNode identifier) => arguments[identifier.Value];
 
-        public LocalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => scope.TryFindMethodDeclaration(identifier);
-
-        public LocalMethodCreationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => scope.TryFindFunctionDeclaration(identifier);
-
         public LocalVariableDeclarationStmt TryFindVariableCreation(IdentifierNode identifier) => scope.TryFindVariableCreation(identifier);
+
+        public LocalVoidDeclarationStmt TryFindVoidDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => scope.TryFindVoidDeclaration(identifier, arguments);
+
+        public LocalMethodCreationStmt TryFindMethodDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => scope.TryFindMethodDeclaration(identifier, arguments);
     }
 }

@@ -8,12 +8,12 @@ using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.UDDataTypes;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
+using Sugar.Language.Semantics.ActionTrees.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes.Casts;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global;
-using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion;
 
 namespace Sugar.Language.Semantics.ActionTrees.DataTypes
@@ -61,11 +61,11 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public PropertyCreationStmt TryFindPropertyCreation(IdentifierNode identifier) => TryFindIdentifiedMember<PropertyCreationStmt, IPropertyContainer>(identifier, MemberEnum.Properties);
 
-        public VoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier, FunctionArguments arguments) => TryFindIdentifiedArgumentedMember<VoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(identifier, arguments, MemberEnum.Void);
+        public VoidDeclarationStmt TryFindVoidDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => TryFindIdentifiedArgumentedMember<VoidDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(identifier, arguments, MemberEnum.Void);
 
-        public MethodDeclarationStmt TryFindFunctionDeclaration(IdentifierNode identifier, FunctionArguments arguments) => TryFindIdentifiedArgumentedMember<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(identifier, arguments, MemberEnum.Function);
+        public MethodDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => TryFindIdentifiedArgumentedMember<MethodDeclarationStmt, IFunctionContainer<MethodDeclarationStmt, VoidDeclarationStmt>>(identifier, arguments, MemberEnum.Function);
 
-        public ConstructorDeclarationStmt TryFindConstructorDeclaration(IdentifierNode identifier, FunctionArguments arguments) => TryFindIdentifiedArgumentedMember<ConstructorDeclarationStmt, IConstructorContainer>(identifier, arguments, MemberEnum.Constructor);
+        public ConstructorDeclarationStmt TryFindConstructorDeclaration(IFunctionArguments arguments) => TryFindIdentifiedArgumentedMember<ConstructorDeclarationStmt, IConstructorContainer>(Identifier, arguments, MemberEnum.Constructor);
 
         public OperatorOverloadDeclarationStmt TryFindOperatorOverloadDeclaration(Operator op, DataType operhand) => TryFindOperatorOverload(op, operhand);
 
@@ -75,7 +75,7 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
 
         public ExplicitCastDeclarationStmt TryFindExplicitCastDeclaration(DataType external) => TryFindCast<ExplicitCastDeclarationStmt, IExplicitContainer>(external, MemberEnum.ExplicitCast);
 
-        public IndexerCreationStmt TryFindIndexerCreationStatement(IdentifierNode identifier) => globalMemberCollection.GetCreationStatement<IndexerCreationStmt, IIndexerContainer>(MemberEnum.Indexer, identifier.Value);
+        public IndexerCreationStmt TryFindIndexerCreationStatement(DataType external, IFunctionArguments arguments) => TryFindIndexer(external, arguments);
 
         public override string ToString() => $"Struct Node [{name.Value}]";
     }

@@ -6,9 +6,12 @@ using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements;
 using Sugar.Language.Semantics.ActionTrees.DataTypes.Structure;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local;
 
 namespace Sugar.Language.Semantics.ActionTrees
@@ -63,11 +66,48 @@ namespace Sugar.Language.Semantics.ActionTrees
             return this;
         }
 
-        public LocalVariableDeclarationStmt TryFindVariableCreation(IdentifierNode identifier) => memberCollection.GetCreationStatement<LocalVariableDeclarationStmt, ILocalVariableContainer>(MemberEnum.Variable, identifier.Value);
+        public LocalVariableDeclarationStmt TryFindVariableCreation(IdentifierNode identifier)
+        {
+            var members = memberCollection[MemberEnum.Variable];
 
-        public LocalMethodCreationStmt TryFindFunctionDeclaration(IdentifierNode identifier) => memberCollection.GetCreationStatement<LocalMethodCreationStmt, IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>(MemberEnum.Function, identifier.Value);
+            var name = identifier.Value;
+            foreach (var member in members)
+                if (member.Name == name)
+                    return (LocalVariableDeclarationStmt)member;
 
-        public LocalVoidDeclarationStmt TryFindMethodDeclaration(IdentifierNode identifier) => memberCollection.GetCreationStatement<LocalVoidDeclarationStmt, IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>(MemberEnum.Function, identifier.Value);
+            return null;
+        }
+
+        public LocalVoidDeclarationStmt TryFindVoidDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => TryFindIdentifiedArgumentedMember<LocalVoidDeclarationStmt, IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>(identifier, arguments, MemberEnum.Void);
+
+        public LocalMethodCreationStmt TryFindMethodDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => TryFindIdentifiedArgumentedMember<LocalMethodCreationStmt, IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>>(identifier, arguments, MemberEnum.Function);
+
+        private ReturnType TryFindIdentifiedArgumentedMember<ReturnType, Parent>(IdentifierNode identifier, IFunctionArguments arguments, MemberEnum memberType) where ReturnType : CreationStatement<Parent>, IFunction where Parent : IActionTreeNode
+        {
+            var members = memberCollection[memberType];
+
+            var name = identifier.Value;
+            foreach (var function in members)
+                if (function.Name == name)
+                {
+                    var converted = (ReturnType)function;
+                    var found = true;
+
+                    for (int i = 0; i < converted.FunctionArguments.Count; i++)
+                    {
+                        if (!arguments[i].CompareTo(converted.FunctionArguments[i]))
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+
+                    if(found)
+                        return converted;
+                }
+
+            return null;
+        }
 
         public override string ToString() => "Scope Node";
     }

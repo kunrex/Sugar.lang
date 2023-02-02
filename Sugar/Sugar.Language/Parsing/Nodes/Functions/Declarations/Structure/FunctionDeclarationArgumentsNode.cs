@@ -7,7 +7,7 @@ namespace Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure
 {
     internal sealed class FunctionDeclarationArgumentsNode : Node
     {
-        public override NodeType NodeType => NodeType.FunctionDeclaration;
+        public override NodeType NodeType => NodeType.MethodDeclaration;
 
         public FunctionDeclarationArgumentsNode(List<Node> _arguments)
         {

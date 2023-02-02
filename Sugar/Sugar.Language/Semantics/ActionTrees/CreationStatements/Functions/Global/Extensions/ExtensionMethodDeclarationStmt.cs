@@ -11,7 +11,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Extensions
 {
-    internal sealed class ExtensionMethodDeclarationStmt : GlobalFunctionCreationStmt<IExtensionFunctionContainer>, IMethodCreation, IExtension
+    internal sealed class ExtensionMethodDeclarationStmt : GlobalMethodCreationStmt<IExtensionFunctionContainer>, IMethodCreation, IExtension
     {
         private readonly DataType parentType;
         public DataType ParentType { get => parentType; }
@@ -20,7 +20,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.ExtensionFunction; }
 
-        public ExtensionMethodDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionArguments _arguments, Node _nodeBody, DataType _parentType) : base(
+        public ExtensionMethodDeclarationStmt(DataType _creationType, IdentifierNode _name, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody, DataType _parentType) : base(
            _creationType,
            _name.Value,
            _describer,

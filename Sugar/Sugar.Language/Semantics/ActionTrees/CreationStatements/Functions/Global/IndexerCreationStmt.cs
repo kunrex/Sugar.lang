@@ -12,7 +12,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.P
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    internal sealed class IndexerCreationStmt : GlobalFunctionCreationStmt<IIndexerContainer>, IProperty
+    internal sealed class IndexerCreationStmt : GlobalMethodCreationStmt<IIndexerContainer>, IProperty
     {
         private readonly PropertyGetIdentifier get;
         public PropertyGetIdentifier GetExpression { get => get; }
@@ -24,7 +24,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 
         public override ActionNodeEnum ActionNodeType { get => (ActionNodeEnum)PropertyType; }
 
-        public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _get, Node _set) : base(
+        public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionDeclArgs _arguments, Node _get, Node _set) : base(
             _creationType,
             _creationType.Name,
             _describer,

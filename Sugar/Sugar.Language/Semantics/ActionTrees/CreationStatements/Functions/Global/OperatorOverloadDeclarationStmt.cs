@@ -13,14 +13,14 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structur
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global
 {
-    internal sealed class OperatorOverloadDeclarationStmt : GlobalFunctionCreationStmt<IOperatorContainer>
+    internal sealed class OperatorOverloadDeclarationStmt : GlobalMethodCreationStmt<IOperatorContainer>
     {
         private readonly Operator operatorToOverload;
         public Operator Operator { get => operatorToOverload; }
 
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.OperatorOverload; }
 
-        public OperatorOverloadDeclarationStmt(DataType _creationType, Describer _describer, FunctionArguments _arguments, Node _nodeBody, Operator _operator) : base(
+        public OperatorOverloadDeclarationStmt(DataType _creationType, Describer _describer, FunctionDeclArgs _arguments, Node _nodeBody, Operator _operator) : base(
             _creationType,
             _operator.OperatorType.ToString(),
             _describer,

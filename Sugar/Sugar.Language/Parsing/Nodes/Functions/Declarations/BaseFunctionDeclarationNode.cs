@@ -9,7 +9,7 @@ namespace Sugar.Language.Parsing.Nodes.Functions.Declarations
 {
     internal abstract class BaseFunctionDeclarationNode : Node, ICreationNode_Type, ICreationNode_Name, ICreationNode_Body, IGenericNode
     {
-        public override NodeType NodeType => NodeType.FunctionDeclaration;
+        public override NodeType NodeType => NodeType.MethodDeclaration;
 
         public Node Describer { get => Children[0]; }
         public Node Type { get => Children[1]; }
