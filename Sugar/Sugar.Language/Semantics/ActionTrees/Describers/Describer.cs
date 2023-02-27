@@ -13,10 +13,10 @@ namespace Sugar.Language.Semantics.ActionTrees.Describers
             value = _value;
         }
 
-        public bool ValidateAccessor(DescriberEnum validAccessors)
+        public bool CheckDescription(DescriberEnum external)
         {
             ushort ushortValue = (ushort)value;
-            ushort accessorValue = (ushort)validAccessors;
+            ushort accessorValue = (ushort)external;
 
             for (byte i = 0; i < 16; i++)
                 if (ReadBit(ushortValue, i) && !ReadBit(accessorValue, i))
@@ -24,6 +24,8 @@ namespace Sugar.Language.Semantics.ActionTrees.Describers
 
             return true;
         }
+
+        public bool ValidateDescriber(DescriberEnum validAccessors) => CheckDescription(validAccessors);
 
         private bool ReadBit(ushort number, byte index)
         {

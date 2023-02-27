@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
+using Sugar.Language.Parsing.Nodes.NodeGroups;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Calling.Structure
 {
-    internal sealed class FunctionCallArgumentsNode : Node
+    internal sealed class FunctionCallArgumentsNode : ExpressionListNode
     {
         public override NodeType NodeType => NodeType.ArgumentCall;
 
@@ -14,14 +15,14 @@ namespace Sugar.Language.Parsing.Nodes.Functions.Calling.Structure
             
         }
 
-        public FunctionCallArgumentsNode(Node _argument)
+        public FunctionCallArgumentsNode(Node _argument) : base(_argument)
         {
-            Children = new List<Node>() { _argument };
+            
         }
 
-        public FunctionCallArgumentsNode(List<Node> _arguments)
+        public FunctionCallArgumentsNode(List<Node> _arguments) : base(_arguments)
         {
-            Children = _arguments;
+            
         }
 
         public override string ToString() => $"Function Call Arguments Node";

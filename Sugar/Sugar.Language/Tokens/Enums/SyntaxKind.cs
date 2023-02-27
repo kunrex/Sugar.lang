@@ -181,5 +181,7 @@ namespace Sugar.Language.Tokens.Enums
 
         FlowerOpenBracket = SeperatorKind.FlowerOpenBracket,
         FlowerCloseBracket = SeperatorKind.FlowerCloseBracket,
+
+        Invalid = 117
     }
 }

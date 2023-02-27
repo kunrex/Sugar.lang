@@ -5,20 +5,28 @@ using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.Enums;
 using Sugar.Language.Semantics.ActionTrees.Interfaces;
+using Sugar.Language.Semantics.ActionTrees.Describers;
+using Sugar.Language.Semantics.ActionTrees.Interfaces.Describers;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Local;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.PropertyIdentifiers
 {
-    internal abstract class PropertyIdentifier : IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>
+    internal abstract class PropertyIdentifier : IFunctionContainer<LocalMethodCreationStmt, LocalVoidDeclarationStmt>, IDescribable
     {
         protected readonly Scope scope;
         public Scope Scope { get => scope; }
 
         public abstract ActionNodeEnum ActionNodeType { get; }
 
-        public PropertyIdentifier(Node _body)
+        private readonly Describer describer;
+        public Describer Describer { get => describer; }
+
+        public DescriberEnum Allowed { get => DescriberEnum.AccessModifiers; }
+
+        public PropertyIdentifier(Describer _describer, Node _body)
         {
+            describer = _describer;
             scope = new Scope(_body);
         }
 
@@ -35,6 +43,10 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
 
             return this;
         }
+
+        public bool ValidateDescriber() => describer.ValidateDescriber(Allowed);
+
+        public bool CheckDescription(DescriberEnum description) => describer.CheckDescription(description);
 
         public LocalVoidDeclarationStmt TryFindVoidDeclaration(IdentifierNode identifier, IFunctionArguments arguments) => scope.TryFindVoidDeclaration(identifier, arguments);
 

@@ -5,13 +5,13 @@ using Sugar.Language.Parsing.Nodes.Enums;
 
 namespace Sugar.Language.Parsing.Nodes.Values
 {
-    internal sealed class ThisNode : Node
+    internal sealed class ParentNode : Node
     {
-        public override NodeType NodeType => NodeType.This;
+        public override NodeType NodeType => NodeType.Parent;
 
         public Node Reference { get => Children[0]; }
 
-        public ThisNode(Node _reference)
+        public ParentNode(Node _reference)
         {
             Children = new List<Node>() { _reference };
         }

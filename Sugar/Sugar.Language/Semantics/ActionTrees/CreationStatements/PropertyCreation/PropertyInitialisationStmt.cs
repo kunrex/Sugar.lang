@@ -5,14 +5,15 @@ using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.PropertyIdentifiers;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation
 {
-    internal sealed class PropertyInitialisationStmt : PropertyDeclarationStmt, IInitialisable 
+    internal sealed class PropertyInitialisationStmt : PropertyDeclarationStmt, IInitialisableCreationStatement 
     {
         public Node Value { get; private set; }
 
-        public PropertyInitialisationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, Node _get, Node _set, Node _value) : base(
+        public PropertyInitialisationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, PropertyGetIdentifier _get, PropertySetIdentifier _set, Node _value) : base(
             _creationType,
             _creationName,
             _describer,

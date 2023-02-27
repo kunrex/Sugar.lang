@@ -20,20 +20,20 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
 
         public override ActionNodeEnum ActionNodeType { get => (ActionNodeEnum)PropertyType; }
 
-        public PropertyDeclarationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, Node _get, Node _set) : base(
+        public PropertyDeclarationStmt(DataType _creationType, IdentifierNode _creationName, Describer _describer, PropertyGetIdentifier _get, PropertySetIdentifier _set) : base(
             _creationType,
             _creationName,
             _describer)
         {
             if (get != null)
             {
-                get = new PropertyGetIdentifier(_get);
+                get = _get;
                 PropertyType = PropertyTypeEnum.Get;
             }
 
             if (set != null)
             {
-                set = new PropertySetIdentifier(_set, _creationType);
+                set = _set;
                 PropertyType = PropertyType == PropertyTypeEnum.Get ? PropertyTypeEnum.GetSet : PropertyTypeEnum.Set;
             }
         }

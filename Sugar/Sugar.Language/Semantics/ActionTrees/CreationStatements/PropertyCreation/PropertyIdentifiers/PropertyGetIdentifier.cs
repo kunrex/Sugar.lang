@@ -1,7 +1,9 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
+
 using Sugar.Language.Semantics.ActionTrees.Enums;
+using Sugar.Language.Semantics.ActionTrees.Describers;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.PropertyIdentifiers
 {
@@ -9,7 +11,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreati
     {
         public override ActionNodeEnum ActionNodeType { get => ActionNodeEnum.PropertyGet; }
 
-        public PropertyGetIdentifier(Node _body) : base(_body)
+        public PropertyGetIdentifier(Describer _describer, Node _body) : base(_describer, _body)
         {
 
         }

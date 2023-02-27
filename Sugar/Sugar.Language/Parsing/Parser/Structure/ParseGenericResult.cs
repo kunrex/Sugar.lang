@@ -2,6 +2,8 @@
 
 using Sugar.Language.Parsing.Nodes;
 
+using Sugar.Language.Exceptions;
+
 namespace Sugar.Language.Parsing.Parser.Structure
 {
     internal struct ParseGenericResult
@@ -9,9 +11,9 @@ namespace Sugar.Language.Parsing.Parser.Structure
         public bool Success { get => Generic != null; }
 
         public Node Generic { get; private set; }
-        public Exception Exception { get; private set; }
+        public CompileException Exception { get; private set; }
 
-        public ParseGenericResult(Node node, Exception exception)
+        public ParseGenericResult(Node node, CompileException exception)
         {
             Generic = node;
             Exception = exception;

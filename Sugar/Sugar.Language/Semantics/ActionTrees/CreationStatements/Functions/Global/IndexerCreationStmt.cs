@@ -14,34 +14,23 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Glob
 {
     internal sealed class IndexerCreationStmt : GlobalMethodCreationStmt<IIndexerContainer>, IProperty
     {
-        private readonly PropertyGetIdentifier get;
-        public PropertyGetIdentifier GetExpression { get => get; }
+        private readonly PropertyCreationStmt property;
 
-        private readonly PropertySetIdentifier set;
-        public PropertySetIdentifier SetExpression { get => set; }
+        public PropertyGetIdentifier GetExpression { get => property.GetExpression; }
+        public PropertySetIdentifier SetExpression { get => property.SetExpression; }
 
-        public PropertyTypeEnum PropertyType { get; private set; }
+        public PropertyTypeEnum PropertyType { get => property.PropertyType; }
 
         public override ActionNodeEnum ActionNodeType { get => (ActionNodeEnum)PropertyType; }
 
-        public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionDeclArgs _arguments, Node _get, Node _set) : base(
+        public IndexerCreationStmt(DataType _creationType, Describer _describer, FunctionDeclArgs _arguments, PropertyCreationStmt _property) : base(
             _creationType,
             _creationType.Name,
             _describer,
             _arguments,
             null)
         {
-            if (get != null)
-            {
-                get = new PropertyGetIdentifier(_get);
-                PropertyType = PropertyTypeEnum.Get;
-            }
-
-            if (set != null)
-            {
-                set = new PropertySetIdentifier(_set, _creationType);
-                PropertyType = PropertyType == PropertyTypeEnum.Get ? PropertyTypeEnum.GetSet : PropertyTypeEnum.Set;
-            }
+            property = _property;
         }
 
         public override string ToString() => $"Indexer Declaration Node";

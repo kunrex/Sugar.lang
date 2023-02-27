@@ -8,7 +8,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.L
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal interface IFunction : IScopeParent, INameable
+    internal interface IFunction : IScopeParent, ICreationStatement
     {
         public Scope Scope { get; }
 

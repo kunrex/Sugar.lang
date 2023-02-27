@@ -14,24 +14,24 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Stru
 
         protected Dictionary<Key, ArgumentBase> Arguments { get; private set; }
 
-        public FunctionArguments()
-        {
-            Arguments = new Dictionary<Key, ArgumentBase>();
-        }
-
         public DataType this[int key]
         {
             get
             {
-                if(key > 0 && key <= Arguments.Count)
+                if (key > 0 && key <= Arguments.Count)
                     return Arguments.ElementAt(key).Value.CreationType;
 
                 return null;
             }
         }
 
-        public void Add(Key key, ArgumentBase value) => Arguments.Add(key, value);
- 
+        public FunctionArguments()
+        {
+            Arguments = new Dictionary<Key, ArgumentBase>();
+        }
+
         public bool ContainsArgument(Key name) => Arguments.ContainsKey(name);
+
+        public void Add(Key key, ArgumentBase value) => Arguments.Add(key, value);
     }
 }

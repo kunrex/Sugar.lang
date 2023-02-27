@@ -27,7 +27,7 @@ namespace Sugar.Language.Semantics.ActionTrees.Enums
         None = 8192,
 
         ReferenceModifiers = In | Out | Ref,
-        MutabilityModifier = Const | Readonly,
+        MutabilityModifier = Const | Readonly | In,
         AccessModifiers = Public | Private | Protected,
         InheritanceModifiers = Sealed | Virtual | Abstract,
         EnumModifiers = Static | Public | Readonly

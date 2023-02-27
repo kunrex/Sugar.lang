@@ -8,6 +8,8 @@ namespace Sugar.Language.Tokens
     internal abstract class Token
     {
         public int Index { get; protected set; }
+        public int End { get; protected set; }
+
         public string Value { get; protected set; }
 
         public abstract TokenType Type { get; }
@@ -32,6 +34,7 @@ namespace Sugar.Language.Tokens
         {
             var copy = Clone();
             copy.Index = _index;
+            copy.End = _index + copy.Value.Length;
 
             return copy;
         }

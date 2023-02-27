@@ -19,16 +19,27 @@ namespace Sugar.Language.Lexing
 {
     public sealed class Lexer
     {
-        private readonly string source;
-        public string Source => source;
+        private static Lexer instance;
+        public static Lexer Instance
+        {
+            get
+            {
+                if (instance == null)
+                    return new Lexer();
+                else
+                    return instance;
+            }
+        }
 
         private int index;
+        private string source;
 
         private List<Token> Tokens;
+        private CompileResult<List<Token>> result;
 
-        public Lexer(string _source)
+        private Lexer()
         {
-            source = _source;
+            
         }
 
         private char? LookAhead()
@@ -41,8 +52,11 @@ namespace Sugar.Language.Lexing
 
         private void CloneToken(Token token) => Tokens.Add(token.Clone(index));
 
-        internal List<Token> Lex()
+        internal CompileResult<List<Token>> Lex(string _source)
         {
+            source = _source;
+            result = new CompileResult<List<Token>>();
+
             Tokens = new List<Token>();
 
             for (index = 0; index < source.Length; index++)
@@ -403,7 +417,7 @@ namespace Sugar.Language.Lexing
                 }
             }
 
-            return Tokens;
+            return result.Build(Tokens);
         }
 
         private void ReadSingleLineComment()
@@ -458,7 +472,8 @@ namespace Sugar.Language.Lexing
                 index++;
             }
 
-            throw new InvalidCharacterException(source[source.Length - 1], '"', index);
+            result.Add(new InvalidCharacterException(source[source.Length - 1], '"', index));
+            return new InvalidToken(index, new StringConstant(value.ToString(), index));
         }
 
         private Token ReadCharacter()
@@ -471,7 +486,10 @@ namespace Sugar.Language.Lexing
 
             index++;
             if (source[index] != '\'')
-                throw new InvalidCharacterException(source[index], '\'', index);
+            {
+                result.Add(new InvalidCharacterException(source[index], '\'', index));
+                return new InvalidToken(index, token);
+            }
 
             return token;
         }
@@ -590,6 +608,7 @@ namespace Sugar.Language.Lexing
         {
             StringBuilder value = new StringBuilder();
 
+            bool invalid = false;
             while (index < source.Length)
             {
                 var current = source[index];
@@ -628,7 +647,9 @@ namespace Sugar.Language.Lexing
 
                     case '"':
                     case '\'':
-                        throw new InvalidCharacterException(current, index);
+                        result.Add(new InvalidCharacterException(current, index));
+                        invalid = true;
+                        break;
 
                     default:
                         value.Append(current);
@@ -638,7 +659,8 @@ namespace Sugar.Language.Lexing
                 index++;
             }
 
-            return Extract();
+            var extracted = Extract();
+            return invalid ? new InvalidToken(index, extracted) : extracted;
             Token Extract()
             {
                 var valueToString = value.ToString();

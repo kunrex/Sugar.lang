@@ -8,7 +8,7 @@ using Sugar.Language.Semantics.ActionTrees.Describers;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local.FunctionArguments
 {
-    internal sealed class FunctionArgumentInitialisationStmt : FunctionArgumentDeclarationStmt, IInitialisable
+    internal sealed class FunctionArgumentInitialisationStmt : FunctionArgumentDeclarationStmt, IInitialisableCreationStatement
     {
         private readonly Node value;
         public Node Value { get => value; }

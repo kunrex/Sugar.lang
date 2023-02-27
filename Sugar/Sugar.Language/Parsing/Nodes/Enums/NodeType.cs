@@ -89,5 +89,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         Input,
         Action,
         Function,
+
+        InvalidTokenCollection
     }
 }

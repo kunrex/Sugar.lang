@@ -2,8 +2,8 @@
 
 namespace Sugar.Language.Semantics.ActionTrees.Interfaces.Collections
 {
-    internal interface IEntityCollection<T, K> : IActionTreeNode
+    internal interface IEntityCollection<DataType, Collection> : IActionTreeNode where Collection : IEntityCollection<DataType, Collection> 
     {
-        public K AddEntity(T dataType);
+        public Collection AddEntity(DataType dataType);
     }
 }

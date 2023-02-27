@@ -2,7 +2,7 @@
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation
 {
-    internal interface IVariableCreationStmt : IReferencableEntity
+    internal interface IVariableCreationStmt : IReturnableCreationStatement
     { 
 
     }

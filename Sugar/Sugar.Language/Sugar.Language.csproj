@@ -110,6 +110,9 @@
     <None Remove="Exceptions\Analytics\ClassMemberCreation\OperatorOverloads\" />
     <None Remove="Exceptions\Analytics\ClassMemberCreation\Casting\" />
     <None Remove="Semantics\Services\Implementations\Binding\" />
+    <None Remove="Semantics\Services\Interfaces\Binding\" />
+    <None Remove="Parsing\Nodes\InvalidNodes\" />
+    <None Remove="Tokens\SyntaxCollections\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tokens\Keywords\Subtypes\" />
@@ -211,6 +214,9 @@
     <Folder Include="Exceptions\Analytics\ClassMemberCreation\OperatorOverloads\" />
     <Folder Include="Exceptions\Analytics\ClassMemberCreation\Casting\" />
     <Folder Include="Semantics\Services\Implementations\Binding\" />
+    <Folder Include="Semantics\Services\Interfaces\Binding\" />
+    <Folder Include="Parsing\Nodes\InvalidNodes\" />
+    <Folder Include="Tokens\SyntaxCollections\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Parsing\Nodes\Loops\ForLoop.cs" />

@@ -15,7 +15,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.L
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions
 {
-    internal abstract class MethodCreationStmt<Parent> : ReturnableCreationStatement<Parent>, IFunction where Parent : IActionTreeNode
+    internal abstract class MethodCreationStmt<Parent> : ReturnableCreationStatement<Parent>, IMethod where Parent : IActionTreeNode
     {
         protected readonly Scope scope;
         public Scope Scope { get => scope; }

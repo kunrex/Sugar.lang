@@ -1,11 +1,10 @@
 ﻿using System;
 
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
-using Sugar.Language.Semantics.ActionTrees.Interfaces;
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
 {
-    internal interface IReturnableCreationStatement : IActionTreeNode
+    internal interface IReturnableCreationStatement : ICreationStatement
     {
         public DataType CreationType { get; }
     }

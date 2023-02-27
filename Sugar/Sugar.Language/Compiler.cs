@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 
 using Sugar.Language.Lexing;
-using Sugar.Language.Exceptions;
-using Sugar.Language.Parsing.Parser;
+
+using Sugar.Language.Tokens.Enums;
 
 using Sugar.Language.Parsing;
+using Sugar.Language.Parsing.Parser;
+
 using Sugar.Language.Semantics.Analysis;
+using Sugar.Language.Semantics.ActionTrees;
+using Sugar.Language.Semantics.ActionTrees.Namespaces;
+
+using Sugar.Language.Exceptions;
+using Sugar.Language.Parsing.Nodes.Statements;
 
 namespace Sugar.Language
 {
@@ -14,6 +21,11 @@ namespace Sugar.Language
     {
         private readonly string[] sourceFiles;
         private readonly string[] internalDataTypes;
+
+        private SugarPackage package;
+
+        private DefaultNameSpaceNode defaultNameSpace;
+        private CreatedNameSpaceCollectionNode createdNameSpaces;
 
         public Compiler(List<string> source, List<string> defaultDataTypes)
         {
@@ -53,18 +65,26 @@ namespace Sugar.Language
             var treeCollection = new SyntaxTreeCollection();
             foreach (var file in source)
             {
-                var tree = new Parser(new Lexer(file).Lex()).Parse();
-
-                if (tree == null)
+                var tokens = Lexer.Instance.Lex(file);
+                if (!tokens.Built)
                 {
-                    Console.WriteLine("Source Code Empty");
-                    continue;
+                    //construct exception
                 }
-
-                treeCollection.Add(tree);
+                else if (tokens.Completed)
+                {
+                  
+                }
+                else
+                    PrintErrors(tokens);         
             }
 
             return treeCollection;
+        }
+
+        private void PrintErrors(CompileResult result)
+        {
+            foreach (var exception in result.Exceptions)
+                Console.WriteLine(exception);
         }
     }
 }

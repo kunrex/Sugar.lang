@@ -5,7 +5,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.P
 
 namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation
 {
-    internal interface IProperty : IReferencableEntity
+    internal interface IProperty : IReturnableCreationStatement
     {
         public PropertyTypeEnum PropertyType { get; }
 

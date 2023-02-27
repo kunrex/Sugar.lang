@@ -13,15 +13,16 @@ using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 using Sugar.Language.Parsing.Nodes.Functions.Properties;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations;
 using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
+using Sugar.Language.Parsing.Nodes.Functions.Properties.Accessors;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations.OperatorOverloading;
 
 using Sugar.Language.Semantics.Analysis;
 using Sugar.Language.Semantics.ActionTrees.Enums;
-using Sugar.Language.Semantics.Services.Interfaces;
 using Sugar.Language.Semantics.ActionTrees.DataTypes;
 using Sugar.Language.Semantics.ActionTrees.Describers;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
+using Sugar.Language.Semantics.Services.Interfaces.Binding;
 using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements;
 using Sugar.Language.Semantics.ActionTrees.Interfaces.DataTypes;
@@ -33,6 +34,7 @@ using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Structure;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Global.Conversion;
+using Sugar.Language.Semantics.ActionTrees.CreationStatements.PropertyCreation.PropertyIdentifiers;
 using Sugar.Language.Semantics.ActionTrees.CreationStatements.VariableCreation.Local.FunctionArguments;
 
 using Sugar.Language.Exceptions.Analytics.ClassMemberCreation;
@@ -320,15 +322,22 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
             {
                 case NodeType.PropertyGet:
                     var getNode = (PropertyGetNode)propertyNode;
-                    propertyCreationNode = CreateStatement(getNode.Get, null);
+                    var getDescriber = describerService.AnalyseDescriber((DescriberNode)((GetNode)getNode.Get).Describer);
+
+                    propertyCreationNode = CreateStatement(new PropertyGetIdentifier(getDescriber, getNode.Get), null);
                     break;
                 case NodeType.PropertySet:
                     var setNode = (PropertySetNode)propertyNode;
-                    propertyCreationNode = CreateStatement(null, setNode.Set);
+                    var setDescriber = describerService.AnalyseDescriber((DescriberNode)((SetNode)setNode.Set).Describer);
+
+                    propertyCreationNode = CreateStatement(null, new PropertySetIdentifier(setDescriber, setNode.Set, dataType));
                     break;
                 default:
                     var getSetNode = (PropertyGetSetNode)propertyNode;
-                    propertyCreationNode = CreateStatement(getSetNode.Get, getSetNode.Set);
+                    getDescriber = describerService.AnalyseDescriber((DescriberNode)((GetNode)getSetNode.Get).Describer);
+                    setDescriber = describerService.AnalyseDescriber((DescriberNode)((SetNode)getSetNode.Set).Describer);
+
+                    propertyCreationNode = CreateStatement(new PropertyGetIdentifier(getDescriber, getSetNode.Get), new PropertySetIdentifier(setDescriber, getSetNode.Set, dataType));
                     break;
             }
 
@@ -340,7 +349,7 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
             else
                 return propertyCreationNode;
 
-            PropertyCreationStmt CreateStatement(Node get, Node set)
+            PropertyCreationStmt CreateStatement(PropertyGetIdentifier get, PropertySetIdentifier set)
             {
                 if (expressionValue == null)
                     return new PropertyDeclarationStmt(dataType, name, describer, get, set);
@@ -429,22 +438,7 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
             if (indexerContainer.TryFindIndexerCreationStatement(returnType, functionInfo.Arguments) != null)
                 return;
 
-            var body = baseFunction.Body;
-            switch (baseFunction.Body.NodeType)
-            {
-                case NodeType.Get:
-                    var getNode = (PropertyGetNode)body;
-                    AddDeclaration(new IndexerCreationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, getNode.Get, null), indexerContainer);
-                    break;
-                case NodeType.Set:
-                    var setNode = (PropertySetNode)body;
-                    AddDeclaration(new IndexerCreationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, null, setNode.Set), indexerContainer);
-                    break;
-                default:
-                    var getSetNode = (PropertyGetSetNode)body;
-                    AddDeclaration(new IndexerCreationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, getSetNode.Get, getSetNode.Set), indexerContainer);
-                    break;
-            }
+            AddDeclaration(new IndexerCreationStmt(returnType, functionInfo.Describer, functionInfo.Arguments, InitialisePropertyDeclaration(baseFunction.Body, returnType.Identifier, returnType, functionInfo.Describer)), indexerContainer);
         }
 
         private void AddExplicitCastDelcration(DataType parent, ExplicitCastDeclarationNode baseFunction, IExplicitContainer explicitContainer, TypeSearcherService subTypeSearcher, TypeNode type)
@@ -537,7 +531,7 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
                 var name = (IdentifierNode)child.Name;
                 var describer = describerService.AnalyseDescriber((DescriberNode)child.Describer);
 
-                if (!describer.ValidateAccessor(DescriberEnum.ReferenceModifiers))
+                if (!describer.ValidateDescriber(DescriberEnum.ReferenceModifiers))
                 {
                     result.Add(new InvalidDescriberException(name.Value, DescriberEnum.ReferenceModifiers, describer));
                     continue;

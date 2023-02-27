@@ -25,6 +25,8 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements
             describer = _describer;
         }
 
-        public virtual bool ValidateDescriber() => describer.ValidateAccessor(Allowed);
+        public virtual bool ValidateDescriber() => describer.ValidateDescriber(Allowed);
+
+        public bool CheckDescription(DescriberEnum description) => describer.CheckDescription(description);
     }
 }

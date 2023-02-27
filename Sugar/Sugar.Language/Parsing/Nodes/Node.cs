@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Sugar.Language.Semantics.Analysis;
+using Sugar.Language.Tokens;
+
 using Sugar.Language.Parsing.Nodes.Enums;
 
 namespace Sugar.Language.Parsing.Nodes
@@ -27,7 +28,7 @@ namespace Sugar.Language.Parsing.Nodes
         }
 
         public Node()
-        {
+        { 
             Children = new List<Node>();
         }
 
