@@ -2,7 +2,7 @@
 
 namespace Sugar.Language.Parsing.Parser.Structure
 {
-    internal sealed class ParseStepCollection : ICollection<>
+    internal sealed class ParseStepCollection //: ICollection<>
     {
         public ParseStepCollection()
         {

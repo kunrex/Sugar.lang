@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 
 using Sugar.Language.Exceptions;
@@ -11,9 +10,9 @@ namespace Sugar.Language
         public abstract IReadOnlyList<CompileException> Exceptions { get; }
     }
 
-    internal class CompileResult<Result> : CompileResult
+    internal sealed class CompileResult<Result> : CompileResult
     {
-        protected bool built;
+        private bool built;
         public bool Built { get => built; }
 
         public bool Completed
@@ -23,11 +22,11 @@ namespace Sugar.Language
                 if (!built)
                     return false;
                 else
-                    return exceptions.Count != 0;
+                    return Exceptions.Count == 0;
             }
         }
 
-        protected readonly List<CompileException> exceptions;
+        private readonly List<CompileException> exceptions;
         public override IReadOnlyList<CompileException> Exceptions { get => exceptions; }
 
         public Result Results { get; private set; }
@@ -51,19 +50,6 @@ namespace Sugar.Language
             built = true;
 
             return this;
-        }
-
-        public override string ToString()
-        {
-            if (!built)
-                return null;
-
-            var builder = new StringBuilder($"Stage: {stage}, Completed: {Completed}");
-
-            foreach (var exception in exceptions)
-                builder.Append($"\nException: {exception}");
-
-            return builder.ToString();
         }
     }
 }

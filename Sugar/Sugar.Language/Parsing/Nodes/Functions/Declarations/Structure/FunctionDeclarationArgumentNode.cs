@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes.Enums;
+using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure
@@ -11,7 +12,7 @@ namespace Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure
 
         public Node DefaultValue { get => ChildCount == 3 ? null : Children[3]; }
 
-        public FunctionDeclarationArgumentNode(Node _describer, Node _type, Node _name) : base (_describer, _type, _name, null)
+        public FunctionDeclarationArgumentNode(Node _describer, Node _type, Node _name) : base (_describer, _type, _name, new DefaultValueNode())
         {
             
         }

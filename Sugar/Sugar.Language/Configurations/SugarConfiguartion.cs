@@ -1,10 +1,13 @@
 ﻿using System;
 
-namespace Sugar.Configurations
+namespace Sugar.Language.Configurations
 {
-    internal sealed class SugarConfiguration
+    public sealed class SugarConfiguration
     {
+        public string SugarFileExtension { get; set; }
+
         public int Version { get; set; }
+
         public string SourceFolder { get; set; }
         public string WrapperFileLocation { get; set; }
     }

@@ -275,7 +275,7 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
         //implement each kind of evaluable you can encounter (this, default, input, etc)
         private DataType ResolveEvaluable(Node operhand, Scope scope, TypeSearcherService searcherService)
         {
-            DataType result;
+            DataType result = null;
             switch (operhand.NodeType)
             {
                 case NodeType.Dot:
@@ -303,6 +303,7 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
                 case NodeType.Parent:
                     var parentNode = (ParentNode)operhand;
                     //I DONT KNWO WHAT IM DOINGJKHQKJFGHJAGS
+                    break;
                 case NodeType.Constant:
                     var constant = (ConstantValueNode)operhand;
                     result = constant.Token.ConstantType == ConstantType.Null ? null : defaultNameSpace.GetInternalDataType(constant.Token.ConstantType);

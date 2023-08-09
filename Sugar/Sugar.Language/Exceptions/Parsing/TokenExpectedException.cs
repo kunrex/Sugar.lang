@@ -17,12 +17,12 @@ namespace Sugar.Language.Exceptions.Parsing
 
         }
 
-        public TokenExpectedException(Token expected) : base($"Invlaid Token detected, '{expected.Value}' epxected", expected.Index)
+        public TokenExpectedException(Token expected, int index) : base($"Invlaid Token detected, '{expected.Value}' epxected", index)
         {
 
         }
 
-        public TokenExpectedException(Token expected, Token token) : base($"Invlaid Token: '{token.Value}' detected, '{expected.Value}' expected", expected.Index)
+        public TokenExpectedException(Token expected, Token token) : base($"Invlaid Token: '{token.Value}' detected, '{expected.Value}' expected", token.Index)
         {
 
         }

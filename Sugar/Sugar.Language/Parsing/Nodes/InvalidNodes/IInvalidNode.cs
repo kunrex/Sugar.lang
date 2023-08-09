@@ -8,5 +8,6 @@ namespace Sugar.Language.Parsing.Nodes
     internal interface IInvalidNode 
     {
         public CompileException Exception { get; }
+        public InvalidNodeType InvalidNodeType { get; }
     }
 }

@@ -24,6 +24,9 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         Initialise,
         CompoundDeclaration,
 
+        PropertyDeclaration,
+        PropertyInitialise,
+
         For,
         While,
         DoWhile,
@@ -90,6 +93,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         Action,
         Function,
 
-        InvalidTokenCollection
+        Invalid,
+        NonParsed
     }
 }

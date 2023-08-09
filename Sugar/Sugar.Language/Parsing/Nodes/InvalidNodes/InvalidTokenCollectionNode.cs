@@ -11,7 +11,8 @@ namespace Sugar.Language.Parsing.Nodes.InvalidNodes
 {
     internal sealed class InvalidTokenCollectionNode : Node, IInvalidNode
     {
-        public override NodeType NodeType { get => NodeType.InvalidTokenCollection; }
+        public override NodeType NodeType { get => NodeType.Invalid; }
+        public InvalidNodeType InvalidNodeType { get => InvalidNodeType.InvalidTokenCollection; }
 
         private readonly List<Token> tokens;
         public List<Token> Tokens { get => tokens; }

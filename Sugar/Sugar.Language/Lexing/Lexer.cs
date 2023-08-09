@@ -2,6 +2,8 @@
 using System.Text;
 using System.Collections.Generic;
 
+using Sugar.Language.Services;
+
 using Sugar.Language.Tokens;
 using Sugar.Language.Tokens.Enums;
 using Sugar.Language.Tokens.Keywords;
@@ -17,30 +19,14 @@ using Sugar.Language.Exceptions.Lexing;
 
 namespace Sugar.Language.Lexing
 {
-    public sealed class Lexer
+    internal sealed class Lexer : SingletonService<Lexer>
     {
-        private static Lexer instance;
-        public static Lexer Instance
-        {
-            get
-            {
-                if (instance == null)
-                    return new Lexer();
-                else
-                    return instance;
-            }
-        }
-
         private int index;
+
+        private SugarFile sourceFile;
+
         private string source;
-
         private List<Token> Tokens;
-        private CompileResult<List<Token>> result;
-
-        private Lexer()
-        {
-            
-        }
 
         private char? LookAhead()
         {
@@ -52,16 +38,16 @@ namespace Sugar.Language.Lexing
 
         private void CloneToken(Token token) => Tokens.Add(token.Clone(index));
 
-        internal CompileResult<List<Token>> Lex(string _source)
+        internal void Lex(SugarFile _source)
         {
-            source = _source;
-            result = new CompileResult<List<Token>>();
+            sourceFile = _source;
 
+            source = sourceFile.Source;
             Tokens = new List<Token>();
 
             for (index = 0; index < source.Length; index++)
             {
-                switch(source[index])
+                switch (source[index])
                 {
                     case var x when char.IsWhiteSpace(x):
                         break;
@@ -160,15 +146,15 @@ namespace Sugar.Language.Lexing
                     case '|':
                         next = LookAhead();
 
-                        if(next == '|')
+                        if (next == '|')
                         {
                             CloneToken(BinaryOperator.Or);
                             index++;
                         }
-                        else if(next == '=')
+                        else if (next == '=')
                         {
                             CloneToken(AssignmentOperator.AssignmentBitwiseOr);
-                            index++; 
+                            index++;
                         }
                         else
                             CloneToken(BinaryOperator.BitwiseOr);
@@ -277,7 +263,7 @@ namespace Sugar.Language.Lexing
                         else
                         {
                             var prev = Tokens.Count == 0 ? null : Tokens[Tokens.Count - 1];
-                            
+
                             if (next.HasValue && char.IsNumber(next.Value))
                             {
                                 if (prev == null)
@@ -336,7 +322,7 @@ namespace Sugar.Language.Lexing
                         else
                             CloneToken(BinaryOperator.Multiplication);
                         break;
-                        
+
                     case '/':
                         next = LookAhead();
                         if (next == '=')
@@ -417,15 +403,24 @@ namespace Sugar.Language.Lexing
                 }
             }
 
-            return result.Build(Tokens);
+            sourceFile.WithTokens(new TokenCollection(Tokens));
+
+            index = 0;
+            sourceFile = null;
         }
 
+        /// <summary>
+        /// Reads a single line comment.
+        /// </summary>
         private void ReadSingleLineComment()
         {
             while(source[index] != '\n')
                 index++;
         }
 
+        /// <summary>
+        /// Reads a mutlti line comment.
+        /// </summary>
         private void ReadMultiLineComment()
         {
             index += 2;
@@ -444,6 +439,9 @@ namespace Sugar.Language.Lexing
             }
         }
 
+        /// <summary>
+        /// Reads a string until the final `"` [exclusive]. Returns InvalidToken if invalid string found.
+        /// </summary>
         private Token ReadString()
         {
             index++;
@@ -472,10 +470,13 @@ namespace Sugar.Language.Lexing
                 index++;
             }
 
-            result.Add(new InvalidCharacterException(source[source.Length - 1], '"', index));
-            return new InvalidToken(index, new StringConstant(value.ToString(), index));
+            return new InvalidToken(index, new StringConstant(value.ToString(), index), PushException(source[source.Length - 1], '"', index));
         }
 
+        /// <summary>
+        /// Reads a character until the final `'` [exclusive]. Returns InvalidToken if invalid string found.
+        /// Does not continute reading until the character ends, stops after 3 indexes.
+        /// </summary>
         private Token ReadCharacter()
         {
             index++;
@@ -486,14 +487,14 @@ namespace Sugar.Language.Lexing
 
             index++;
             if (source[index] != '\'')
-            {
-                result.Add(new InvalidCharacterException(source[index], '\'', index));
-                return new InvalidToken(index, token);
-            }
+                return new InvalidToken(index, token, PushException(source[index], '\'', index));
 
             return token;
         }
 
+        /// <summary>
+        /// Reads a number.
+        /// </summary>
         private Token ReadNumber()
         {
             StringBuilder value = new StringBuilder();
@@ -604,17 +605,19 @@ namespace Sugar.Language.Lexing
             }
         }
 
+        /// <summary>
+        /// Reads an entity.
+        /// </summary>
         private Token ReadEntity()
         {
             StringBuilder value = new StringBuilder();
 
-            bool invalid = false;
             while (index < source.Length)
             {
                 var current = source[index];
 
                 if (char.IsWhiteSpace(current))
-                    return Extract();
+                    break;
 
                 switch(current)
                 {
@@ -647,9 +650,8 @@ namespace Sugar.Language.Lexing
 
                     case '"':
                     case '\'':
-                        result.Add(new InvalidCharacterException(current, index));
-                        invalid = true;
-                        break;
+                        value.Append(current);
+                        return new InvalidToken(index, Extract(), PushException(current, index));
 
                     default:
                         value.Append(current);
@@ -659,8 +661,7 @@ namespace Sugar.Language.Lexing
                 index++;
             }
 
-            var extracted = Extract();
-            return invalid ? new InvalidToken(index, extracted) : extracted;
+            return Extract();
             Token Extract()
             {
                 var valueToString = value.ToString();
@@ -670,6 +671,9 @@ namespace Sugar.Language.Lexing
             }
         }
 
+        /// <summary>
+        /// Tries to match a keyword, returns 'null' if no match was found..
+        /// </summary>
         private Token FindKeyWord(string _value)
         {
             foreach(var keyword in Keyword.Keywords)
@@ -686,6 +690,22 @@ namespace Sugar.Language.Lexing
                 return NullConstant.Null;
 
             return null;
+        }
+
+        private InvalidCharacterException PushException(char character, int index)
+        {
+            var exception = new InvalidCharacterException(character, index);
+
+            sourceFile.PushException(exception);
+            return exception;
+        }
+
+        private InvalidCharacterException PushException(char character, char expected, int index)
+        {
+            var exception = new InvalidCharacterException(character, expected, index);
+
+            sourceFile.PushException(exception);
+            return exception;
         }
     }
 }

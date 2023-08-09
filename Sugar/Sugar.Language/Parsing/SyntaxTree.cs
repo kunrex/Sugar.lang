@@ -6,18 +6,22 @@ namespace Sugar.Language.Parsing
 {
     internal sealed class SyntaxTree
     {
-        public Node BaseNode { get; private set; }
-
-        public SyntaxTree()
+        private readonly Node baseNode;
+        public Node BaseNode
         {
-
+            get
+            {
+                return baseNode;
+            }
         }
 
         public SyntaxTree(Node _baseNode)
         {
-            BaseNode = _baseNode;
+            baseNode = _baseNode;
         }
 
-        public void ParentNodes() => BaseNode.SetParent();
+        public void Print() => baseNode.Print("", true);
+
+        public void ParentNodes() => baseNode.SetParent();
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+
+using Sugar.Language.Exceptions;
 using Sugar.Language.Tokens.Enums;
 
 namespace Sugar.Language.Tokens
@@ -10,9 +12,14 @@ namespace Sugar.Language.Tokens
         private readonly Token expectedRead;
         public Token ExpectedRead { get => expectedRead; }
 
-        public InvalidToken(int _index, Token _expectedRead) : base(_expectedRead.Value, SyntaxKind.Invalid)
+        private readonly CompileException exception;
+        public CompileException Exception { get => exception; }
+
+        public InvalidToken(int _index, Token _expectedRead, CompileException _exception) : base(_expectedRead.Value, SyntaxKind.Invalid)
         {
             Index = _index;
+
+            exception = _exception;
             expectedRead = _expectedRead;
         }
 

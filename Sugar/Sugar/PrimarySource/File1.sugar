@@ -1,6 +1,0 @@
-﻿import X.Y;
-
-class A
-{
-    X.Y.B: x;
-}
