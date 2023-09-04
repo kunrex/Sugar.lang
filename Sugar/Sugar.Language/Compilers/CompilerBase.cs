@@ -22,13 +22,5 @@ namespace Sugar.Language.Compilers
 
             return file;
         }
-
-        protected internal void PrintErrors(SugarFile sourcefile)
-        {
-            Console.WriteLine($"ERROR: Following exceptions encountered in Compilation");
-
-            foreach (var error in sourcefile.Exceptions)
-                Console.WriteLine(error);
-        }
     }
 }

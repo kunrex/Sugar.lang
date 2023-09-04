@@ -1,20 +1,17 @@
 ﻿using System;
 using Sugar.Language.Lexing;
 
-using Sugar.Language.Parsing;
 using Sugar.Language.Parsing.Parser;
 
 using Sugar.Language.Exceptions;
 
+using Sugar.Language.Semantics.Analysis;
 using Sugar.Language.Semantics.ActionTrees.Namespaces;
 
 namespace Sugar.Language.Compilers
 {
     internal sealed class FileCompiler : CompilerBase
     {
-        private DefaultNameSpaceNode defaultNameSpace;
-        private CreatedNameSpaceCollectionNode createdNameSpaces;
-
         public FileCompiler()
         {
             Lexer.CreateInstance();
@@ -26,15 +23,26 @@ namespace Sugar.Language.Compilers
             try
             {
                 var collection = CreateSyntaxTree(source);
-                if (collection.Count == 0)
+                if (collection.Length == 0)
                 {
                     Console.WriteLine("No Output");
                     return true;
                 }
 
-                Console.WriteLine("Theres something here!");
+                var wrapperCollection = CreateSyntaxTree(wrappers);
+                if(!collection.Valid)
+                {
+                    collection.PrintExceptions();
+                    return false;
+                }
 
-                //analyso capricio
+                var fileTree = collection.SyntaxTree;
+                var wrapperTree = wrapperCollection.SyntaxTree;
+
+                SemanticAnalyser.CreateInstance();
+                var result = SemanticAnalyser.Instance.Analyse(wrapperTree, fileTree);
+                Console.Write(result);
+                //analyser.Analyse();
 
                 return true;
             }
@@ -45,22 +53,14 @@ namespace Sugar.Language.Compilers
             }
         }
 
-        private SyntaxTreeCollection CreateSyntaxTree(string[] files)
+        private SugarFileCollection CreateSyntaxTree(string[] files)
         {
-            var treeCollection = new SyntaxTreeCollection();
+            var treeCollection = new SugarFileCollection();
 
             foreach (var file in files)
-            {
-                var sugarFile = ReadFile(file);
-
-                if (sugarFile.Exceptions.Count > 0)
-                    PrintErrors(sugarFile);
-
-                treeCollection.Add(sugarFile.SyntaxTree);
-            }
+                treeCollection.Add(ReadFile(file));
 
             return treeCollection;
         }
-
     }
 }

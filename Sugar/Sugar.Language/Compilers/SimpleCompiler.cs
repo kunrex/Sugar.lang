@@ -23,14 +23,14 @@ namespace Sugar.Language.Compilers
             return ReadFile(source);
         }
 
-        public bool LexParse() => CreateFile().Exceptions.Count == 0;
+        public bool LexParse() => CreateFile().ExceptionCount == 0;
 
         public bool Analyse()
         {
             var file = CreateFile();
 
             //analyse file
-            return file.Exceptions.Count == 0;
+            return file.ExceptionCount == 0;
         }
     }
 }

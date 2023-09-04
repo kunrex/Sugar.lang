@@ -47,6 +47,10 @@ namespace Sugar.Language.Semantics.ActionTrees.Namespaces
         {
             for (int i = 0; i < dataTypes.Count; i++)
                 dataTypes[i].Print(indent, i == dataTypes.Count - 1);
+
+            var internalTypes = InternalDataTypes;
+            for (int i = 0; i < internalTypes.Count; i++)
+                internalTypes[i].Print(indent, i == internalTypes.Count - 1);
         }
 
         public override string ToString() => $"Default Name Space";

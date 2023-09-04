@@ -1,1 +1,5 @@
-﻿
+﻿namespace X {
+    class Y {
+
+    }
+}

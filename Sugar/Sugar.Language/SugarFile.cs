@@ -14,13 +14,7 @@ namespace Sugar.Language
         public string Source { get { return builder.ToString(); } }
 
         private readonly List<CompileException> compileExceptions;
-        public IReadOnlyList<CompileException> Exceptions
-        {
-            get
-            {
-                return compileExceptions.AsReadOnly();
-            }
-        }
+        public int ExceptionCount { get => compileExceptions.Count; }
 
         private SyntaxTree syntaxTree;
         public SyntaxTree SyntaxTree
@@ -86,6 +80,12 @@ namespace Sugar.Language
             compileExceptions.Add(exception);
 
             return this;
+        }
+
+        public void PrintExceptions()
+        {
+            foreach (var exception in compileExceptions)
+                Console.WriteLine(exception);
         }
 
         public void PrintTree() => syntaxTree.BaseNode.ToString();

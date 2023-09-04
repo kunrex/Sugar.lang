@@ -1,70 +1,70 @@
 ﻿struct Character
+{
+    [private] int: ascii;
+
+    [public]
+    constructor Character()
     {
-        [private] int: ascii;
-
-        [public]
-        constructor Character()
-        {
-            ascii = 0;
-        }
-
-        [public]
-        constructor Character(char: c)
-        {
-            ascii = c as int;
-        }
-
-        [public]
-        constructor Character(int: ascii)
-        {
-            ascii = c;
-        }
-
-        [public, static]
-        implicit char(Character: value) => value.ascii as char;
-
-        [public, static]
-        implicit Character(char: value) => create Character(value);
-
-        [public, static]
-        implicit Character(int: value) => create Character(value);
-
-        /*[public, static]
-        implicit ushort(char: c) => c.ascii as ushort;
-
-        [public, static]
-        implicit int(char: c) => c.ascii;
-
-        [public, static]
-        implicit uint(char: c) => c.ascii as uint;
-
-        [public, static]
-        implicit long(char: c) => c.ascii as long;
-
-        [public, static]
-        implicit ulong(char: c) => c.ascii as ulong;
-
-        [public, static]
-        implicit float(char: c) => c.ascii as float;
-
-        [public, static]
-        implicit double(char: c) => c.ascii as double;
-
-        [public, static]
-        implicit decimal(char: c) => c.ascii as decimal;*/
-
-        [public, static]
-        explicit bool(char: c)
-        {
-            if(c.ascii == 0)
-                return true;
-            else
-                return false;
-        }
-
-        [public, static]
-        explicit string(char: c) => c.ToString();
-
-        [public]
-        string ToString() => c + "";
+        ascii = 0;
     }
+
+    [public]
+    constructor Character(char: c)
+    {
+        ascii = c as int;
+    }
+
+    [public]
+    constructor Character(int: ascii)
+    {
+        ascii = c;
+    }
+
+    [public, static]
+    implicit char(Character: value) => value.ascii as char;
+
+    [public, static]
+    implicit Character(char: value) => create Character(value);
+
+    [public, static]
+    implicit Character(int: value) => create Character(value);
+
+    [public, static]
+    implicit ushort(char: c) => c.ascii as ushort;
+
+    [public, static]
+    implicit int(char: c) => c.ascii;
+
+    [public, static]
+    implicit uint(char: c) => c.ascii as uint;
+
+    [public, static]
+    implicit long(char: c) => c.ascii as long;
+
+    [public, static]
+    implicit ulong(char: c) => c.ascii as ulong;
+
+    [public, static]
+    implicit float(char: c) => c.ascii as float;
+
+    [public, static]
+    implicit double(char: c) => c.ascii as double;
+
+    [public, static]
+    implicit decimal(char: c) => c.ascii as decimal;
+
+    [public, static]
+    explicit bool(char: c)
+    {
+        if(c.ascii == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public, static]
+    explicit string(char: c) => c.ToString();
+
+    [public]
+    string ToString() => c + "";
+}
