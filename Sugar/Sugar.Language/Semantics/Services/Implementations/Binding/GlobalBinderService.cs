@@ -162,6 +162,8 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
                 case NodeType.OperatorOverload:
                     var operatorOverload = (OperatorOverloadFunctionDeclarationNode)node;
 
+                    Console.WriteLine(operatorOverload.Operator);
+
                     AddOperatorOverload(generalType, operatorOverload, subTypeSearcher);
                     break;
                 case NodeType.ExplicitDeclaration:
@@ -403,28 +405,33 @@ namespace Sugar.Language.Semantics.Services.Implementations.Binding
                     }
                     break;
                 case TokenType.BinaryOperator:
-                    if (functionInfo.Arguments.Count != 2)
-                        result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
-
-                    var found = false;
-                    for (int i = 0; i < functionInfo.Arguments.Count; i++)
-                        if (functionInfo.Arguments[i] == generalType)
-                        {
-                            found = true;
-                            break;
-                        }
-
-                    if (!found)
-                    {
-                        result.Add(new BinaryOperationArgumentException(0));
-                        return;
-                    }
-                    else if (generalType.TryFindOperatorOverloadDeclaration(operatorOverload.Operator, functionInfo.Arguments[0], functionInfo.Arguments[1]) != null)
-                    {
-                        result.Add(new DuplicateGlobalDefinitionException(operatorOverload.Operator.Value, generalType.Name));
-                        return;
-                    }
+                    EvaluateBinaryOperation(operatorOverload);
                     break;
+            }
+
+            void EvaluateBinaryOperation(OperatorOverloadFunctionDeclarationNode operatorOverload)
+            {
+                if (functionInfo.Arguments.Count != 2)
+                    result.Add(new OperatorArgumentCounMismatchException(operatorOverload.Operator.Type));
+
+                var found = false;
+                for (int i = 0; i < functionInfo.Arguments.Count; i++)
+                    if (functionInfo.Arguments[i] == generalType)
+                    {
+                        found = true;
+                        break;
+                    }
+
+                if (!found)
+                {
+                    result.Add(new BinaryOperationArgumentException(0));
+                    return;
+                }
+                else if (generalType.TryFindOperatorOverloadDeclaration(operatorOverload.Operator, functionInfo.Arguments[0], functionInfo.Arguments[1]) != null)
+                {
+                    result.Add(new DuplicateGlobalDefinitionException(operatorOverload.Operator.Value, generalType.Name));
+                    return;
+                }
             }
 
             AddDeclaration<OperatorOverloadDeclarationStmt, IOperatorContainer>(new OperatorOverloadDeclarationStmt(functionInfo.ReturnType, functionInfo.Describer, functionInfo.Arguments, functionInfo.Body, operatorOverload.Operator), generalType);

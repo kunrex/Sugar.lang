@@ -1,0 +1,127 @@
+﻿struct UShort
+{
+    [private] ushort: value;
+
+    [public]
+    constructor UShort()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor UShort(ushort: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit ushort(UShort: i) => i.value;
+
+    [public, static]
+    implicit UShort(ushort: i) => create UShort(i);
+
+    [public, static]
+    implicit char(UShort: i) => i.value as char;
+
+    [public, static]
+    implicit byte(UShort: i) => i.value as byte;
+
+    [public, static]
+    implicit sbyte(UShort: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(UShort: i) => i.value as short;
+
+    [public, static]
+    implicit int(UShort: i) => i.value as int;
+
+    [public, static]
+    implicit uint(UShort: i) => i.value as uint;
+
+    [public, static]
+    implicit long(UShort: i) => i.value as long;
+
+    [public, static]
+    implicit ulong(UShort: i) => i.value as ulong;
+
+    [public, static]
+    implicit float(UShort: i) => i.value as float;
+
+    [public, static]
+    implicit double(UShort: i) => i.value as double;
+
+    [public, static]
+    implicit decimal(UShort: i) => i.value as decimal;
+
+    [public, static]
+    explicit bool(UShort: i)
+    {
+        if(i.value == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator ushort +(UShort: a, UShort: b) => a.value + b.value;
+
+    [public, static]
+    operator ushort -(UShort: a, UShort: b) => a.value - b.value;
+
+    [public, static]
+    operator ushort *(UShort: a, UShort: b) => a.value * b.value;
+
+    [public, static]
+    operator ushort /(UShort: a, UShort: b) => a.value / b.value;
+
+    [public, static]
+    operator ushort %(UShort: a, UShort: b) => a.value % b.value;
+
+    [public, static]
+    operator ushort ++(UShort: a) => a++;
+
+    [public, static]
+    operator ushort --(UShort: a) => a--;
+
+    [public, static]
+    operator ushort -(UShort: a) => -a;
+
+    [public, static]
+    operator ushort &(UShort: a, UShort: b) => a.value & b.value;
+
+    [public, static]
+    operator ushort |(UShort: a, UShort: b) => a.value | b.value;
+
+    [public, static]
+    operator ushort <<(UShort: a, UShort: b) => a.value << b.value;
+
+    [public, static]
+    operator ushort >>(UShort: a, UShort: b) => a.value >> b.value;
+
+    [public, static]
+    operator ushort ~(UShort: a) => ~a.value;
+
+    [public, static]
+    operator uint ==(UShort: a, UShort: b) => a.value == b.value;
+
+    [public, static]
+    operator uint !=(UShort: a, UShort: b) => a.value != b.value;
+
+    [public, static]
+    operator uint >=(UShort: a, UShort: b) => a.value >= b.value;
+
+    [public, static]
+    operator uint <=(UShort: a, UShort: b) => a.value <= b.value;
+
+    [public, static]
+    operator uint <(UShort: a, UShort: b) => a.value < b.value;
+
+    [public, static]
+    operator uint >(UShort: a, UShort: b) => a.value > b.value;
+
+    [public, static]
+    operator ushort +(UShort: a) => +a.value; 
+}

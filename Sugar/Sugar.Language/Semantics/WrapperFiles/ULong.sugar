@@ -1,0 +1,127 @@
+﻿struct ULong
+{
+    [private] ulong: value;
+
+    [public]
+    constructor ULong()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor ULong(ulong: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit ulong(ULong: i) => i.value;
+
+    [public, static]
+    implicit ULong(ulong: i) => create ULong(i);
+
+    [public, static]
+    implicit char(ULong: i) => i.value as char;
+
+    [public, static]
+    implicit byte(ULong: i) => i.value as byte;
+
+    [public, static]
+    implicit sbyte(ULong: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(ULong: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(ULong: i) => i.value as ushort;
+
+    [public, static]
+    implicit int(ULong: i) => i.value as int;
+
+    [public, static]
+    implicit uint(Ulong: i) => i.value as uint;
+
+    [public, static]
+    implicit long(ULong: i) => i.value as long;
+
+    [public, static]
+    implicit float(UInt: i) => i.value as float;
+
+    [public, static]
+    implicit double(UInt: i) => i.value as double;
+
+    [public, static]
+    implicit decimal(UInt: i) => i.value as decimal;
+
+    [public, static]
+    explicit bool(ULong: i)
+    {
+        if(i.value == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator ulong +(ULong: a, ULong: b) => a.value + b.value;
+
+    [public, static]
+    operator ulong -(ULong: a, ULong: b) => a.value - b.value;
+
+    [public, static]
+    operator ulong *(ULong: a, ULong: b) => a.value * b.value;
+
+    [public, static]
+    operator ulong /(ULong: a, ULong: b) => a.value / b.value;
+
+    [public, static]
+    operator ulong %(ULong: a, ULong: b) => a.value % b.value;
+
+    [public, static]
+    operator ulong ++(ULong: a) => a++;
+
+    [public, static]
+    operator ulong --(ULong: a) => a--;
+
+    [public, static]
+    operator ulong -(ULong: a) => -a;
+
+    [public, static]
+    operator ulong &(ULong: a, ULong: b) => a.value & b.value;
+
+    [public, static]
+    operator ulong |(ULong: a, ULong: b) => a.value | b.value;
+
+    [public, static]
+    operator ulong <<(ULong: a, ULong: b) => a.value << b.value;
+
+    [public, static]
+    operator ulong >>(ULong: a, ULong: b) => a.value >> b.value;
+
+    [public, static]
+    operator ulong ~(ULong: a) => ~a.value;
+
+    [public, static]
+    operator ulong ==(ULong: a, ULong: b) => a.value == b.value;
+
+    [public, static]
+    operator ulong !=(ULong: a, ULong: b) => a.value != b.value;
+
+    [public, static]
+    operator ulong >=(ULong: a, ULong: b) => a.value >= b.value;
+
+    [public, static]
+    operator ulong <=(ULong: a, ULong: b) => a.value <= b.value;
+
+    [public, static]
+    operator ulong <(ULong: a, ULong: b) => a.value < b.value;
+
+    [public, static]
+    operator ulong >(ULong: a, ULong: b) => a.value > b.value;
+
+    [public, static]
+    operator ulong +(ULong: a) => +a.value; 
+}

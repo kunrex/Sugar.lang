@@ -18,7 +18,7 @@ namespace Sugar.Language.Semantics.ActionTrees.CreationStatements.Functions.Stru
         {
             get
             {
-                if (key > 0 && key <= Arguments.Count)
+                if (key >= 0 && key < Arguments.Count)
                     return Arguments.ElementAt(key).Value.CreationType;
 
                 return null;

@@ -1,0 +1,127 @@
+﻿struct Short
+{
+    [private] short: value;
+
+    [public]
+    constructor Short()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor Short(short: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit short(Short: i) => i.value;
+
+    [public, static]
+    implicit Short(short: i) => create Short(i);
+
+    [public, static]
+    implicit char(Short: i) => i.value as char;
+
+    [public, static]
+    implicit sbyte(Short: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(Short: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(Short: i) => i.value as ushort;
+
+    [public, static]
+    implicit int(Short: i) => i.value as int;
+
+    [public, static]
+    implicit uint(Short: i) => i.value as uint;
+
+    [public, static]
+    implicit long(Short: i) => i.value as long;
+
+    [public, static]
+    implicit ulong(Short: i) => i.value as ulong;
+
+    [public, static]
+    implicit float(Short: i) => i.value as float;
+
+    [public, static]
+    implicit double(Short: i) => i.value as double;
+
+    [public, static]
+    implicit decimal(Short: i) => i.value as decimal;
+
+    [public, static]
+    explicit bool(Short: i)
+    {
+        if(i.value == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator short +(Short: a, Short: b) => a.value + b.value;
+
+    [public, static]
+    operator short -(Short: a, Short: b) => a.value - b.value;
+
+    [public, static]
+    operator short *(Short: a, Short: b) => a.value * b.value;
+
+    [public, static]
+    operator short /(Short: a, Short: b) => a.value / b.value;
+
+    [public, static]
+    operator short %(Short: a, Short: b) => a.value % b.value;
+
+    [public, static]
+    operator short ++(Short: a) => a++;
+
+    [public, static]
+    operator short --(Short: a) => a--;
+
+    [public, static]
+    operator short -(Short: a) => -a;
+
+    [public, static]
+    operator short &(Short: a, Short: b) => a.value & b.value;
+
+    [public, static]
+    operator short |(Short: a, Short: b) => a.value | b.value;
+
+    [public, static]
+    operator short <<(Short: a, Short: b) => a.value << b.value;
+
+    [public, static]
+    operator short >>(Short: a, Short: b) => a.value >> b.value;
+
+    [public, static]
+    operator short ~(Short: a) => ~a.value;
+
+    [public, static]
+    operator bool ==(Short: a, Short: b) => a.value == b.value;
+
+    [public, static]
+    operator bool !=(Short: a, Short: b) => a.value != b.value;
+
+    [public, static]
+    operator bool >=(Short: a, Short: b) => a.value >= b.value;
+
+    [public, static]
+    operator bool <=(Short: a, Short: b) => a.value <= b.value;
+
+    [public, static]
+    operator bool <(Short: a, Short: b) => a.value < b.value;
+
+    [public, static]
+    operator bool >(Short: a, Short: b) => a.value > b.value;
+
+    [public, static]
+    operator short +(Short: a) => +a.value; 
+}

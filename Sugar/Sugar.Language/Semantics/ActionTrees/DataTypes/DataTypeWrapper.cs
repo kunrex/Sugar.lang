@@ -146,14 +146,18 @@ namespace Sugar.Language.Semantics.ActionTrees.DataTypes
                     var arg1 = converted.FunctionArguments[0];
                     var arg2 = converted.FunctionArguments[1];
 
+                    Console.WriteLine(arg1 == null);
+
                     if (arg1 == this)
                     {
                         if (arg2.StrictCompareTo(operhand1))
                             return converted;
                     }
                     else
+                    {
                         if (arg1.StrictCompareTo(operhand2))
-                        return converted;
+                            return converted;
+                    }
                 }
 
             return null;

@@ -40,9 +40,7 @@ namespace Sugar.Language.Compilers
                 var wrapperTree = wrapperCollection.SyntaxTree;
 
                 SemanticAnalyser.CreateInstance();
-                var result = SemanticAnalyser.Instance.Analyse(wrapperTree, fileTree);
-                Console.Write(result);
-                //analyser.Analyse();
+                SemanticAnalyser.Instance.Analyse(wrapperTree, fileTree);
 
                 return true;
             }

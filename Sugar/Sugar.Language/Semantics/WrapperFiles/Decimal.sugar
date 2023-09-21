@@ -1,0 +1,100 @@
+﻿struct Decimal
+{
+    [private] decimal: value;
+
+    [public]
+    constructor Decimal()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor Decimal(decimal: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit decimal(Decimal: i) => i.value;
+
+    [public, static]
+    implicit Decimal(decimal: i) => create Double(i);
+
+    [public, static]
+    implicit byte(Decimal: i) => i.value as byte;
+
+    [public, static]
+    implicit sbyte(Decimal: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(Decimal: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(Decimal: i) => i.value as ushort;
+
+    [public, static]
+    implicit int(Decimal: i) => i.value as int;
+
+    [public, static]
+    implicit uint(Decimal: i) => i.value as uint;
+
+    [public, static]
+    implicit long(Decimal: i) => i.value as long;
+
+    [public, static]
+    implicit ulong(Decimal: i) => i.value as ulong;
+
+    [public, static]
+    implicit floar(Decimal: i) => i.value as float;
+
+    [public, static]
+    implicit double(Decimal: i) => i.value as double;
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator decimal +(Decimal: a, Decimal: b) => a.value + b.value;
+
+    [public, static]
+    operator decimal -(Decimal: a, Decimal: b) => a.value - b.value;
+
+    [public, static]
+    operator decimal *(Decimal: a, Decimal: b) => a.value * b.value;
+
+    [public, static]
+    operator decimal /(Decimal: a, Decimal: b) => a.value / b.value;
+
+    [public, static]
+    operator decimal %(Decimal: a, Decimal: b) => a.value % b.value;
+
+    [public, static]
+    operator decimal ++(Decimal: a) => a++;
+
+    [public, static]
+    operator decimal --(Decimal: a) => a--;
+
+    [public, static]
+    operator decimal -(Decimal: a) => -a;
+
+    [public, static]
+    operator bool ==(Decimal: a, Decimal: b) => a.value == b.value;
+
+    [public, static]
+    operator bool !=(Decimal: a, Decimal: b) => a.value != b.value;
+
+    [public, static]
+    operator bool >=(Decimal: a, Decimal: b) => a.value >= b.value;
+
+    [public, static]
+    operator bool <=(Decimal: a, Decimal: b) => a.value <= b.value;
+
+    [public, static]
+    operator bool <(Decimal: a, Decimal: b) => a.value < b.value;
+
+    [public, static]
+    operator bool >(Decimal: a, Decimal: b) => a.value > b.value;
+
+    [public, static]
+    operator decimal +(Decimal: a) => +a.value; 
+}

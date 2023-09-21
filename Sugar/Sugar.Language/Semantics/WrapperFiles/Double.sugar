@@ -1,0 +1,100 @@
+﻿struct Double
+{
+    [private] double: value;
+
+    [public]
+    constructor Double()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor Double(double: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit double(Double: i) => i.value;
+
+    [public, static]
+    implicit Double(double: i) => create Double(i);
+
+    [public, static]
+    implicit byte(Double: i) => i.value as byte;
+
+    [public, static]
+    implicit sbyte(Double: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(Double: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(Double: i) => i.value as ushort;
+
+    [public, static]
+    implicit int(Double: i) => i.value as int;
+
+    [public, static]
+    implicit uint(Double: i) => i.value as uint;
+
+    [public, static]
+    implicit long(Double: i) => i.value as long;
+
+    [public, static]
+    implicit ulong(Double: i) => i.value as ulong;
+
+    [public, static]
+    implicit floar(Double: i) => i.value as float;
+
+    [public, static]
+    implicit decimal(Double: i) => i.value as decimal;
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator double +(Double: a, Double: b) => a.value + b.value;
+
+    [public, static]
+    operator double -(Double: a, Double: b) => a.value - b.value;
+
+    [public, static]
+    operator double *(Double: a, Double: b) => a.value * b.value;
+
+    [public, static]
+    operator double /(Double: a, Double: b) => a.value / b.value;
+
+    [public, static]
+    operator double %(Double: a, Double: b) => a.value % b.value;
+
+    [public, static]
+    operator double ++(Double: a) => a++;
+
+    [public, static]
+    operator double --(Double: a) => a--;
+
+    [public, static]
+    operator double -(Double: a) => -a;
+
+    [public, static]
+    operator bool ==(Double: a, Double: b) => a.value == b.value;
+
+    [public, static]
+    operator bool !=(Double: a, Double: b) => a.value != b.value;
+
+    [public, static]
+    operator bool >=(Double: a, Double: b) => a.value >= b.value;
+
+    [public, static]
+    operator bool <=(Double: a, Double: b) => a.value <= b.value;
+
+    [public, static]
+    operator bool <(Double: a, Double: b) => a.value < b.value;
+
+    [public, static]
+    operator bool >(Double: a, Double: b) => a.value > b.value;
+
+    [public, static]
+    operator double +(Double: a) => +a.value; 
+}

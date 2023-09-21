@@ -1,0 +1,127 @@
+﻿struct Long
+{
+    [private] long: value;
+
+    [public]
+    constructor Long()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor Long(long: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit long(Long: i) => i.value;
+
+    [public, static]
+    implicit Long(long: i) => create Long(i);
+
+    [public, static]
+    implicit char(Long: i) => i.value as char;
+
+    [public, static]
+    implicit byte(Long: i) => i.value as byte;
+
+    [public, static]
+    implicit sbyte(Long: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(Long: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(Long: i) => i.value as ushort;
+
+    [public, static]
+    implicit int(Long: i) => i.value as int;
+
+    [public, static]
+    implicit uint(Long: i) => i.value as uint;
+
+    [public, static]
+    implicit ulong(Long: i) => i.value as ulong;
+
+    [public, static]
+    implicit float(Long: i) => i.value as float;
+
+    [public, static]
+    implicit double(Long: i) => i.value as double;
+
+    [public, static]
+    implicit decimal(Long: i) => i.value as decimal;
+
+    [public, static]
+    explicit bool(Long: i)
+    {
+        if(i.value == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator long +(Long: a, Long: b) => a.value + b.value;
+
+    [public, static]
+    operator long -(Long: a, Long: b) => a.value - b.value;
+
+    [public, static]
+    operator long *(Long: a, Long: b) => a.value * b.value;
+
+    [public, static]
+    operator long /(Long: a, Long: b) => a.value / b.value;
+
+    [public, static]
+    operator long %(Long: a, Long: b) => a.value % b.value;
+
+    [public, static]
+    operator long ++(Long: a) => a++;
+
+    [public, static]
+    operator long --(Long: a) => a--;
+
+    [public, static]
+    operator long -(Long: a) => -a;
+
+    [public, static]
+    operator long &(Long: a, Long: b) => a.value & b.value;
+
+    [public, static]
+    operator long |(Long: a, Long: b) => a.value | b.value;
+
+    [public, static]
+    operator long <<(Long: a, Long: b) => a.value << b.value;
+
+    [public, static]
+    operator long >>(Long: a, Long: b) => a.value >> b.value;
+
+    [public, static]
+    operator long ~(Long: a) => ~a.value;
+
+    [public, static]
+    operator long ==(Long: a, Long: b) => a.value == b.value;
+
+    [public, static]
+    operator long !=(Long: a, Long: b) => a.value != b.value;
+
+    [public, static]
+    operator long >=(Long: a, Long: b) => a.value >= b.value;
+
+    [public, static]
+    operator long <=(Long: a, Long: b) => a.value <= b.value;
+
+    [public, static]
+    operator long <(Long: a, Long: b) => a.value < b.value;
+
+    [public, static]
+    operator long >(Long: a, Long: b) => a.value > b.value;
+
+    [public, static]
+    operator long +(Long: a) => +a.value; 
+}

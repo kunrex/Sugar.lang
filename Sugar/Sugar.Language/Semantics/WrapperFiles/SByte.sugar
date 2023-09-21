@@ -1,0 +1,127 @@
+﻿struct SByte
+{
+    [private] sbyte: value;
+
+    [public]
+    constructor SByte()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor SByte(sbyte: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit sbyte(Sbyte: i) => i.value;
+
+    [public, static]
+    implicit SByte(sbyte: i) => create SByte(i);
+
+    [public, static]
+    implicit char(SByte: i) => i.value as char;
+
+    [public, static]
+    implicit byte(SByte: i) => i.value as byte;
+
+    [public, static]
+    implicit short(SByte: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(SByte: i) => i.value as ushort;
+
+    [public, static]
+    implicit int(SByte: i) => i.value as int;
+
+    [public, static]
+    implicit uint(SByte: i) => i.value as uint;
+
+    [public, static]
+    implicit long(SByte: i) => i.value as long;
+
+    [public, static]
+    implicit ulong(SByte: i) => i.value as ulong;
+
+    [public, static]
+    implicit float(SByte: i) => i.value as float;
+
+    [public, static]
+    implicit double(SByte: i) => i.value as double;
+
+    [public, static]
+    implicit decimal(SByte: i) => i.value as decimal;
+
+    [public, static]
+    explicit bool(SByte: i)
+    {
+        if(i.value == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator byte +(SByte: a, SByte: b) => a.value + b.value;
+
+    [public, static]
+    operator byte -(SByte: a, SByte: b) => a.value - b.value;
+
+    [public, static]
+    operator sbyte *(SByte: a, SByte: b) => a.value * b.value;
+
+    [public, static]
+    operator sbyte /(SByte: a, SByte: b) => a.value / b.value;
+
+    [public, static]
+    operator sbyte %(SByte: a, SByte: b) => a.value % b.value;
+
+    [public, static]
+    operator sbyte ++(SByte: a) => a++;
+
+    [public, static]
+    operator sbyte --(SByte: a) => a--;
+
+    [public, static]
+    operator sbyte -(SByte: a) => -a;
+
+    [public, static]
+    operator sbyte &(SByte: a, SByte: b) => a.value & b.value;
+
+    [public, static]
+    operator sbyte |(SByte: a, SByte: b) => a.value | b.value;
+
+    [public, static]
+    operator sbyte <<(SByte: a, SByte: b) => a.value << b.value;
+
+    [public, static]
+    operator sbyte >>(SByte: a, SByte: b) => a.value >> b.value;
+
+    [public, static]
+    operator sbyte ~(SByte: a) => ~a.value;
+
+    [public, static]
+    operator bool ==(SByte: a, SByte: b) => a.value == b.value;
+
+    [public, static]
+    operator bool !=(SByte: a, SByte: b) => a.value != b.value;
+
+    [public, static]
+    operator bool >=(SByte: a, SByte: b) => a.value >= b.value;
+
+    [public, static]
+    operator bool <=(SByte: a, SByte: b) => a.value <= b.value;
+
+    [public, static]
+    operator bool <(SByte: a, SByte: b) => a.value < b.value;
+
+    [public, static]
+    operator bool >(SByte: a, SByte: b) => a.value > b.value;
+
+    [public, static]
+    operator sbyte +(SByte: a) => +a.value; 
+}

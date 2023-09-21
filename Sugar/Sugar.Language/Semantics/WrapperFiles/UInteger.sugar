@@ -1,0 +1,127 @@
+﻿struct UInteger
+{
+    [private] uint: value;
+
+    [public]
+    constructor UInteger()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor UInteger(uint: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit uint(UInteger: i) => i.value;
+
+    [public, static]
+    implicit UInteger(uint: i) => create UInteger(i);
+
+    [public, static]
+    implicit char(UInteger: i) => i.value as char;
+
+    [public, static]
+    implicit byte(UInteger: i) => i.value as byte;
+
+    [public, static]
+    implicit sbyte(UInteger: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(UInteger: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(UInteger: i) => i.value as ushort;
+
+    [public, static]
+    implicit int(UInteger: i) => i.value as int;
+
+    [public, static]
+    implicit long(UInteger: i) => i.value as long;
+
+    [public, static]
+    implicit ulong(UInteger: i) => i.value as ulong;
+
+    [public, static]
+    implicit float(UInteger: i) => i.value as float;
+
+    [public, static]
+    implicit double(UInteger: i) => i.value as double;
+
+    [public, static]
+    implicit decimal(UInteger: i) => i.value as decimal;
+
+    [public, static]
+    explicit bool(UInteger: i)
+    {
+        if(i.value == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator byte +(UInteger: a, UInteger: b) => a.value + b.value;
+
+    [public, static]
+    operator byte -(UInteger: a, UInteger: b) => a.value = b.value;
+
+    [public, static]
+    operator uint *(UInteger: a, UInteger: b) => a.value * b.value;
+
+    [public, static]
+    operator uint /(UInteger: a, UInteger: b) => a.value / b.value;
+
+    [public, static]
+    operator uint %(UInteger: a, UInteger: b) => a.value % b.value;
+
+    [public, static]
+    operator uint ++(UInteger: a) => a++;
+
+    [public, static]
+    operator uint --(UInteger: a) => a--;
+
+    [public, static]
+    operator uint -(UInteger: a) => -a;
+
+    [public, static]
+    operator uint &(UInteger: a, UInteger: b) => a.value & b.value;
+
+    [public, static]
+    operator uint |(UInteger: a, UInteger: b) => a.value | b.value;
+
+    [public, static]
+    operator uint <<(UInteger: a, UInteger: b) => a.value << b.value;
+
+    [public, static]
+    operator uint >>(UInteger: a, UInteger: b) => a.value >> b.value;
+
+    [public, static]
+    operator uint ~(UInteger: a) => ~a.value;
+
+    [public, static]
+    operator uint ==(UInteger: a, UInteger: b) => a.value == b.value;
+
+    [public, static]
+    operator uint !=(UInteger: a, UInteger: b) => a.value != b.value;
+
+    [public, static]
+    operator uint >=(UInteger: a, UInteger: b) => a.value >= b.value;
+
+    [public, static]
+    operator uint <=(UInteger: a, UInteger: b) => a.value <= b.value;
+
+    [public, static]
+    operator uint <(UInteger: a, UInteger: b) => a.value < b.value;
+
+    [public, static]
+    operator uint >(UInteger: a, UInteger: b) => a.value > b.value;
+
+    [public, static]
+    operator uint +(UInteger: a) => +a.value; 
+}

@@ -34,11 +34,12 @@ namespace Sugar.Language.Semantics.Analysis
 
             package = new SugarPackage(defaultNameSpace, createdNameSpaces);
             var import = new ImportStatementService(defaultNameSpace, createdNameSpaces).Validate();
+            var classMemberCreation = new GlobalBinderService(defaultNameSpace, createdNameSpaces).Validate();
+
             defaultNameSpace.Print("", true);
             createdNameSpaces.Print("", true);
-            /*var classMemberCreation = new GlobalBinderService(defaultNameSpace, createdNameSpaces).Validate();
 
-            var statementValidation = new LocalBinderService(defaultNameSpace, createdNameSpaces).Validate();
+            /*var statementValidation = new LocalBinderService(defaultNameSpace, createdNameSpaces).Validate();
 
             Console.WriteLine(import);
             Console.WriteLine(classMemberCreation);
