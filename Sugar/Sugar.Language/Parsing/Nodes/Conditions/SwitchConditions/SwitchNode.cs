@@ -1,19 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.NodeGroups;
+
 namespace Sugar.Language.Parsing.Nodes.Conditions.SwitchConditions
 {
-    internal sealed class SwitchNode : Node
+    internal sealed class SwitchNode : ParseNodeCollection
     {
-        public override NodeType NodeType => NodeType.Switch;
-        private Node Value { get => Children[0]; }
+        public override ParseNodeType NodeType { get => ParseNodeType.Switch; }
 
-        public SwitchNode(Node _valueToCheck, List<Node> _cases)
+        private readonly CompoundStatementNode cases;
+        public CompoundStatementNode Cases { get => cases; }
+
+        private readonly ParseNodeCollection value;
+        public ParseNodeCollection Value { get => value; }
+
+        public SwitchNode(ParseNodeCollection _value, CompoundStatementNode _cases) : base(_cases, _value)
         {
-            Children = new List<Node>() { _valueToCheck };
-            Children.AddRange(_cases);
+            cases = _cases;
+            value = _value;
         }
 
         public override string ToString() => $"Switch Node";

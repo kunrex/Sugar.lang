@@ -4,6 +4,6 @@ namespace Sugar.Language.Parsing.Nodes.Interfaces.Creation
 {
     internal interface ICreationNode_Body
     {
-        public Node Body { get; }
+        public ParseNode Body { get; }
     }
 }

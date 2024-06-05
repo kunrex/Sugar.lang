@@ -1,23 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
+
+using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
 
 namespace Sugar.Language.Parsing.Nodes.Loops
 {
     internal sealed class ForeachLoopNode : LoopNode
     {
-        public override NodeType NodeType => NodeType.Foreach;
+        public override ParseNodeType NodeType { get => ParseNodeType.Foreach; }
 
-        public Node Declaration { get => Children[0]; }
-        public Node Collection { get => Children[1]; }
-        public override Node Body { get => Children[2]; }
+        private readonly DeclarationNode declaration;
+        public DeclarationNode Declaration { get => declaration; }
 
-        public override Node Condition { get => throw new NotImplementedException(); }
+        private readonly ParseNodeCollection collection;
+        public ParseNodeCollection Collection { get => collection; }
 
-        public ForeachLoopNode(Node _declaration, Node _collection, Node _body)
+        public ForeachLoopNode(DeclarationNode _declaration, ParseNodeCollection _collection, ParseNode _body) : base(_body)
         {
-            Children = new List<Node>() { _declaration, _collection, _body };
+            declaration = _declaration;
+            Add(declaration);
+
+            collection = _collection;
+            Add(collection);
         }
 
         public override string ToString() => "Foreach Loop Node";

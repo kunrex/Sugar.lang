@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.Interfaces.Expressions;
 
 namespace Sugar.Language.Parsing.Nodes.Expressions.Associative
 {
-    internal sealed class DotExpression : ExpressionNode, IBinaryExpression
+    internal sealed class DotExpression : BaseBinaryNode<ParseNodeCollection, ParseNodeCollection>
     {
-        public override NodeType NodeType => NodeType.Dot;
+        public override ParseNodeType NodeType { get => ParseNodeType.Dot; }
 
-        public Node LHS { get => Children[0]; }
-        public Node RHS { get => Children[1]; }
-
-        public DotExpression(Node _lhs, Node _rhs) 
+        public DotExpression(ParseNodeCollection _lhs, ParseNodeCollection _rhs) : base(_lhs, _rhs)
         {
-            Children = new List<Node>() { _lhs, _rhs };
+            
         }
 
         public override string ToString() => $"Dot Expression";

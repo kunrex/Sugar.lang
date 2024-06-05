@@ -89,7 +89,7 @@ namespace Sugar.Tests
         [TestMethod]
         public void GenericAmbiguity_FunctionCall()
         {
-            string source = "int: x = Function(Function2()<x,z> + y);";
+            string source = "int: x = Function(Function2()<x,z> * y);";
 
             Assert.AreEqual(true, new UnitTestCompiler(source).Compile());
         }
@@ -361,7 +361,7 @@ namespace Sugar.Tests
         [TestMethod]
         public void ActionDeclaration()
         {
-            string source = "action: myAction = () => { print(\" Actions wooo\"); };";
+            string source = "action: myAction => () { print(\" Actions wooo\"); };";
 
             Assert.AreEqual(true, new UnitTestCompiler(source).Compile());
         }
@@ -369,7 +369,7 @@ namespace Sugar.Tests
         [TestMethod]
         public void FunctionDeclaration()
         {
-            string source = "function<int>: isEqual = (int: a, int: b) => { return a == b; };";
+            string source = "function<int>: isEqual => (int: a, int: b) { return a == b; };";
 
             Assert.AreEqual(true, new UnitTestCompiler(source).Compile());
         }

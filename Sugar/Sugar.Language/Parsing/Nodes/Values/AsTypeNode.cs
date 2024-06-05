@@ -1,20 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.Types;
+
 namespace Sugar.Language.Parsing.Nodes.Values
 {
-    internal sealed class AsTypeNode : Node
+    internal sealed class AsTypeNode : ParseNodeCollection
     {
-        public override NodeType NodeType { get => NodeType.AsType; }
+        public override ParseNodeType NodeType { get => ParseNodeType.AsType; }
 
-        public Node Type { get => Children[0]; }
+        private readonly TypeNode type;
+        public TypeNode Type { get => type; }
 
-        public AsTypeNode(Node _type)
+        public AsTypeNode(TypeNode _type) : base(_type)
         {
-            Children = new List<Node>() { _type };
+            type = _type;
         }
+
+        public override ParseNode AddChild(ParseNode _node) { return this; }
 
         public override string ToString() => $"As Type Node";
     }

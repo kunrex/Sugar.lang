@@ -1,29 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.CtrlStatements;
+
+using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
+
 namespace Sugar.Language.Parsing.Nodes.Conditions.SwitchConditions
 {
-    internal sealed class CaseNode : Node
+    internal sealed class CaseNode : ParseNodeCollection, ICreationNode_Body
     {
-        public override NodeType NodeType => NodeType.Get; 
+        public override ParseNodeType NodeType { get => ParseNodeType.Case; }
 
-        private Node Value { get => Children[0]; }
-        private Node Body { get => Children[1]; }
-        private Node ControlStatment { get => Children[2]; }
+        private readonly ParseNodeCollection expression;
+        public ParseNodeCollection Expression { get => expression; }
 
-        private bool IsFallThrough { get => ChildCount == 1; }
+        private readonly ParseNode body;
+        public ParseNode Body { get => body; }
 
-        public CaseNode(Node value)
+        private readonly ControlStatement control;
+        public ControlStatement Control { get => control; }
+
+        public bool IsFallThrough { get => body == null; }
+
+        public CaseNode(ParseNodeCollection _expression) : base(_expression)
         {
-            Children = new List<Node>() { value };
+            expression = _expression;
+
+            body = null;
+            control = null;
         }
 
-        public CaseNode(Node value, Node body, Node controlStatement)
+        public CaseNode(ParseNodeCollection _expression, ParseNode _body, ControlStatement _control) : base(_expression, _body, _control)
         {
-            Children = new List<Node>() { value, body, controlStatement };
+            expression = _expression;
+
+            body = _body;
+            control = _control;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
 
         public override string ToString() => $"Case Node";
     }

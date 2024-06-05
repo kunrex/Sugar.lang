@@ -2,7 +2,7 @@
 
 namespace Sugar.Language.Parsing.Nodes.Enums
 {
-    internal enum InvalidNodeType
+    internal enum InvalidParseNodeType
     {
         InvalidToken,
         ExpectedToken,

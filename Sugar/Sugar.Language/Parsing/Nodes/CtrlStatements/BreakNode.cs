@@ -6,7 +6,7 @@ namespace Sugar.Language.Parsing.Nodes.CtrlStatements
 {
     internal sealed class BreakNode : ControlStatement
     {
-        public override NodeType NodeType => NodeType.Break;
+        public override ParseNodeType NodeType { get => ParseNodeType.Break; }
 
         public BreakNode()
         {

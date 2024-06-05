@@ -1,18 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
+
+using Sugar.Language.Parsing.Nodes.Describers;
 
 using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Properties.Accessors
 {
-    internal abstract class AccessorNode : Node, ICreationNode
+    internal abstract class AccessorNode : ParseNodeCollection, ICreationNode, ICreationNode_Body
     {
-        public Node Describer { get => Children[0]; }
-        public virtual Node Body { get => Children[1]; }
+        protected readonly DescriberNode describer;
+        public DescriberNode Describer { get => describer; }
 
-        public AccessorNode(Node _describer, Node _body)
+        private readonly ParseNode body;
+        public ParseNode Body { get => body; }
+
+        public AccessorNode(DescriberNode _describer, ParseNode _body) : base(_describer, _body)
         {
-            Children = new List<Node>() { _describer, _body };
+            describer = _describer;
+            body = _body;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
     }
 }

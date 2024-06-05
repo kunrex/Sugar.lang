@@ -14,5 +14,13 @@ namespace Sugar.Language.Parsing.Parser
             list.RemoveAt(list.Count - 1);
             return pop;
         }
+
+        public static T Peek<T>(this List<T> list)
+        {
+            if (list.Count == 0)
+                throw new IndexOutOfRangeException();
+
+            return list[list.Count - 1];
+        }
     }
 }

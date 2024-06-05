@@ -2,9 +2,9 @@
 
 namespace Sugar.Language.Parsing.Nodes.Interfaces.Expressions
 {
-    internal interface IBinaryExpression
+    internal interface IBinaryExpression<LHSType, RHSType> where LHSType : ParseNodeCollection where RHSType : ParseNodeCollection
     {
-        public Node LHS { get; }
-        public Node RHS { get; }
+        public LHSType LHS { get; }
+        public RHSType RHS { get; }
     }
 }

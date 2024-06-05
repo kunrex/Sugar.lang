@@ -1,21 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.CtrlStatements;
+
+using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
+
 namespace Sugar.Language.Parsing.Nodes.Conditions.SwitchConditions
 {
-    internal sealed class DefaultNode : Node
+    internal sealed class DefaultNode : ParseNodeCollection, ICreationNode_Body
     {
-        public override NodeType NodeType => NodeType.Default; 
+        public override ParseNodeType NodeType { get => ParseNodeType.Default; }
 
-        private Node Body { get => Children[0]; }
-        private Node ControlStatement { get => Children[1]; }
+        private readonly ParseNode body;
+        public ParseNode Body { get => body; }
 
-        public DefaultNode(Node body, Node controlStatement)
+        private readonly ControlStatement control;
+        public ControlStatement Control { get => control; }
+
+        public DefaultNode(ParseNode _body, ControlStatement _control) : base(_body, _control)
         {
-            Children = new List<Node>() { body, controlStatement };
+            body = _body;
+            control = _control;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
 
         public override string ToString() => $"Default Node";
     }

@@ -1,23 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
+
+using Sugar.Language.Parsing.Nodes.Types;
+
+using Sugar.Language.Parsing.Nodes.Values;
+
+using Sugar.Language.Parsing.Nodes.Describers;
+
 using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
 
 namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation
 {
     internal abstract class VariableCreationNode : StatementNode, ICreationNode_Type, ICreationNode_Name
     {
-        public Node Describer { get => Children[0]; }
+        protected readonly DescriberNode describer;
+        public DescriberNode Describer { get => describer; }
 
-        public Node Type { get => Children[1]; }
-        public virtual Node Name { get => Children[2]; }
+        protected readonly TypeNode type;
+        public TypeNode Type { get => type; }
 
-        public virtual NodeType CreationType { get => Name.NodeType; }
+        protected readonly IdentifierNode name;
+        public virtual IdentifierNode Name { get => name; }
 
-        public VariableCreationNode(Node _describer, Node _type, Node _name)
+        public VariableCreationNode(DescriberNode _describer, TypeNode _type, IdentifierNode _name) : base(_describer, _type, _name)
         {
-            Children = new List<Node>() { _describer, _type, _name };
+            describer = _describer;
+
+            type = _type;
+            name = _name;
         }
     }
 }

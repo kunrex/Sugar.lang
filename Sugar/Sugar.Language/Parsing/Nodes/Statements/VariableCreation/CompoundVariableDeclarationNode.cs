@@ -5,13 +5,13 @@ using Sugar.Language.Parsing.Nodes.Enums;
 
 namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation
 {
-    internal sealed class CompoundVariableDeclarationNode : StatementNode
+    internal sealed class CompoundVariableDeclarationNode : NodeCollection<DeclarationNode>
     {
-        public override NodeType NodeType => NodeType.CompoundDeclaration; 
+        public override ParseNodeType NodeType { get => ParseNodeType.CompoundDeclaration; }
 
-        public CompoundVariableDeclarationNode(List<Node> _declarations)
+        public CompoundVariableDeclarationNode(List<DeclarationNode> _declarations) : base(_declarations)
         {
-            Children = _declarations;
+           
         }
 
         public override string ToString() => $"Compound Variable Declaration Node";

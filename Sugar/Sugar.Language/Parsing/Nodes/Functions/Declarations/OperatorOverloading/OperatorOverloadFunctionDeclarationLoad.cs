@@ -4,17 +4,31 @@ using Sugar.Language.Tokens.Operators;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.Types;
+
+using Sugar.Language.Parsing.Nodes.Describers;
+
+using Sugar.Language.Parsing.Nodes.Values.Generics;
+
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
+
 namespace Sugar.Language.Parsing.Nodes.Functions.Declarations.OperatorOverloading
 {
-    internal sealed class OperatorOverloadFunctionDeclarationNode : UnnamedFunctionDeclarationNode
+    internal sealed class OperatorOverloadFunctionDeclarationNode : BaseFunctionDeclarationNode
     {
-        public Operator Operator { get; private set; }
+        public override ParseNodeType NodeType { get => ParseNodeType.OperatorOverload; }
 
-        public override NodeType NodeType { get => NodeType.OperatorOverload; }
+        private readonly Operator oprator;
+        public Operator Operator { get => oprator; }
 
-        public OperatorOverloadFunctionDeclarationNode(Node _describer, Node _returnType, Node _arguments, Node _body, Operator _operator) : base(_describer, _returnType, _arguments, _body)
+        public OperatorOverloadFunctionDeclarationNode(DescriberNode _describer, TypeNode _returnType, FunctionParamatersNode _arguments, ParseNode _body, Operator _operator) : base(_describer, _returnType, _arguments, _body)
         {
-            Operator = _operator;
+            oprator = _operator;
+        }
+
+        public OperatorOverloadFunctionDeclarationNode(DescriberNode _describer, TypeNode _returnType, FunctionParamatersNode _arguments, ParseNode _body, Operator _operator, GenericDeclarationNode _generic) : base(_describer, _returnType, _arguments, _body, _generic)
+        {
+            oprator = _operator;
         }
 
         public override string ToString() => $"Operator Overload Declaration [Operator: {Operator.Value}]";

@@ -5,16 +5,11 @@ using Sugar.Language.Parsing.Nodes.Enums;
 
 namespace Sugar.Language.Parsing.Nodes.NodeGroups
 {
-    internal sealed class ScopeNode : Node
+    internal sealed class ScopeNode : CompoundStatementNode
     {
-        public override NodeType NodeType => NodeType.Scope;
+        public override ParseNodeType NodeType { get => ParseNodeType.Scope; }
 
-        public ScopeNode() : base()
-        {
-
-        }
-
-        public ScopeNode(List<Node> _children) : base(_children)
+        public ScopeNode(List<ParseNode> _children) : base(_children)
         {
 
         }

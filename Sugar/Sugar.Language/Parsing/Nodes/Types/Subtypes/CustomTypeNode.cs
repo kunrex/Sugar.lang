@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Types.Enums;
 
@@ -7,12 +6,11 @@ namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
 {
     internal sealed class CustomTypeNode : TypeNode
     {
-        public Node CustomType { get => Children[0]; }
         public override TypeNodeEnum Type => TypeNodeEnum.Custom;
 
-        public CustomTypeNode(Node _type)
+        public CustomTypeNode(TypeNode _type) : base(_type)
         {
-            Children = new List<Node>() { _type };
+            
         }
 
         public override string ToString() => $"Custom Type Node";

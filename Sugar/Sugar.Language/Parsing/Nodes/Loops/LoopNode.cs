@@ -1,12 +1,29 @@
 ﻿using System;
 
+using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
+
 namespace Sugar.Language.Parsing.Nodes.Loops
 {
-    internal abstract class LoopNode : Node
+    internal abstract class LoopNode : ParseNodeCollection, ICreationNode_Body
     {
-        public abstract Node Body { get; }
-        public abstract Node Condition { get; }
+        protected readonly ParseNodeCollection condition;
+        public ParseNodeCollection Condition { get => condition; }
 
-        public override Node AddChild(Node _node) => throw new NotImplementedException();
+        protected readonly ParseNode body;
+        public ParseNode Body { get => body; }
+
+        public LoopNode(ParseNode _body) : base(_body)
+        {
+            body = _body;
+        }
+
+        public LoopNode(ParseNodeCollection _condition, ParseNode _body) : base(_condition, _body)
+        {
+            condition = _condition;
+
+            body = _body;
+        }
+
+        public override ParseNode AddChild(ParseNode _node) { return this; }
     }
 }

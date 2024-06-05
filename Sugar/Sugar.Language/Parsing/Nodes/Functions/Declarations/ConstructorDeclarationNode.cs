@@ -1,23 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
+
+using Sugar.Language.Parsing.Nodes.Types;
+
 using Sugar.Language.Parsing.Nodes.Enums;
+
+using Sugar.Language.Parsing.Nodes.Describers;
+using Sugar.Language.Parsing.Nodes.NodeGroups;
+
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Declarations
 {
-    internal sealed class ConstructorDeclarationNode : UnnamedFunctionDeclarationNode
+    internal sealed class ConstructorDeclarationNode : BaseFunctionDeclarationNode
     {
-        public Node ParentOverrideNode { get => Children.Count == 4 ? null : Children[4]; }
+        public override ParseNodeType NodeType { get => ParseNodeType.ConstructorDeclaration; }
 
-        public override NodeType NodeType => NodeType.ConstructorDeclaration;
+        private readonly ExpressionListNode parentOverrideNode;
+        public ExpressionListNode ParentOverrideNode { get => parentOverrideNode; }
 
-        public ConstructorDeclarationNode(Node _describer, Node _returnType, Node _arguments, Node _body) : base(_describer, _returnType, _arguments, _body)
+        public ConstructorDeclarationNode(DescriberNode _describer, TypeNode _returnType, FunctionParamatersNode _arguments, ParseNode _body) : base(_describer, _returnType, _arguments, _body)
         {
-           
+            parentOverrideNode = null;
         }
 
-        public ConstructorDeclarationNode(Node _describer, Node _returnType, Node _arguments, Node _body, Node _parent) : base(_describer, _returnType, _arguments, _body)
+        public ConstructorDeclarationNode(DescriberNode _describer, TypeNode _returnType, FunctionParamatersNode _arguments, ParseNode _body, ExpressionListNode _parent) : base(_describer, _returnType, _arguments, _body)
         {
-            Children = new List<Node>() { _describer, _returnType, _arguments, _body, _parent };
+            parentOverrideNode = _parent;
+            Add(parentOverrideNode);
         }
 
         public override string ToString() => $"Constructor Declaration Node";

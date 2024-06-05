@@ -1,28 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.NodeGroups;
 
 namespace Sugar.Language.Parsing.Nodes.Describers
 {
-    internal class DescriberNode : ExpressionListNode
+    internal class DescriberNode : NodeCollection<DescriberKeywordNode>
     {
-        public override NodeType NodeType => NodeType.Describer;
+        public override ParseNodeType NodeType { get => ParseNodeType.Describer; }
 
-        public DescriberNode()
+        public DescriberNode() : base()
         {
 
         }
 
-        public DescriberNode(Node _keyword) : base(_keyword)
+        public DescriberNode AddChild(DescriberKeywordNode node)
         {
-            
-        }
+            Add(node);
 
-        public DescriberNode(List<Node> _keywords) : base(_keywords)
-        {
-           
+            return this;
         }
 
         public override string ToString() => $"Describer Node";

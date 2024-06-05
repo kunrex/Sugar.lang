@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using Sugar.Language.Services;
+using Sugar.Language.Services.Interfaces;
+
 namespace Sugar.Language.Parsing
 {
-    internal sealed class SyntaxTreeCollection : IEnumerable<SyntaxTree>
+    internal sealed class SyntaxTreeCollection : ICustomCollection<SyntaxTree>
     {
         private readonly List<SyntaxTree> Trees;
 
@@ -13,7 +16,7 @@ namespace Sugar.Language.Parsing
             get => Trees[index];
         }
 
-        public int Count { get => Trees.Count; }
+        public int Length { get => Trees.Count; }
 
         public SyntaxTreeCollection()
         {
@@ -32,7 +35,7 @@ namespace Sugar.Language.Parsing
 
         public IEnumerator<SyntaxTree> GetEnumerator()
         {
-            return new SyntaxTreeCollectionEnumerator(this);
+            return new GenericEnumeratorService<SyntaxTreeCollection, SyntaxTree>(this);
         }
     }
 }

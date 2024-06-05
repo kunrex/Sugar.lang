@@ -1,19 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Types.Enums;
+
+using Sugar.Language.Parsing.Nodes.Values.Generics;
 
 namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
 {
     internal sealed class FunctionTypeNode : TypeNode
     {
-        public override TypeNodeEnum Type => TypeNodeEnum.Function;
+        public override TypeNodeEnum Type { get => TypeNodeEnum.Function; }
 
-        public Node TypeNode { get => Children[0]; }
-             
-        public FunctionTypeNode(Node _type)
+        private readonly GenericCallNode generic;
+        public GenericCallNode Generic { get => generic; }
+
+        public FunctionTypeNode(GenericCallNode _generic) : base(_generic)
         {
-            Children = new List<Node>() { _type };
+            generic = _generic;
         }
 
         public override string ToString() => $"Function Type Node";

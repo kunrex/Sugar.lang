@@ -1,20 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
+
+using Sugar.Language.Parsing.Nodes.Types;
+
+using Sugar.Language.Parsing.Nodes.Describers;
 
 using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Properties
 {
-    internal abstract class PropertyNode : Node, ICreationNode_Name, ICreationNode_Type
+    internal abstract class PropertyNode : ParseNodeCollection, ICreationNode_Type
     {
-        public Node Name { get => Children[0]; }
-        public Node Type { get => Children[1]; }
+        protected readonly DescriberNode describer;
+        public DescriberNode Describer { get => describer; }
 
-        public Node Describer { get => null; }
+        protected readonly TypeNode type;
+        public TypeNode Type { get => type; }
 
-        public PropertyNode(Node _name, Node _type) 
+        public PropertyNode(DescriberNode _describer, TypeNode _type) : base(_describer, _type)
         {
-            Children = new List<Node>() { _name, _type };
+            describer = _describer;
+
+            type = _type;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
     }
 }

@@ -414,7 +414,7 @@ namespace Sugar.Language.Lexing
         /// </summary>
         private void ReadSingleLineComment()
         {
-            while(source[index] != '\n')
+            while(index < source.Length && source[index] != '\n')
                 index++;
         }
 

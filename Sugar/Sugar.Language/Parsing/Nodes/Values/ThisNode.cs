@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
 namespace Sugar.Language.Parsing.Nodes.Values
 {
-    internal sealed class ThisNode : Node
+    internal sealed class ThisNode : ParseNodeCollection
     {
-        public override NodeType NodeType => NodeType.This;
+        public override ParseNodeType NodeType { get => ParseNodeType.This; }
 
-        public Node Reference { get => Children[0]; }
+        private readonly ParseNodeCollection reference;
+        public ParseNodeCollection Reference { get => reference; }
 
-        public ThisNode(Node _reference)
+        public ThisNode(ParseNodeCollection _reference) : base(_reference)
         {
-            Children = new List<Node>() { _reference };
+            reference = _reference;
         }
+
+        public override ParseNode AddChild(ParseNode _node) { return this; }
 
         public override string ToString() => $"This Node";
     }

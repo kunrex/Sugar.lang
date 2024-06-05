@@ -1,38 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
 
-using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.Interfaces;
+using Sugar.Language.Parsing.Nodes.Types;
+
+using Sugar.Language.Parsing.Nodes.Values.Generics;
+
+using Sugar.Language.Parsing.Nodes.Describers;
+
+using Sugar.Language.Parsing.Nodes.Interfaces.Generic;
 using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
+
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Declarations
 {
-    internal abstract class BaseFunctionDeclarationNode : Node, ICreationNode_Type, ICreationNode_Name, ICreationNode_Body, IGenericNode
+    internal abstract class BaseFunctionDeclarationNode : ParseNodeCollection, ICreationNode_Type, ICreationNode_Body, IGenericDeclaration
     {
-        public override NodeType NodeType => NodeType.MethodDeclaration;
+        protected readonly DescriberNode describer;
+        public DescriberNode Describer { get => describer; }
 
-        public Node Describer { get => Children[0]; }
-        public Node Type { get => Children[1]; }
+        protected readonly TypeNode type;
+        public TypeNode Type { get => type; }
 
-        public virtual Node Name  { get => Children[2]; }
-        public virtual Node Arguments { get => Children[3]; }
-        public virtual Node Body { get => Children[4]; }
+        protected readonly FunctionParamatersNode arguments;
+        public FunctionParamatersNode Arguments { get => arguments; }
 
-        private int genericIndex = -1;
-        public Node Generic { get => genericIndex == -1 ? null : Children[genericIndex]; }
+        protected readonly ParseNode body;
+        public ParseNode Body { get => body; }
 
-        public BaseFunctionDeclarationNode(Node _describer, Node _returnType, Node _name, Node _arguments, Node _body)
+        protected readonly GenericDeclarationNode generic;
+        public GenericDeclarationNode Generic { get => generic; }
+
+        public BaseFunctionDeclarationNode(DescriberNode _describer, TypeNode _type, FunctionParamatersNode _arguments, ParseNode _body) : base(_describer, _type, _arguments, _body)
         {
-            Children = new List<Node>() { _describer, _returnType, _name, _arguments, _body };
+            describer = _describer;
+
+            type = _type;
+            arguments = _arguments;
+
+            body = _body;
+            generic = null;
         }
 
-        public override Node AddChild(Node _node)
+        public BaseFunctionDeclarationNode(DescriberNode _describer, TypeNode _type, FunctionParamatersNode _arguments, ParseNode _body, GenericDeclarationNode _generic) : base(_describer, _type, _arguments, _body, _generic)
         {
-            Children.Add(_node);
-            if (_node.NodeType == NodeType.Generic)
-                genericIndex = Children.Count - 1;
+            describer = _describer;
 
-            return this;
+            type = _type;
+            arguments = _arguments;
+
+            body = _body;
+            generic = _generic;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
     }
 }

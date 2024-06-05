@@ -34,32 +34,34 @@ using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.Describers;
 using Sugar.Language.Parsing.Nodes.NodeGroups;
-using Sugar.Language.Parsing.Nodes.UDDataTypes;
+using Sugar.Language.Parsing.Nodes.Expressions;
+using Sugar.Language.Parsing.Nodes.Values.Invalid;
+using Sugar.Language.Parsing.Nodes.DataTypes;
 using Sugar.Language.Parsing.Nodes.Types.Enums;
-using Sugar.Language.Parsing.Nodes.InvalidNodes;
 using Sugar.Language.Parsing.Nodes.Types.Subtypes;
 using Sugar.Language.Parsing.Nodes.CtrlStatements;
 using Sugar.Language.Parsing.Nodes.TryCatchFinally;
 using Sugar.Language.Parsing.Nodes.Values.Generics;
 using Sugar.Language.Parsing.Nodes.Functions.Calling;
-using Sugar.Language.Parsing.Nodes.UDDataTypes.Enums;
-using Sugar.Language.Parsing.Nodes.Expressions.Lambdas;
+using Sugar.Language.Parsing.Nodes.DataTypes.Enums;
+using Sugar.Language.Parsing.Nodes.Expressions.Invalid;
 using Sugar.Language.Parsing.Nodes.Functions.Properties;
 using Sugar.Language.Parsing.Nodes.Expressions.Operative;
 using Sugar.Language.Parsing.Nodes.TryCatchFinally.Blocks;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations;
 using Sugar.Language.Parsing.Nodes.Expressions.Associative;
-using Sugar.Language.Parsing.Nodes.UDDataTypes.Inheritance;
 using Sugar.Language.Parsing.Nodes.Conditions.IfConditions;
-using Sugar.Language.Parsing.Nodes.InvalidNodes.Structure;
 using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
 using Sugar.Language.Parsing.Nodes.Functions.Calling.Structure;
 using Sugar.Language.Parsing.Nodes.Conditions.SwitchConditions;
-using Sugar.Language.Parsing.Nodes.Values.Generics.Declarations;
 using Sugar.Language.Parsing.Nodes.Functions.Properties.Accessors;
 using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
-using Sugar.Language.Parsing.Nodes.Statements.VariableCreation.Delegates;
+
 using Sugar.Language.Parsing.Nodes.Functions.Declarations.OperatorOverloading;
+using Sugar.Language.Parsing.Nodes.Values.Generics.Invalid;
+using Sugar.Language.Parsing.Nodes.Types.Invalid;
+using Sugar.Language.Parsing.Nodes.Statements.VariableCreation.Properties;
+using Sugar.Language.Parsing.Nodes.Declarations.Delegates;
 
 namespace Sugar.Language.Parsing.Parser
 {
@@ -272,12 +274,13 @@ namespace Sugar.Language.Parsing.Parser
         {
             sourceFile = _source;
 
-            var nodes = new List<Node>();
+            var nodes = new List<ParseNode>();
             for (index = 0; index < sourceFile.TokenCount; index++)
             {
+                
                 var toAdd = ParseStatement();
 
-                if (toAdd.NodeType != NodeType.Empty)
+                if (toAdd.NodeType != ParseNodeType.Empty)
                     nodes.Add(toAdd);
             }
 
@@ -287,9 +290,9 @@ namespace Sugar.Language.Parsing.Parser
                 sourceFile.WithSyntaxTree(new SyntaxTree(new SugarFileGroupNode(nodes)));
         }
 
-        private Node ParseStatement() => ParseStatement(StatementEnum.Scope | StatementEnum.GeneralStatement);
+        private ParseNode ParseStatement() => ParseStatement(StatementEnum.Scope | StatementEnum.GeneralStatement);
 
-        private Node ParseStatement(StatementEnum statementType)
+        private ParseNode ParseStatement(StatementEnum statementType)
         {
             var current = Current;
 
@@ -297,7 +300,7 @@ namespace Sugar.Language.Parsing.Parser
             {
                 case SyntaxKind.FlowerOpenBracket:
                     if (!Match(StatementEnum.Scope))
-                        return ReturnInvalidTokenNode(SeperatorKind.Any);
+                        return new InvalidEntityNode(PushInvalidCurrentException(), PanicModeSimple(SeperatorKind.None));
 
                     return ParseScope();
                 case SyntaxKind.Lambda:
@@ -305,12 +308,12 @@ namespace Sugar.Language.Parsing.Parser
                     if (Match(StatementEnum.LambdaStatement))
                         return ParseStatement(false, SeperatorKind.Semicolon);
                     else if (Match(StatementEnum.LambdaExpression))
-                        return new LambdaExpression(ParseExpression(false, false, SeperatorKind.Semicolon));
+                        return new LambdaNode(ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
                     else
-                        return ReturnInvalidTokenNode(SeperatorKind.Any);
+                        return new InvalidStatementNode(PushInvalidStatementException(), PanicModeSimple(SeperatorKind.None));
                 default:
                     if(!Match(StatementEnum.StandaloneStatement))
-                        return ReturnInvalidTokenNode(SeperatorKind.Any);
+                        return new InvalidStatementNode(PushInvalidStatementException(), PanicModeSimple(SeperatorKind.None));
 
                     return ParseStatement(Match(StatementEnum.EmptyStatement), SeperatorKind.Semicolon);
             }
@@ -318,7 +321,7 @@ namespace Sugar.Language.Parsing.Parser
             bool Match(StatementEnum match) => (statementType & match) == match;            
         }
 
-        private Node ParseStatement(bool readEmty, SeperatorKind breakOutSeperators)
+        private ParseNode ParseStatement(bool readEmty, SeperatorKind breakOutSeperators)
         {
             switch (Current.Type)
             {
@@ -329,22 +332,32 @@ namespace Sugar.Language.Parsing.Parser
                 case TokenType.UnaryOperator:
                     var unaryOperator = Current as Operator;
                     index++;
-                    return new UnaryExpression(unaryOperator, ParseEntity(false, SeperatorKind.Semicolon));
+                    var expression = new UnaryExpression(unaryOperator, ParseEntity(false, SeperatorKind.Semicolon));
+
+                    TryMatchCurrent(Seperator.Semicolon);
+                    return expression;
                 case TokenType.Seperator:
                     if (readEmty && MatchBreakOutSeperator(Current, breakOutSeperators))
                         return new EmptyNode();
                     else if (TryMatchCurrent(Seperator.BoxOpenBracket))
                         return ParseDescriberStatement(breakOutSeperators);
                     else
-                        return ReturnInvalidTokenNode(breakOutSeperators);
+                        return new InvalidStatementNode(PushInvalidStatementException(), PanicModeSimple(breakOutSeperators));
                 default:
-                    return ReturnInvalidTokenNode(breakOutSeperators);
+                    return new InvalidStatementNode(PushInvalidStatementException(), PanicModeSimple(breakOutSeperators));
             }
         }
 
-        private Node ParseScope()
+        //Expressions and Entities
+
+        /// <summary>
+        /// Parse Scope (can be empty)
+        /// <para>• Force starts at opening { </para>
+        /// • Ends on same index as closing } 
+        /// </summary>
+        private ParseNode ParseScope()
         {
-            var nodes = new List<Node>();
+            var nodes = new List<ParseNode>();
             ForceMatchCurrent(Seperator.FlowerOpenBracket, true);
 
             for (; index < sourceFile.TokenCount; index++)
@@ -353,12 +366,13 @@ namespace Sugar.Language.Parsing.Parser
                     break;
 
                 var stmt = ParseStatement();
-                if (stmt.NodeType != NodeType.Empty)
+                if (stmt.NodeType != ParseNodeType.Empty)
                     nodes.Add(stmt);
             }
 
             TryMatchCurrent(Seperator.FlowerCloseBracket);
-            switch (nodes.Count)
+
+            switch(nodes.Count)
             {
                 case 0:
                     return new EmptyNode();
@@ -369,9 +383,9 @@ namespace Sugar.Language.Parsing.Parser
             }
         }
 
-        private Node ParseDescriberStatement(SeperatorKind breakOutSeperators)
+        private ParseNode ParseDescriberStatement(SeperatorKind breakOutSeperators)
         {
-            Node toReturn;
+            ParseNode toReturn;
             DescriberNode describer = ParseDescribers();
 
             switch (Current.Type)
@@ -398,16 +412,16 @@ namespace Sugar.Language.Parsing.Parser
                                 case SyntaxKind.Var:
                                     index++;
                                     TryMatchCurrent(Seperator.Colon, true);
-                                    toReturn = ParseVariableDeclaration(new DescriberNode(), new AnonymousTypeNode());
+                                    toReturn = ParseVariableDeclaration(describer, new AnonymousTypeNode());
                                     break;
                                 case SyntaxKind.Action:
-                                    toReturn = ParseActionDelegateDeclaration(new DescriberNode());
+                                    toReturn = ParseActionDelegateDeclaration(describer);
                                     break;
                                 case SyntaxKind.Function:
-                                    toReturn = ParseFunctionDelegateDeclaration(new DescriberNode());
+                                    toReturn = ParseActionDelegateDeclaration(describer);
                                     break;
                                 default:
-                                    return ReturnInvalidTokenNode(breakOutSeperators);
+                                    return new InvalidEntityNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators));
                             }
                             break;
                         case KeywordType.Type:
@@ -417,20 +431,25 @@ namespace Sugar.Language.Parsing.Parser
                                 return toReturn;
                             break;
                         default:
-                            return ReturnInvalidTokenNode(breakOutSeperators);
+                            return new InvalidEntityNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators));
                     }
                     break;
                 default:
-                    return ReturnInvalidTokenNode(breakOutSeperators);
+                    return new InvalidEntityNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators));
             }
 
             TryMatchBreakOutSeperator(breakOutSeperators);
             return toReturn;
         }
 
+        /// <summary>
+        /// Parse Describer
+        /// <para>• Force starts at opening [ </para>
+        /// • Ends one index after closing ]
+        /// </summary>
         private DescriberNode ParseDescribers()
         {
-            var describers = new List<Node>();
+            var describer = new DescriberNode();
             ForceMatchCurrent(Seperator.BoxOpenBracket, true);
 
             while (index < sourceFile.TokenCount)
@@ -442,31 +461,34 @@ namespace Sugar.Language.Parsing.Parser
                     var keyword = (Keyword)Current;
 
                     if (keyword.KeywordType == KeywordType.Describer)
-                        describers.Add(new DescriberKeywordNode(Current as Keyword));
-                    else
-                        describers.Add(PushInvalidToken(current));
-                }
-                else
-                    describers.Add(PanicModeSimple(PushInvalidTokenException(current), SeperatorKind.BoxCloseBracket));
+                    {
+                        describer.AddChild(new DescriberKeywordNode(keyword));
 
-                index++;
-                if (MatchCurrent(Seperator.BoxCloseBracket, true))
-                {
-                    if (MatchCurrent(Seperator.BoxOpenBracket, true))
+                        index++;
+                        if (MatchCurrent(Seperator.BoxCloseBracket, true))
+                        {
+                            if (MatchCurrent(Seperator.BoxOpenBracket, true))
+                                continue;
+
+                            break;
+                        }
+
+                        TryMatchCurrent(Seperator.Comma, true);
                         continue;
-
-                    break;
+                    }
                 }
 
-                TryMatchCurrent(Seperator.Comma, true);
+                describer.AddChild(new InvalidDescriberNode(PanicModeSimple(SeperatorKind.BoxCloseBracket), PushInvalidTokenException(current)));
+                MatchCurrent(Seperator.BoxCloseBracket, true);
+                break;
             }
 
-            return new DescriberNode(describers);
+            return describer;
         }
 
-        private Node ParseKeyword(SeperatorKind breakOutSeperators)
+        private ParseNode ParseKeyword(SeperatorKind breakOutSeperators)
         {
-            Node toReturn;
+            ParseNode toReturn;
 
             var current = Current;
             switch (current.SyntaxKind)
@@ -478,15 +500,13 @@ namespace Sugar.Language.Parsing.Parser
                     break;
                 case SyntaxKind.Print:
                     toReturn = ParsePrintCall();
-                    index++;
                     break;
                 case SyntaxKind.Input:
-                    toReturn = ParseInputCall();
-                    index++;
+                    toReturn = ParseInputCall(false);
                     break;
                 case SyntaxKind.Throw:
                     index++;
-                    toReturn = new ThrowExceptionNode(ParseExpression(false, false, SeperatorKind.Semicolon));
+                    toReturn = new ThrowExceptionNode(ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
                     break;
                 case SyntaxKind.Var:
                     index++;
@@ -526,6 +546,10 @@ namespace Sugar.Language.Parsing.Parser
                 case SyntaxKind.Function:
                     toReturn = ParseFunctionDelegateDeclaration(new DescriberNode());
                     break;
+                case SyntaxKind.Constructor:
+                    index++;
+                    toReturn = ParseConstructorDeclaration(new DescriberNode(), new ConstructorTypeNode(ParseType(SeperatorKind.OpenBracket)));
+                    break;
                 default:
                     switch (((Keyword)current).KeywordType)
                     {
@@ -540,7 +564,7 @@ namespace Sugar.Language.Parsing.Parser
                         case KeywordType.Function:
                             return ParseFunctionKeyword(new DescriberNode());
                         default:
-                            return ReturnInvalidTokenNode(breakOutSeperators);
+                            return new InvalidEntityNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators));
                     }
                     break;
             }
@@ -549,7 +573,7 @@ namespace Sugar.Language.Parsing.Parser
             return toReturn;
         }
 
-        private Node ParseFunctionKeyword(Node describer)
+        private ParseNode ParseFunctionKeyword(DescriberNode describer)
         {
             switch (Current.SyntaxKind)
             {
@@ -562,40 +586,38 @@ namespace Sugar.Language.Parsing.Parser
                     return ParseFunctionDeclaration(describer, new VoidNode());
                 case SyntaxKind.Constructor:
                     index++;
-                    ForceMatchCurrentType(TokenType.Identifier);
-
-                    return ParseFunctionDeclaration(describer, new ConstructorTypeNode(new CustomTypeNode(new IdentifierNode((Identifier)Current))));
+                    return ParseConstructorDeclaration(describer, new ConstructorTypeNode(ParseType(SeperatorKind.OpenBracket)));
                 default:
                     return ParseConversionOverload(describer);
             }
         }
 
-        private Node ParseIdentifier(SeperatorKind breakOutSeperators)
+        private ParseNode ParseIdentifier(SeperatorKind breakOutSeperators)
         {
-            var variable = ParseEntity(false, SeperatorKind.Any);
+            var variable = ParseEntity(false, SeperatorKind.None);
             var node = variable;
 
             while (true)
-                if (node.NodeType == NodeType.Dot)
+                if (node.NodeType == ParseNodeType.Dot)
                     node = ((DotExpression)node).RHS;
                 else
                     break;
 
-            Node toReturn = null;
+            ParseNode toReturn = null;
             switch (node.NodeType)
             {
-                case NodeType.FunctionCall:
-                    index++;
+                case ParseNodeType.FunctionCall:
                     toReturn = variable;
+                    index++;
                     break;
-                case NodeType.Type:
+                case ParseNodeType.Type:
                     toReturn = ParseDeclaration(new DescriberNode(), variable as TypeNode);
 
                     if (MatchFunctionPropertyDeclaration(toReturn))
                         return toReturn;
                     break;
-                case NodeType.Indexer:
-                case NodeType.Variable:
+                case ParseNodeType.Indexer:
+                case ParseNodeType.Variable:
                     var next = LookAhead();
                     switch (next.Type)
                     {
@@ -608,7 +630,15 @@ namespace Sugar.Language.Parsing.Parser
                             toReturn = ParseVariableAssignment(variable, next as AssignmentOperator, breakOutSeperators);
                             break;
                         default:
-                            toReturn = ParseDeclaration(new DescriberNode(), new CustomTypeNode(variable));
+                            if(next.SyntaxKind == SyntaxKind.Lambda)
+                            {
+                                index += 2;
+                                toReturn = new AssignmentNode(variable, ParseDelegateDeclaration(new DescriberNode()));
+
+                                break;
+                            }
+
+                            toReturn = ParseDeclaration(new DescriberNode(), new CreatedTypeNode(variable));
 
                             if (MatchFunctionPropertyDeclaration(toReturn))
                                 return toReturn;
@@ -621,144 +651,157 @@ namespace Sugar.Language.Parsing.Parser
             return toReturn;
         }
 
-        private bool MatchFunctionPropertyDeclaration(Node node)
+        private bool MatchFunctionPropertyDeclaration(ParseNode node)
         {
             switch(node.NodeType)
             {
-                case NodeType.MethodDeclaration:
-                case NodeType.PropertyInitialise:
-                case NodeType.PropertyDeclaration:
+                case ParseNodeType.PropertyInitialise:
+                case ParseNodeType.PropertyDeclaration:
+                case ParseNodeType.FunctionDeclaration:
                     return true;
                 default:
                     return false;
             }
         }
 
-        private Node ParseDeclaration(DescriberNode describer) => ParseDeclaration(describer, ParseType(SeperatorKind.Any));
+        private ParseNode ParseDeclaration(DescriberNode describer) => ParseDeclaration(describer, ParseType(SeperatorKind.None));
 
-        private Node ParseDeclaration(DescriberNode describer, Node typeNode)
+        private ParseNode ParseDeclaration(DescriberNode describer, TypeNode typeNode)
         {
             index++;
 
             if (MatchCurrent(Seperator.Colon, true))
                 return ParseVariableDeclaration(describer, typeNode);
             else if (MatchCurrentType(TokenType.Identifier))
-                return ParseFunctionDeclaration(describer, (TypeNode)typeNode);
+                return ParseFunctionDeclaration(describer, typeNode);
             else
-                return ReturnInvalidTokenNode(SeperatorKind.Any);
+                return new InvalidEntityNode(PushInvalidCurrentException(), PanicModeSimple(SeperatorKind.None));
         }
 
-        private Node ParseVariableDeclaration(DescriberNode _describer, Node _type)
+        private ParseNode ParseVariableDeclaration(DescriberNode describer, TypeNode type)
         {
-            List<Node> assignNodes = new List<Node>();
-
             if (LookAhead() == Seperator.FlowerOpenBracket)
-                assignNodes.Add(ParseVariableInitialisation(_describer, _type, ParseProperty(_type, ParseIdentifier()), true));
+            {
+                var identifier = ParseIdentifier(true);
+                var property = ParseProperty(describer, type);
+
+                if (LookAhead() == AssignmentOperator.Assignment)
+                {
+                    index += 2;
+                    return new PropertyInitialisationNode(describer, type, identifier, property, ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
+
+                }
+                else
+                    return new PropertyDeclarationNode(describer, type, identifier, property);
+            }
             else
             {
+                List<DeclarationNode> declarations = new List<DeclarationNode>();
+
+                IdentifierNode identifier;
                 while (index < sourceFile.TokenCount)
                 {
-                    assignNodes.Add(ParseVariableInitialisation(_describer, _type, ParseIdentifier(), false));
+                    identifier = ParseIdentifier(true);
 
+                    if (MatchCurrent(AssignmentOperator.Assignment))
+                    {
+                        index++;
+                        declarations.Add(new InitializeNode(describer, type, identifier, ParseNonEmptyExpression(false, SeperatorKind.Semicolon | SeperatorKind.Comma)));
+                    }
+                    else
+                        declarations.Add(new DeclarationNode(describer, type, identifier));
+                    
                     if (MatchCurrent(Seperator.Comma, true))
                         continue;
 
                     break;
                 }
-            }
 
-            switch (assignNodes.Count)
-            {
-                case 1:
-                    return assignNodes[0];
-                default:
-                    return new CompoundVariableDeclarationNode(assignNodes);
+               
+                switch (declarations.Count)
+                {
+                    case 1:
+                        return declarations[0];
+                    default:
+                        return new CompoundVariableDeclarationNode(declarations);
+                }
             }
         }
 
-        private Node ParseVariableInitialisation(DescriberNode describer, Node _type, Node _variableNode, bool isProperty)
-        {
-            var next = LookAhead();
-
-            if (next != AssignmentOperator.Assignment)
-            {
-                if (!isProperty)
-                    index++;
-
-                return new DeclarationNode(describer, _type, _variableNode);
-            }
-
-            index += 2;
-            return new InitializeNode(describer, _type, _variableNode, ParseExpression(false, false, SeperatorKind.Semicolon | (isProperty ? SeperatorKind.Any : SeperatorKind.Comma)));
-        }
-
-        private Node ParseVariableAssignment(Node variable, AssignmentOperator assignmentOperator, SeperatorKind breakOutSeperators)
+        private ParseNodeCollection ParseVariableAssignment(ParseNodeCollection variable, AssignmentOperator assignmentOperator, SeperatorKind breakOutSeperators)
         {
             index++;
-            var expresssion = ParseExpression(false, true, breakOutSeperators);
-
-            if (Current.Type == TokenType.AssignmentOperator)
+            if(assignmentOperator.BaseOperator == null)
+                return ParseMultiVariableAssignment(variable, breakOutSeperators);
+            else
             {
-                TryMatchCurrent(AssignmentOperator.Assignment);
-
-                if(!CheckVariable(expresssion))
-                    expresssion = PushInvalidEntityNodeCurrent(expresssion, NodeType.Variable);
-
-                expresssion = ParseVariableAssignment(expresssion, AssignmentOperator.Assignment, breakOutSeperators);
+                var expression = ParseNonEmptyExpression(false, breakOutSeperators);
+                return new AssignmentNode(variable, expression); 
             }
-
-            expresssion = assignmentOperator.BaseOperator == null ? expresssion : new BinaryExpression(assignmentOperator.BaseOperator, variable, expresssion);
-            return new AssignmentNode(variable, expresssion);
         }
 
-        private Node ParseImportStatement()
+        private ParseNodeCollection ParseMultiVariableAssignment(ParseNodeCollection variable, SeperatorKind breakOutSeperators)
+        {
+            var expression = ParseNonEmptyExpression(true, breakOutSeperators);
+
+            if (MatchCurrent(AssignmentOperator.Assignment))
+            {
+                if (!CheckVariable(expression))
+                    expression = new InvalidVariableNode(PushExpectedCurrentException("Variable"), expression);
+
+                index++;
+                expression = ParseMultiVariableAssignment(expression, breakOutSeperators);
+            }
+
+            return new AssignmentNode(variable, expression);
+        }
+
+        private ImportNode ParseImportStatement()
         {
             index++;
-            UDDataType entityType;
+            CreationType entityType;
 
             var current = Current;
             switch (current.SyntaxKind)
             {
                 case SyntaxKind.Enum:
-                    entityType = UDDataType.Enum;
+                    entityType = CreationType.Enum;
                     break;
                 case SyntaxKind.Class:
-                    entityType = UDDataType.Class;
+                    entityType = CreationType.Class;
                     break;
                 case SyntaxKind.String:
-                    entityType = UDDataType.Struct;
+                    entityType = CreationType.Struct;
                     break;
                 case SyntaxKind.Interface:
-                    entityType = UDDataType.Interface;
+                    entityType = CreationType.Interface;
                     break;
                 default:
-                    entityType = UDDataType.Namespace;
+                    entityType = CreationType.Namespace;
                     break;
             }
 
-            if (entityType != UDDataType.Namespace)
+            if (entityType != CreationType.Namespace)
                 index++;
 
-            return new ImportNode(UDDataType.Namespace, ParseVariable(SeperatorKind.Semicolon));
+            return new ImportNode(entityType, ParseVariable(SeperatorKind.Semicolon));
         }
 
-        private Node ParseTryCatchBlock()
+        private TryCatchFinallyBlockNode ParseTryCatchBlock()
         {
             ForceMatchCurrent(Keyword.Try, true);
-            var tryBlock = new TryBlockNode(ParseStatement(StatementEnum.GeneralStatement | StatementEnum.Scope));
+            TryBlockNode tryBlock = new TryBlockNode(ParseStatement(StatementEnum.GeneralStatement | StatementEnum.Scope));
             index++;
 
-            Node catchBlock = null, finallyBlock = null;
+            CatchBlockNode catchBlock = null;
+            FinallyBlockNode finallyBlock = null;
             if (MatchCurrent(Keyword.Catch, true))
             {
-                Node arguments;
+                FunctionParamatersNode arguments;
                 if (MatchCurrent(Seperator.OpenBracket))
-                {
-                    arguments = new CatchBlockArgumentsNode(ParseDeclarationArguments());
-                    index++;
-                }
+                    arguments = ParseFunctionParameters();
                 else
-                    arguments = new CatchBlockArgumentsNode();
+                    arguments = new FunctionParamatersNode();
 
                 catchBlock = new CatchBlockNode(arguments, ParseStatement(StatementEnum.GeneralStatement | StatementEnum.Scope));
                 index++;
@@ -767,100 +810,72 @@ namespace Sugar.Language.Parsing.Parser
             if (MatchCurrent(Keyword.Finally, true))
                 finallyBlock = new FinallyBlockNode(ParseStatement(StatementEnum.GeneralStatement | StatementEnum.Scope));
 
-            return new TryCatchFinallyBlockNode(tryBlock, catchBlock, finallyBlock);
+            if (catchBlock == null)
+            {
+                if (finallyBlock == null)
+                    return new InvalidTryCatchFinallyNode(PushExpectedCurrentException("catch of finally"), tryBlock);
+                else
+                    return new TryCatchFinallyBlockNode(tryBlock, finallyBlock);
+            }
+            else if (finallyBlock == null)
+                return new TryCatchFinallyBlockNode(tryBlock, catchBlock);
+            else
+                return new TryCatchFinallyBlockNode(tryBlock, catchBlock, finallyBlock);
         }
 
-        private Node ParseActionDelegateDeclaration(Node describer)
+        private DelegateDeclarationNode ParseActionDelegateDeclaration(DescriberNode describer)
         {
             ForceMatchCurrent(Keyword.Action, true);
+
             TryMatchCurrent(Seperator.Colon, true);
+            var identifer = ParseIdentifier(true);
 
-            var name = ParseIdentifier();
-
-            index++;
-            if (MatchCurrent(AssignmentOperator.Assignment, true))
-            {
-                if (MatchCurrent(Seperator.OpenBracket))
-                {
-                    var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
-                    index++;
-
-                    TryMatchCurrent(Seperator.Lambda, true);
-
-                    var body = ParseStatement(StatementEnum.Scope);
-
-                    index++;
-                    return new ActionDelegateNode(describer, name, arguments, body);
-                }
-                else
-                    return new ActionDelegateNode(describer, name, ParseVariable(SeperatorKind.Semicolon), new EmptyNode());
-            }
-            else
-            {
-                CompileException exception;
-                if (index >= sourceFile.TokenCount)
-                    exception = new TokenExpectedException(AssignmentOperator.Assignment, Final);
-                else
-                    exception = new TokenExpectedException(AssignmentOperator.Assignment, Current);
-
-                return PanicModeSimple(exception, SeperatorKind.Any);
-            }
+            TryMatchCurrent(Seperator.Lambda, true);
+            return new DelegateDeclarationNode(describer, new ActionTypeNode(), identifer, ParseDelegateDeclaration(describer));
         }
 
-        private Node ParseFunctionDelegateDeclaration(Node describer)
+        private DelegateDeclarationNode ParseFunctionDelegateDeclaration(DescriberNode describer)
         {
             ForceMatchCurrent(Keyword.Function);
             var type = new FunctionTypeNode(ParseGenericCall(true));
+
             index++;
- 
             TryMatchCurrent(Seperator.Colon, true);
+            var identifer = ParseIdentifier(true);
 
-            var name = ParseIdentifier();
-            index++;
-
-            if (MatchCurrent(AssignmentOperator.Assignment, true))
-            {
-                if (MatchCurrent(Seperator.OpenBracket))
-                {
-                    var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
-                    index++;
-
-                    TryMatchCurrent(Seperator.Lambda, true);
-
-                    var body = ParseStatement(StatementEnum.Scope);
-
-                    index++;
-                    return new FunctionDelegateNode(describer, type, name, arguments, body);
-                }
-                else
-                    return new FunctionDelegateNode(describer, type, name, ParseVariable(SeperatorKind.Semicolon), new EmptyNode());
-            }
-            else
-            {
-                CompileException exception;
-                if (index >= sourceFile.TokenCount)
-                    exception = new TokenExpectedException(AssignmentOperator.Assignment, Final);
-                else
-                    exception = new TokenExpectedException(AssignmentOperator.Assignment, Current);
-
-                return PanicModeSimple(exception, SeperatorKind.Any);
-            }
+            TryMatchCurrent(Seperator.Lambda, true);
+            return new DelegateDeclarationNode(describer, type, identifer, ParseDelegateDeclaration(describer));
         }
 
-        private Node ReturnInvalidTokenNode(SeperatorKind breakOutSeperators)
+        private DelegateNode ParseDelegateDeclaration(DescriberNode describer)
         {
-            var current = Current;
-            var exception = new InvalidTokenException(current);
-            sourceFile.PushException(exception);
+            FunctionParamatersNode paramaters = ParseFunctionParameters();
 
-            return PanicModeSimple(exception, breakOutSeperators);
+            GenericDeclarationNode generic = null;
+            if (MatchToken(BinaryOperator.LesserThan, LookAhead(), true))
+                generic = ParseGenericDeclaration();
+
+            DelegateNode toReturn;
+            if (generic == null)
+                toReturn =  new DelegateNode(describer, paramaters, ParseStatement(StatementEnum.Scope));
+            else
+                toReturn = new DelegateNode(describer, paramaters, ParseStatement(StatementEnum.Scope), generic);
+
+            MatchCurrent(Seperator.FlowerCloseBracket, true);
+            return toReturn;
         }
 
         //Expressions and Entities
-        private Node ParseExpression(bool readEmpty, bool readAssignment, SeperatorKind breakOutSeperators)
+
+        /// <summary>
+        /// Parse Expression (can be empty)
+        /// <para>• Ends on same index as <paramref name="breakOutSeperators"/></para>
+        /// • if <paramref name="readAssignment"/> is set to true, ends one index after =
+        /// </summary>
+        private ParseNode ParseExpression(bool readAssignment, SeperatorKind breakOutSeperators)
         {
-            var output = new List<Node>();
             var stack = new List<Token>();
+            var output = new List<ParseNodeCollection>();
             TokenType expected = TokenType.Constant | TokenType.Identifier | TokenType.Seperator | TokenType.UnaryOperator | TokenType.Keyword;
 
             bool breakOut = false, invalid = false;
@@ -882,11 +897,11 @@ namespace Sugar.Language.Parsing.Parser
                                     break;
                                 case SyntaxKind.This:
                                     index++;
-                                    ForceMatchCurrent(Seperator.Dot, true);
-                                    output.Add(new ThisNode(ParseEntity(true, SeperatorKind.Any)));
+                                    TryMatchCurrent(Seperator.Dot, true);
+                                    output.Add(new ThisNode(ParseEntity(true, SeperatorKind.None)));
                                     break;
                                 case SyntaxKind.Input:
-                                    output.Add(ParseInputCall());
+                                    output.Add(ParseInputCall(true));
                                     break;
                                 case SyntaxKind.Default:
                                     output.Add(ParseDefault());
@@ -897,7 +912,7 @@ namespace Sugar.Language.Parsing.Parser
                                 default:
                                     if (((Keyword)current).KeywordType == KeywordType.Type)
                                     {
-                                        output.Add(ParseEntity(true, SeperatorKind.Any));
+                                        output.Add(ParseEntity(true, SeperatorKind.None));
                                         break;
                                     }
                                     invalid = breakOut = true;
@@ -907,11 +922,11 @@ namespace Sugar.Language.Parsing.Parser
                             expected = TokenType.Seperator | TokenType.Operator;
                             break;
                         case TokenType.Constant:
-                            output.Add(ParseEntity(true, SeperatorKind.Any));
+                            output.Add(ParseEntity(true, SeperatorKind.None));
                             expected = TokenType.Seperator | TokenType.BinaryOperator;
                             break;
                         case TokenType.Identifier:
-                            output.Add(ParseEntity(true, SeperatorKind.Any));
+                            output.Add(ParseEntity(true, SeperatorKind.None));
                             expected = TokenType.Seperator | TokenType.Operator;
                             break;
                         case TokenType.Seperator:
@@ -923,7 +938,7 @@ namespace Sugar.Language.Parsing.Parser
 
                             if (MatchToken(Seperator.OpenBracket, current, true))
                             {
-                                output.Add(ParseExpression(false, false, SeperatorKind.CloseBracket));
+                                output.Add(ParseNonEmptyExpression(false, SeperatorKind.CloseBracket));
                                 expected = TokenType.Operator | TokenType.Seperator;
                             }
                             else if (MatchToken(Seperator.Questionmark, current, true))
@@ -1021,8 +1036,13 @@ namespace Sugar.Language.Parsing.Parser
                 {
                     ClearStack(output, stack);
 
-                    if(invalid)
-                        output.Add(ParseInvalidExpression(expected, current, breakOutSeperators));
+                    if (invalid)
+                    {
+                        if ((expected & TokenType.Seperator) == TokenType.Seperator)
+                            output.Add(new InvalidExpressionNode(PushExpectedTokenException($"{breakOutSeperators}", current), PanicModeSimple(breakOutSeperators)));
+                        else
+                            output.Add(new InvalidExpressionNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators)));
+                    }
 
                     break;
                 }
@@ -1030,49 +1050,15 @@ namespace Sugar.Language.Parsing.Parser
                 index++;
             }
 
-            if (breakOut)
-            {
-                switch(output.Count)
-                {
-                    case 0:
-                        if (readEmpty)
-                        {
-                            output.Add(new EmptyNode());
-                            break;
-                        }
-
-                        CompileException exception;
-                        if (index >= sourceFile.TokenCount)
-                            exception = new TokenExpectedException($"{breakOutSeperators}", Final);
-                        else
-                            exception = new TokenExpectedException(expected, Current);
-
-                        sourceFile.PushException(exception);
-                        output.Add(new InvalidExpressionNode(exception));
-                        break;
-                    case 2:
-                        if(invalid)
-                        {
-                            var invalidNode = output.Pop();
-
-                            var invalidExpression = new InvalidExpressionNode(new UnparsedTokenCollectionNode(stack), output.Pop(), invalidNode);
-                            output.Add(invalidExpression);
-                        }
-                        break;
-                }
-            }
-            else
-            {
-                if (index >= sourceFile.TokenCount)
-                    sourceFile.PushException(new TokenExpectedException($"{breakOutSeperators}", Final));
-                else
-                    sourceFile.PushException(new TokenExpectedException($"{breakOutSeperators}", Current));
-            }
+            if (breakOut && output.Count == 0)
+                return new EmptyNode();
+            else if (index >= sourceFile.TokenCount)
+                PushExpectedCurrentException($"{breakOutSeperators}");
 
             return output[0];
         }
 
-        private Node ParseExpression(Operator top, List<Node> output)
+        private ParseNodeCollection ParseExpression(Operator top, List<ParseNodeCollection> output)
         {
             if (top.Type == TokenType.UnaryOperator)
             {
@@ -1090,13 +1076,13 @@ namespace Sugar.Language.Parsing.Parser
                 if (top == BinaryOperator.DotOperator)
                     return new DotExpression(lhs, rhs);
                 else if (top == BinaryOperator.AsCastOperator)
-                    return new CastExpression(lhs, rhs);
+                    return new CastExpression(lhs, (TypeNode)rhs);
                 else
                     return new BinaryExpression(top, lhs, rhs);
             }
         }
 
-        private Node ParseExpression(Operator current, List<Node> output, List<Token> stack)
+        private ParseNodeCollection ParseExpression(Operator current, List<ParseNodeCollection> output, List<Token> stack)
         {
             var top = (Operator)stack[stack.Count - 1];
             if (current.Precedence < top.Precedence && !(top.Precedence == current.Precedence && current.LeftAssociative))
@@ -1105,115 +1091,126 @@ namespace Sugar.Language.Parsing.Parser
             return ParseExpression(top, output);
         }
 
-        private void ClearStack(List<Node> output, List<Token> stack)
+        /// <summary>
+        /// Parse Expression (non empty)
+        /// <para>• Ends on same index as <paramref name="breakOutSeperators"/></para>
+        /// • if <paramref name="readAssignment"/> is set to true, ends one index after =
+        /// </summary>
+        private ParseNodeCollection ParseNonEmptyExpression(bool readAssignment, SeperatorKind breakOutSeperators)
         {
-            while (stack.Count > 0)
-            {
-                output.Add(ParseExpression((Operator)stack[stack.Count - 1], output));
-                stack.RemoveAt(stack.Count - 1);
-            }
+            var expression = ParseExpression(readAssignment, breakOutSeperators);
+
+            if (expression.NodeType == ParseNodeType.Empty)
+                return new EmptyExpressionNode(PushInvalidCurrentException());
+            else
+                return (ParseNodeCollection)expression;
         }
 
-        private Node ParseCondition()
+        private void ClearStack(List<ParseNodeCollection> output, List<Token> stack)
         {
-            Node condition;
-            if (TryMatchCurrent(Seperator.OpenBracket, true))
-            {
-                condition = ParseExpression(false, false, SeperatorKind.CloseBracket);
-                index++;
-            }
-            else
-                condition = new InvalidExpressionNode(PushInvalidCurrentException());
+            while (stack.Count > 0)
+                output.Add(ParseExpression((Operator)stack.Pop(), output));
+        }
 
+        /// <summary>
+        /// Parse Condition (non empty)
+        /// <para>• Starts at opening (</para>
+        /// • Ends one index after closing )
+        /// </summary>
+        private ParseNodeCollection ParseCondition()
+        {
+            TryMatchCurrent(Seperator.OpenBracket, true);
+            var condition = ParseNonEmptyExpression(false, SeperatorKind.CloseBracket);
+
+            TryMatchCurrent(Seperator.CloseBracket, true);
             return condition;
         }
 
-        private Node ParseInvalidExpression(TokenType expected, Token current, SeperatorKind breakOutSeperators)
+        /// <summary>
+        /// Parse Ternary (non empty)
+        /// <para>• Ends on same index as <paramref name="breakOutSeperators"/></para>
+        /// </summary>
+        private TernaryExpression ParseTernary(List<ParseNodeCollection> output, List<Token> stack, SeperatorKind breakOutSeperators)
         {
-            CompileException exception;
-            if ((expected & TokenType.Seperator) == TokenType.Seperator)
-                exception = new TokenExpectedException($"{breakOutSeperators}", current);
-            else
-                exception = new InvalidTokenException(current);
-
-            sourceFile.PushException(exception);
-            return PanicModeSimple(exception, breakOutSeperators);
-        }
-
-        private Node ParseTernary(List<Node> output, List<Token> stack, SeperatorKind breakOutSeperators)
-        {
+            ParseNodeCollection condition;
             if (output.Count == 0)
+                condition = new EmptyExpressionNode(PushInvalidCurrentException());
+            else
             {
-                var invalid = ParseInvalidExpression(TokenType.Seperator, Current, breakOutSeperators);
+                ClearStack(output, stack);
 
-                index--;
-                return invalid;
+                condition = output.Pop();
             }
 
-            ClearStack(output, stack);
-
-            var condition = output[output.Count - 1];
-            output.RemoveAt(output.Count - 1);
-
-            var trueExpression = ParseExpression(false, false, SeperatorKind.Colon);
-
+            var trueExpression = ParseNonEmptyExpression(false, SeperatorKind.Colon);
             index++;
-            var falseExpression = ParseExpression(false, false, SeperatorKind.Semicolon | breakOutSeperators);
+            var falseExpression = ParseNonEmptyExpression(false, SeperatorKind.Semicolon | breakOutSeperators);
 
             index--;
             return new TernaryExpression(condition, trueExpression, falseExpression);
         }
 
-        private Node ParseIndexer(Node operhand)
+        /// <summary>
+        /// Parse Indexer (non empty)
+        /// <para>• Force starts on opening [ </para>
+        /// • Ends on same index as closing ]
+        /// </summary>
+        private IndexerExpression ParseIndexer(ParseNodeCollection operhand)
         {
-            index++;
-            var arguments = new List<Node>();
+            ForceMatchCurrent(Seperator.BoxOpenBracket, true);
+
+            var arguments = new ExpressionListNode();
             while (index < sourceFile.TokenCount)
             {
-                arguments.Add(ParseExpression(false, false, SeperatorKind.BoxCloseBracket | SeperatorKind.Comma));
+                arguments.AddChild(ParseNonEmptyExpression(false, SeperatorKind.BoxCloseBracket | SeperatorKind.Comma));
 
                 if (MatchCurrent(Seperator.Comma, true))
                     continue;
                 else if(MatchCurrent(Seperator.BoxCloseBracket))
-                    return new IndexerExpression(operhand, new IndexerArgumentsNode(arguments));
+                    return new IndexerExpression(operhand, arguments);
                 else
                     break;
             }
 
-            CompileException exception;
-            if(index >= sourceFile.TokenCount)
-                exception = new TokenExpectedException(Seperator.BoxCloseBracket, Final);
-            else
-                exception = new TokenExpectedException(Seperator.BoxCloseBracket, Current);
-
-            sourceFile.PushException(exception);
-            return PanicModeSimple(exception, SeperatorKind.BoxCloseBracket);
+            return new InvalidIndexerNode(PushExpectedCurrentException(Seperator.BoxCloseBracket), PanicModeSimple(SeperatorKind.BoxCloseBracket));
         }
 
-        private Node ParseReturn()
+        /// <summary>
+        /// <para>• Force starts on default </para>
+        /// • Ends on index of closing ;
+        /// </summary>
+        private ReturnKeyword ParseReturn()
         {
             ForceMatchCurrent(ControlKeyword.Return, true);
 
             if (MatchCurrent(Seperator.Semicolon))
                 return new ReturnKeyword();
             else
-                return new ReturnKeyword(ParseExpression(false, false, SeperatorKind.Semicolon));
+                return new ReturnKeyword(ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
         }
 
-        private Node ParseDefault()
+        /// <summary>
+        /// <para>• Force starts on default </para>
+        /// • Ends on index of closing )
+        /// </summary>
+        private DefaultValueNode ParseDefault()
         {
             ForceMatchCurrent(Keyword.Default, false);
 
             if (MatchToken(Seperator.OpenBracket, LookAhead()))
             {
                 index += 2;
-                return new DefaultTypeNode(ParseType(SeperatorKind.CloseBracket));
+                return new DefaultValueNode(ParseType(SeperatorKind.CloseBracket));
             }
 
             return new DefaultValueNode();
         }
 
-        private Node ParseAsType()
+        /// <summary>
+        /// <para>• Force starts on AsType </para>
+        /// • Ends on index of closing )
+        /// </summary>
+        private AsTypeNode ParseAsType()
         {
             ForceMatchCurrent(Keyword.AsType, true);
             TryMatchCurrent(Seperator.OpenBracket, true);
@@ -1221,52 +1218,59 @@ namespace Sugar.Language.Parsing.Parser
             return new AsTypeNode(ParseType(SeperatorKind.CloseBracket));
         }
 
-        private Node ParseExpressionList(SeperatorKind finalBreakOut)
+        /// <summary>
+        /// Parse Expression List 
+        /// <para>• Starts on opening seperator </para>
+        /// • Ends on index of closing <paramref name="finalBreakOut"/> if <paramref name="increment"/> is false
+        /// </summary>
+        private ExpressionListNode ParseExpressionList(SeperatorKind finalBreakOut, bool increment = false)
         {
-            var nodes = new List<Node>();
-
             index++;
+            var nodes = new ExpressionListNode();
+ 
+            if(MatchBreakOutSeperator(Current, finalBreakOut))
+            {
+                if (increment)
+                    index++;
+
+                return nodes;
+            }
+
             while (index < sourceFile.TokenCount)
             {
-                if (MatchBreakOutSeperator(Current, finalBreakOut))
-                    break;
-
-                var expression = ParseExpression(false, true, SeperatorKind.Comma | finalBreakOut);
+                var expression = ParseNonEmptyExpression(true, SeperatorKind.Comma | finalBreakOut);
                 if (MatchCurrent(AssignmentOperator.Assignment, true))
-                    expression = new AssignmentNode(expression, ParseExpression(false, false, SeperatorKind.Comma | finalBreakOut));
+                    expression = new AssignmentNode(expression, ParseNonEmptyExpression(false, SeperatorKind.Comma | finalBreakOut));
 
-                nodes.Add(expression);
+                nodes.AddChild(expression);
+
                 if (MatchCurrent(Seperator.Comma, true))
                     continue;
                 else if (MatchBreakOutSeperator(Current, finalBreakOut))
-                    return Extract();
-                else
+                {
+                    if (increment)
+                        index++;
+
                     break;
-            }
-
-            CompileException exception;
-            if (index >= sourceFile.TokenCount)
-                exception = new TokenExpectedException(Seperator.BoxCloseBracket, Final);
-            else
-                exception = new TokenExpectedException(Seperator.BoxCloseBracket, Current);
-
-            sourceFile.PushException(exception);
-            nodes.Add(PanicModeSimple(exception, finalBreakOut));
-
-            return Extract();
-            Node Extract()
-            {
-                if (nodes.Count == 0)
-                    return new EmptyNode();
+                }
                 else
-                    return new ExpressionListNode(nodes);
+                {
+                    nodes.AddChild(new InvalidEntityNode(PushExpectedCurrentException($"{finalBreakOut}"), PanicModeSimple(finalBreakOut)));
+                    break;
+                }
             }
+
+            return nodes;
         }
 
-        private Node ParseEntity(bool inExpression, SeperatorKind breakOutSeperators)
+        /// <summary>
+        /// Parse Expression List 
+        /// <para>• Ends on index of last valid entity or <paramref name="breakOutSeperators"/></para>
+        /// </summary>
+        private ParseNodeCollection ParseEntity(bool inExpression, SeperatorKind breakOutSeperators)
         {
-            var output = new List<Node>();
             var stack = new List<Token>();
+            var output = new List<ParseNodeCollection>();
             TokenType expected = TokenType.Constant | TokenType.Identifier | TokenType.Keyword;
 
             bool breakOut = false, subtract = false;
@@ -1293,14 +1297,22 @@ namespace Sugar.Language.Parsing.Parser
                             break;
                         }
 
-                        Node identifier = new IdentifierNode((Identifier)current);
+                        IdentifierNode identifier = ParseIdentifier();
                         if (MatchToken(BinaryOperator.LesserThan, LookAhead()))
                         {
-                            Node generic = ParseGenericCall(!inExpression);
-                            identifier = generic == null ? identifier : new CustomTypeNode(identifier).AddChild(generic);
+                            GenericCallNode generic = ParseGenericCall(!inExpression);
+         
+                            if (generic == null)
+                                output.Add(identifier);
+                            else
+                                output.Add(new CreatedTypeNode(identifier, generic));
+                        }
+                        else
+                        {
+                            output.Add(identifier);
                         }
 
-                        output.Add(identifier);
+
                         expected = TokenType.Seperator;
                         break;
                     case TokenType.Seperator:
@@ -1309,7 +1321,7 @@ namespace Sugar.Language.Parsing.Parser
                             breakOut = subtract = true;
                             break;
                         }
-                        else if (MatchBreakOutSeperator(current, breakOutSeperators))
+                        else if(MatchBreakOutSeperator(current, breakOutSeperators))
                         {
                             breakOut = true;
                             break;
@@ -1325,7 +1337,7 @@ namespace Sugar.Language.Parsing.Parser
                                 output.Add(ParseIndexer(output.Pop()));
                                 break;
                             case SyntaxKind.OpenBracket:
-                                output.Add(ParseFunctionCall(inExpression, false, ParseVariable(output.Pop())));
+                                output.Add(ParseFunctionCall(inExpression, ParseVariable(output.Pop())));
                                 break;
                             default:
                                 breakOut = subtract = true;
@@ -1338,32 +1350,24 @@ namespace Sugar.Language.Parsing.Parser
                             breakOut = subtract = true;
                             break;
                         }
-
-                        switch (current.SyntaxKind)
+                        else if(current.SyntaxKind == SyntaxKind.Array)
                         {
-                            case SyntaxKind.Array:
-                                if (inExpression)
-                                    output.Add(new TypeKeywordNode(TypeKeyword.Array));
-                                else
-                                    output.Add(new ArrayTypeNode(ParseGenericCall(true)));
-
-                                expected = TokenType.Seperator;
-                                break;
-                            default:
-                                var keyword = (Keyword)current;
-                                if (keyword.KeywordType == KeywordType.Type)
-                                {
-                                    output.Add(new TypeKeywordNode(keyword));
-                                    expected = TokenType.Seperator;
-                                    break;
-                                }
-
-                                var exception = new InvalidTokenException(current);
-                                sourceFile.PushException(exception);
-
-                                output.Add(PanicModeSimple(exception, breakOutSeperators));
-                                break;
+                            if (inExpression)
+                                output.Add(new TypeKeywordNode(TypeKeyword.Array));
+                            else
+                                output.Add(new ArrayTypeNode(ParseGenericCall(true)));
                         }
+
+                        var keyword = (Keyword)current;
+
+                        if (keyword.KeywordType == KeywordType.Type)
+                        {
+                            output.Add(new TypeKeywordNode(keyword));
+                            expected = TokenType.Seperator;
+                            break;
+                        }
+
+                        breakOut = subtract = true;
                         break;
                     default:
                         breakOut = subtract = true;
@@ -1382,22 +1386,17 @@ namespace Sugar.Language.Parsing.Parser
                 index++;
             }
 
-            if (output.Count == 0)
-            {
-                CompileException exception;
-                if (index >= sourceFile.TokenCount)
-                    exception = new TokenExpectedException($"{breakOutSeperators}", Final);
-                else
-                    exception = new TokenExpectedException(expected, Current);
-
-                sourceFile.PushException(exception);
-                output.Add(new InvalidExpressionNode(exception));
-            }
-
-            return output[0];
+            if (output.Count > 0)
+                return output[0];
+            else
+                return new EmptyEntityNode(PushExpectedTokenException(expected, Current), expected);
         }
 
-        private Node ParseIdentifier(bool increment = false)
+        /// <summary>
+        /// Parse Identifier
+        /// <para>• Returns one index after identifer if <paramref name="increment"/> is true</para>
+        /// </summary>
+        private IdentifierNode ParseIdentifier(bool increment = false)
         {
             if (TryMatchCurrentType(TokenType.Identifier))
             {
@@ -1408,56 +1407,52 @@ namespace Sugar.Language.Parsing.Parser
                 return node;
             }
             else
-            {
-                var exception = new TokenExpectedException(TokenType.Identifier, Current);
-                sourceFile.PushException(exception);
-
-                return new TokenExpectedNode(exception);
-            }
+                return new InvalidIdentifierNode(Current, PushInvalidCurrentException());
         }
 
-        private Node ParseVariable(Node entity)
+        /// <summary>
+        /// Force Parse a Variable
+        /// </summary>
+        private ParseNodeCollection ParseVariable(ParseNodeCollection entity)
         {
-            var token = Current;
-
-            Node toReturn;
             if (CheckVariable(entity))
-                toReturn = entity;
+                return entity;
             else
-            {
-                var exception = new TokenExpectedException(TokenType.Identifier, token.Index);
-                toReturn = new InvalidEntityNode(exception, entity, NodeType.Variable);
-
-                sourceFile.PushException(exception);
-            }
-
-            return toReturn;
+                return new InvalidVariableNode(PushExpectedCurrentException(TokenType.Identifier), entity);
         }
 
-        private Node ParseVariable(SeperatorKind breakOutSeperators)
+        /// <summary>
+        /// Force Parse a Variable
+        /// <para>• Ends on index of closing <paramref name="breakOutSeperators"/> </para>
+        /// </summary>
+        private ParseNodeCollection ParseVariable(SeperatorKind breakOutSeperators)
         {
             var entity = ParseEntity(false, breakOutSeperators);
 
             return ParseVariable(entity);
         }
 
-        private bool CheckVariable(Node entity)
+        private bool CheckVariable(ParseNodeCollection entity)
         {
             var node = entity;
             while (true)
             {
-                if (node.NodeType == NodeType.Dot)
+                if (node.NodeType == ParseNodeType.Dot)
                     node = ((DotExpression)node).RHS;
-                else if (node.NodeType == NodeType.Variable)
+                else if (node.NodeType == ParseNodeType.Variable)
                     break;
                 else
                     return false;
             }
 
-            return node.NodeType == NodeType.Variable;
+            return node.NodeType == ParseNodeType.Variable;
         }
 
-        private Node ParseType(SeperatorKind breakOutSeperators)
+        /// <summary>
+        /// Force Parse a Type
+        /// <para>• Ends on index of closing <paramref name="breakOutSeperators"/> </para>
+        /// </summary>
+        private TypeNode ParseType(SeperatorKind breakOutSeperators, bool force = true)
         {
             if (MatchCurrent(Keyword.Var, true))
             {
@@ -1465,20 +1460,20 @@ namespace Sugar.Language.Parsing.Parser
                 return new AnonymousTypeNode();
             }
 
-            return ValidateType(Current, ParseEntity(false, breakOutSeperators));
+            return ValidateType(Current, ParseEntity(false, breakOutSeperators), force);
         }
 
-        private Node ValidateType(Token token, Node entity)
+        private TypeNode ValidateType(Token token, ParseNodeCollection entity, bool force)
         {
             var node = entity;
 
             while (true)
-                if (node.NodeType == NodeType.Dot)
+                if (node.NodeType == ParseNodeType.Dot)
                 {
                     var dot = (DotExpression)node;
                     var lhs = dot.LHS.NodeType;
 
-                    if (lhs != NodeType.Type || lhs != NodeType.Variable)
+                    if (lhs != ParseNodeType.Type || lhs != ParseNodeType.Variable)
                         break;
 
                     node = dot.RHS;
@@ -1487,45 +1482,75 @@ namespace Sugar.Language.Parsing.Parser
                 {
                     switch (node.NodeType)
                     {
-                        case NodeType.Type:
+                        case ParseNodeType.Type:
                             return (TypeNode)entity;
-                        case NodeType.Variable:
-                            return new CustomTypeNode(entity);
+                        case ParseNodeType.Variable:
+                            return new CreatedTypeNode(entity);
                     }
 
                     break;
                 }
 
             var exception = new TokenExpectedException("Type", token);
-            sourceFile.PushException(exception);
+            if (force)
+                sourceFile.PushException(exception);
 
-            return new InvalidEntityNode(exception, entity, NodeType.Type);
+            return new InvalidTypeNode(exception, entity);
         }
 
-        private Node ParseInheritanceTypes()
+        /// <summary>
+        /// Parse list of Types
+        /// <para>• Force starts at beginning : </para>
+        /// • Ends one index after final valid Type parsed
+        /// </summary>
+        private InheritanceNode ParseInheritanceTypes(SeperatorKind breakoutSeperators)
         {
+            var inheritance = new InheritanceNode();
             ForceMatchCurrent(Seperator.Colon, true);
 
-            var types = new List<Node>();
+            bool breakOut;
             while (index < sourceFile.TokenCount)
             {
-                types.Add(new InheritsTypeNode(ParseType(SeperatorKind.Comma)));
+                breakOut = false;
+                var current = Current;
 
-                if (MatchCurrent(Seperator.Comma, true))
-                    continue;
+              
+                switch (current.Type)
+                {
+                    case TokenType.Keyword:
+                    case TokenType.Identifier:
+                        inheritance.AddChild(ParseType(SeperatorKind.Comma | breakoutSeperators));
 
-                break;
+                        if (MatchBreakOutSeperator(Current, breakoutSeperators))
+                            breakOut = true;
+                        else
+                            index++;
+                        break;
+                    case TokenType.Seperator:
+                        if (MatchToken(current, Seperator.Comma, true))
+                            continue;
+
+                        breakOut = true;
+                        break;
+                    default:
+                        breakOut = true;
+                        break;
+                }
+
+                if (breakOut)
+                    break;
             }
 
-            index++;
-            return new InheritanceNode(types);
+            return inheritance;
         }
 
         private ParseGenericResult ParseGenericCall()
         {
             index++;
-            var output = new List<Node>();
-            TokenType expected = TokenType.BinaryOperator;
+            ForceMatchCurrent(BinaryOperator.LesserThan, true);
+
+            var generic = new GenericCallNode();
+            TokenType expected = TokenType.Identifier | TokenType.Keyword;
 
             while (index < sourceFile.TokenCount)
             {
@@ -1535,100 +1560,73 @@ namespace Sugar.Language.Parsing.Parser
                 {
                     case TokenType.BinaryOperator:
                         if (!MatchType(expected, current))
-                            return new ParseGenericResult(null, new TokenExpectedException(expected, 0));
+                            return new ParseGenericResult(new TokenExpectedException(expected, 0));
 
-                        switch (current.SyntaxKind)
-                        {
-                            case SyntaxKind.LesserThan:
-                                output.Add(new GenericCallNode());
-                                expected = TokenType.Identifier | TokenType.Keyword;
-                                break;
-                            case SyntaxKind.GreaterThan:
-                                bool found = false;
-                                var types = new List<Node>();
+                        if(current.SyntaxKind == SyntaxKind.GreaterThan)
+                            return new ParseGenericResult(generic);
 
-                                while (output.Count > 0)
-                                {
-                                    var top = output[output.Count - 1];
-                                    if (top.NodeType == NodeType.Generic)
-                                    {
-                                        found = true;
-                                        for (int i = types.Count - 1; i >= 0; i--)
-                                            top.AddChild(types[i]);
-
-                                        if (output.Count > 1)
-                                        {
-                                            output[output.Count - 2].AddChild(top);
-                                            output.RemoveAt(output.Count - 1);
-                                        }
-                                        break;
-                                    }
-
-                                    types.Add(top);
-                                    output.RemoveAt(output.Count - 1);
-                                }
-
-                                if (!found)
-                                    return new ParseGenericResult(null, new TokenExpectedException(BinaryOperator.GreaterThan, current));
-                                else if (output.Count == 1)
-                                    return new ParseGenericResult(output[0], null);
-                                break;
-                            default:
-                                return new ParseGenericResult(null, new InvalidTokenException(current));
-                        }
-                        break;
+                        return new ParseGenericResult(new InvalidTokenException(current));
                     case TokenType.Keyword:
                         if (!MatchType(expected, current))
                         { }
                         else if ((current as Keyword).KeywordType == KeywordType.Type)
                         {
-                            output.Add(new TypeKeywordNode((Keyword)current));
-                            expected = TokenType.Seperator | TokenType.Operator;
-                            break;
+                            TypeNode type = ParseType(SeperatorKind.Comma, false);
+
+                            if (type.NodeType != ParseNodeType.Invalid)
+                            {
+                                generic.AddChild(type);
+                                expected = TokenType.Seperator | TokenType.Operator;
+                                break;
+                            }
                         }
 
-                        return new ParseGenericResult(null, new InvalidTokenException(current));
+                        return new ParseGenericResult(new InvalidTokenException(current));
                     case TokenType.Identifier:
                         if (!MatchType(expected, current))
-                            return new ParseGenericResult(null, new InvalidTokenException(current));
+                            return new ParseGenericResult(new InvalidTokenException(current));
                         else
                         {
-                            output.Add(new CustomTypeNode(new IdentifierNode((Identifier)current)));
-                            expected = TokenType.Seperator | TokenType.Operator;
+                            TypeNode type = ParseType(SeperatorKind.Comma, false);
+
+                            if (type.NodeType == ParseNodeType.Invalid)
+                                return new ParseGenericResult(new InvalidTokenException(current));
+
+                            generic.AddChild(type);
+                            if (MatchCurrent(Seperator.Comma, true))
+                                continue;
+                            else
+                                expected = TokenType.BinaryOperator;
                         }
                         break;
                     case TokenType.Seperator:
                         if (!MatchType(expected, current) || !MatchToken(Seperator.Comma, current))
-                            return new ParseGenericResult(null, new InvalidTokenException(current));
+                            return new ParseGenericResult(new InvalidTokenException(current));
                         else
                             expected = TokenType.Identifier | TokenType.Keyword;
+                        break;
+                    default:
                         break;
                 }
 
                 index++;
             }
 
-            return new ParseGenericResult(null, new TokenExpectedException(BinaryOperator.GreaterThan, Current));
+            return new ParseGenericResult(new TokenExpectedException(BinaryOperator.GreaterThan, Current));
         }
 
-        private Node ParseGenericCall(bool force)
+        /// <summary>
+        /// Parse Generic Call
+        /// <para>• Force starts one index before the beginning LESSERTHAN </para>
+        /// • Ends on same index as closing GREATERTHAN, if found
+        /// </summary>
+        private GenericCallNode ParseGenericCall(bool force)
         {
             int beforeIndex = index;
 
             var genericResult = ParseGenericCall();
-            if (!genericResult.Success)
-            {
-                index = beforeIndex;
-
-                if (force)
-                {
-                    sourceFile.PushException(genericResult.Exception);
-                    return PanicModeSimple(genericResult.Exception, SeperatorKind.Any);
-                }
-                else
-                    return null;
-            }
-            else
+ 
+            if (genericResult.Success)
             {
                 var next = LookAhead();
                 var toMatch = TokenType.Seperator | TokenType.BinaryOperator;
@@ -1643,83 +1641,103 @@ namespace Sugar.Language.Parsing.Parser
                     if (force)
                     {
                         sourceFile.PushException(genericResult.Exception);
-                        return PanicModeSimple(genericResult.Exception, SeperatorKind.Any);
+                        return new InvalidGenericCallNode(genericResult.Exception, PanicModeSimple(SeperatorKind.None));
                     }
                     else
                         return null;
                 }
             }
+            else
+            {
+                index = beforeIndex;
+
+                if (force)
+                {
+                    sourceFile.PushException(genericResult.Exception);
+                    return new InvalidGenericCallNode(genericResult.Exception, PanicModeSimple(SeperatorKind.None));
+                }
+                else
+                    return null;
+            }
         }
 
-        private Node ParseGenericDeclaration()
+        /// <summary>
+        /// Parse Generic Declaration
+        /// <para>• Force starts at beginning LESSERTHAN </para>
+        /// • Ends one index after closing GREATERTHAN
+        /// </summary>
+        private GenericDeclarationNode ParseGenericDeclaration()
         {
-            var types = new List<Node>();
+            var generic = new GenericDeclarationNode();
             ForceMatchCurrent(BinaryOperator.LesserThan, true);
 
             while (index < sourceFile.TokenCount)
             {
-                Node variable = ParseIdentifier(), enforcement = null;
+                IdentifierNode variable = ParseIdentifier(true);
 
-                index++;
                 if (MatchCurrent(Seperator.Colon))
-                    enforcement = ParseInheritanceTypes();
+                    generic.AddChild(new GenericVariableNode(variable, ParseInheritanceTypes(SeperatorKind.Semicolon)));
+                else
+                    generic.AddChild(new GenericVariableNode(variable));
 
-                types.Add(enforcement == null ? new GenericDeclarationVariableNode(variable) : new GenericDeclarationVariableNode(variable, enforcement));
                 if (MatchCurrent(Seperator.Semicolon, true))
                     continue;
-                else if (MatchCurrent(BinaryOperator.GreaterThan))
-                    return new GenericDeclarationNode(types);
+                else if (MatchCurrent(BinaryOperator.GreaterThan, true))
+                    return generic;
                 else
                     break;
             }
 
-            CompileException exception;
-            if (index >= sourceFile.TokenCount)
-                exception = new TokenExpectedException(BinaryOperator.GreaterThan, Final);
-            else
-                exception = new TokenExpectedException(BinaryOperator.GreaterThan, Current);
-
-            sourceFile.PushException(exception);
-            return PanicModeSimple(exception, SeperatorKind.Any);
+            return new InvalidGenericDeclarationNode(PushExpectedCurrentException(BinaryOperator.GreaterThan), PanicModeSimple(SeperatorKind.None));
         }
 
         //Loops
-        private Node ParseForLoop()
+        private ParseNodeCollection ParseForLoop()
         {
             ForceMatchCurrent(LoopKeyword.For, true);
             TryMatchCurrent(Seperator.OpenBracket, true);
             var initialise = ParseStatement(StatementEnum.StandaloneStatement | StatementEnum.EmptyStatement);
+   
+            index++;
+            var expression = ParseNonEmptyExpression(false, SeperatorKind.Semicolon);
 
-            index++;
-            var expression = ParseExpression(true, false, SeperatorKind.Semicolon);
-  
-            index++;
-            var increment = ParseMultiLine(Seperator.CloseBracket, SeperatorKind.CloseBracket | SeperatorKind.Comma);
+            index++;            
+            var increment = ParseMultiLine();
             var body = ParseStatement(StatementEnum.Scope | StatementEnum.GeneralStatement);
 
             return new ForLoopNode(initialise, expression, increment, body);
 
-            Node ParseMultiLine(Seperator finalBreakOut, SeperatorKind breakOutSeperators)
+            ParseNode ParseMultiLine()
             {
-                var subStatements = new List<Node>();
+                var subStatements = new List<ParseNode>();
 
                 while (index < sourceFile.TokenCount)
                 {
-                    subStatements.Add(ParseStatement(true, breakOutSeperators));
-                    if (Current == finalBreakOut)
-                    {
-                        index++;
-                        return subStatements.Count == 1 ? subStatements[0] : new CompoundStatementNode(subStatements);
-                    }
+                    subStatements.Add(ParseStatement(true, SeperatorKind.CloseBracket | SeperatorKind.Comma));
 
-                    index++;
+                    switch(Current.SyntaxKind)
+                    {
+                        case SyntaxKind.Comma:
+                            index++;
+                            continue;
+                        case SyntaxKind.CloseBracket:
+                            index++;
+                            return subStatements.Count == 1 ? subStatements[0] : new CompoundStatementNode(subStatements);
+                        default:
+                            if(subStatements.Peek().NodeType == ParseNodeType.Invalid)
+                                return subStatements.Count == 1 ? subStatements[0] : new CompoundStatementNode(subStatements);
+
+                            index++;
+                            break;
+                    }
                 }
 
-                throw new TokenExpectedException(finalBreakOut, Final);
+                PushExpectedCurrentException(Seperator.CloseBracket);
+                return subStatements.Count == 1 ? subStatements[0] : new CompoundStatementNode(subStatements);
             }
         }
 
-        private Node ParseForeachLoop()
+        private ParseNodeCollection ParseForeachLoop()
         {
             ForceMatchCurrent(LoopKeyword.Foreach, true);
             TryMatchCurrent(Seperator.OpenBracket, true);
@@ -1730,24 +1748,24 @@ namespace Sugar.Language.Parsing.Parser
             var variable = ParseIdentifier(true);
 
             TryMatchCurrent(DescriberKeyword.In, true);
-            var array = ParseVariable(SeperatorKind.CloseBracket);
-            index++;
+            var collection = ParseEntity(false, SeperatorKind.CloseBracket);
 
+            TryMatchCurrent(Seperator.CloseBracket, true);
             var body = ParseStatement(StatementEnum.Scope | StatementEnum.GeneralStatement);
 
-            return new ForeachLoopNode(new DeclarationNode(new DescriberNode(), type, variable), array, body);
+            return new ForeachLoopNode(new DeclarationNode(new DescriberNode(), type, variable), collection, body);
         }
 
-        private Node ParseWhileLoop()
+        private ParseNodeCollection ParseWhileLoop()
         {
             ForceMatchCurrent(LoopKeyword.While, true);
-            Node condition = ParseCondition();
+            ParseNodeCollection condition = ParseCondition();
 
             var body = ParseStatement(StatementEnum.Scope | StatementEnum.GeneralStatement);
             return new WhileLoopNode(condition, body);
         }
 
-        private Node ParseDoWhileLoop()
+        private ParseNodeCollection ParseDoWhileLoop()
         {
             ForceMatchCurrent(LoopKeyword.Do, true);
 
@@ -1756,14 +1774,14 @@ namespace Sugar.Language.Parsing.Parser
 
             TryMatchCurrent(LoopKeyword.While, true);
 
-            Node condition = ParseCondition();
+            ParseNodeCollection condition = ParseCondition();
             return new DoWhileNode(condition, body);
         }
 
         //Conditions
-        private Node ParseIfCondition()
+        private ParseNodeCollection ParseIfCondition()
         {
-            var nodes = new List<Node>();
+            var nodes = new List<ParseNodeCollection>();
 
             bool breakOut = false;
             while (index < sourceFile.TokenCount)
@@ -1800,7 +1818,7 @@ namespace Sugar.Language.Parsing.Parser
             return nodes.Count == 1 ? nodes[0] : new IfElseChainNode(nodes);
         }
 
-        private Node ParseSwitchCase()
+        private ParseNodeCollection ParseSwitchCase()
         {
             ForceMatchCurrent(ConditionKeyword.Switch, true);
 
@@ -1809,7 +1827,8 @@ namespace Sugar.Language.Parsing.Parser
 
             Token current;
             bool breakOut = false;
-            var cases = new List<Node>();
+            var cases = new List<ParseNode>();
+
             while (index < sourceFile.TokenCount)
             {
                 current = Current;
@@ -1821,7 +1840,7 @@ namespace Sugar.Language.Parsing.Parser
                     case SyntaxKind.Case:
                         index++;
 
-                        Node value;
+                        ParseNodeCollection value;
                         current = Current;
                         switch (current.Type)
                         {
@@ -1832,10 +1851,10 @@ namespace Sugar.Language.Parsing.Parser
                                 {
                                     index++;
                                     if (LookAhead() == Keyword.When)
-                                        value = ParseWhenStatement(ValidateType(current, value));
+                                        value = ParseWhenStatement(ValidateType(current, value, true));
                                     else
                                     {
-                                        PushInvalidCurrentToken();
+                                        PushInvalidTokenException(current);
                                         index++;
                                     }
                                 }
@@ -1851,7 +1870,7 @@ namespace Sugar.Language.Parsing.Parser
                                 index++;
                                 break;
                             default:
-                                value = PushInvalidCurrentToken();
+                                value = new InvalidEntityNode(PushExpectedTokenException("", current), new TokenCollection(current));
                                 break;
                         }
 
@@ -1883,9 +1902,9 @@ namespace Sugar.Language.Parsing.Parser
             }
 
             TryMatchCurrent(Seperator.FlowerCloseBracket);
-            return new SwitchNode(valueToCheck, cases);
+            return new SwitchNode(valueToCheck, new CompoundStatementNode(cases));
 
-            Node ParseBody()
+            ParseNode ParseBody()
             {
                 if (MatchCurrent(ControlKeyword.Break) || MatchCurrent(ControlKeyword.Return))
                     return new EmptyNode();
@@ -1896,347 +1915,364 @@ namespace Sugar.Language.Parsing.Parser
                 return stmt;
             }
 
-            Node ParseControlStatement()
+            ControlStatement ParseControlStatement()
             {
-                Node controlStatement;
-
                 if (MatchCurrent(ControlKeyword.Return))
-                    controlStatement = ParseReturn();
-                else
-                {
-                    if (TryMatchCurrent(ControlKeyword.Break, true))
-                        controlStatement = new BreakNode();
-                    else
-                        controlStatement = PushInvalidCurrentToken();
-                }
-
+                    return ParseReturn();
+                else if (MatchCurrent(ControlKeyword.Break, true))
                 TryMatchCurrent(Seperator.Semicolon);
-                return controlStatement;
+                else
+                    PushExpectedCurrentException(ControlKeyword.Break);
+
+                return new BreakNode();
             }
 
-            Node ParseWhenStatement(Node typeNode)
+            ParseNodeCollection ParseWhenStatement(TypeNode typeNode)
             {
                 var variable = ParseIdentifier();
 
                 index++;
                 ForceMatchCurrent(Keyword.When, true);
-                var expression = ParseExpression(false, false, SeperatorKind.Colon);
+                var expression = ParseNonEmptyExpression(false, SeperatorKind.Colon);
 
-                return new WhenNode(new DeclarationNode(new DescriberNode(new DescriberKeywordNode(DescriberKeyword.Const)), typeNode, variable), expression);
+                return new WhenNode(new DeclarationNode(new DescriberNode().AddChild(new DescriberKeywordNode(DescriberKeyword.Const)), typeNode, variable), expression);
             }
         }
 
         //Functions and Properties
-        private Node ParseProperty(Node typeNode, Node variableNode)
+
+        /// <summary>
+        /// Parses Property Declaration
+        /// <para>• Starts at the opening { </para>
+        /// • Ends on same index as closing }
+        /// </summary>
+        private PropertyNode ParseProperty(DescriberNode describer, TypeNode typeNode)
         {
-            index++;
-            ForceMatchCurrent(Seperator.FlowerOpenBracket, true);
+            TryMatchCurrent(Seperator.FlowerOpenBracket, true);
 
-            Node getNode = null, setNode = null, describer;
-
+            DescriberNode accessorDescriber;
             if (MatchCurrent(Seperator.BoxOpenBracket))
-                describer = ParseDescribers();
+                accessorDescriber = ParseDescribers();
             else
-                describer = new DescriberNode();
+                accessorDescriber = new DescriberNode();
 
+            GetNode getNode;
             if (MatchCurrent(Keyword.Get, true))
-                getNode = new GetNode(describer, ParseAccessorBody(StatementEnum.LambdaExpression));
+            {
+                getNode = new GetNode(accessorDescriber, ParseStatement(StatementEnum.Scope | StatementEnum.EmptyStatement | StatementEnum.LambdaExpression));
+                index++;
+            }
+            else
+                getNode = null;
 
+ 
+            SetNode setNode;
             if (MatchCurrent(Seperator.BoxOpenBracket))
             {
-                describer = ParseDescribers();
+                accessorDescriber = ParseDescribers();
 
                 TryMatchCurrent(Keyword.Set, true);
-                setNode = ParseSetNode(describer);
+                setNode = ParseSetNode(accessorDescriber, typeNode);
             }
             else if (MatchCurrent(Keyword.Set, true))
             {
-                describer = new DescriberNode();
-                setNode = ParseSetNode(describer);
+                accessorDescriber = new DescriberNode();
+                setNode = ParseSetNode(accessorDescriber, typeNode);
             }
+            else
+                setNode = null;
 
-            ForceMatchCurrent(Seperator.FlowerCloseBracket);
+            TryMatchCurrent(Seperator.FlowerCloseBracket);
 
             if (getNode != null && setNode != null)
-                return new PropertyGetSetNode(variableNode, typeNode, getNode, setNode);
+                return new PropertyGetSetNode(describer, typeNode, getNode, setNode);
             else if (getNode != null)
-                return new PropertyGetNode(variableNode, typeNode, getNode);
+                return new PropertyGetNode(describer, typeNode, getNode);
             else
-                return new PropertySetNode(variableNode, typeNode, setNode);
+                return new PropertySetNode(describer, typeNode, setNode);
 
-            Node ParseSetNode(Node describer)
+            SetNode ParseSetNode(DescriberNode describer, TypeNode type)
             {
-                var setvalueDeclaration = new DeclarationNode(new DescriberNode(new DescriberKeywordNode(DescriberKeyword.Const)), typeNode, new IdentifierNode(new Identifier("value", 0)));
-                return new SetNode(describer, setvalueDeclaration, ParseAccessorBody(StatementEnum.LambdaStatement));
-            }
-
-            Node ParseAccessorBody(StatementEnum lambdaType)
-            {
-                Node body;
-                if (MatchCurrent(Seperator.Semicolon))
-                    body = new EmptyNode();
-                else
-                    body = ParseStatement(lambdaType | StatementEnum.Scope);
-
+                var set = new SetNode(describer, new DeclarationNode(new DescriberNode().AddChild(new DescriberKeywordNode(DescriberKeyword.Const)), type, IdentifierNode.ValueIdentifier), ParseStatement(StatementEnum.Scope | StatementEnum.EmptyStatement | StatementEnum.LambdaStatement));
                 index++;
-                return body;
+
+                return set;
             }
         }
 
-        private Node ParseConstructorCall(bool inExpression)
+        /// <summary>
+        /// Parses Property Declaration
+        /// <para>• Starts at the opening ( </para>
+        /// • Ends on same index after closing ) or GREATERTHAN in case of generic
+        /// </summary>
+        private ParseNodeCollection ParseConstructorCall(bool inExpression)
         {
             ForceMatchCurrent(Keyword.Create, true);
-            var functionCall = ParseFunctionCall(true, true, ParseEntity(inExpression, SeperatorKind.OpenBracket));
+            var name = ParseEntity(inExpression, SeperatorKind.OpenBracket);
 
-            if (MatchToken(Seperator.FlowerOpenBracket, LookAhead(), true))
-                functionCall.AddChild(ParseExpressionList(SeperatorKind.FlowerCloseBracket));
+            var arguments = ParseFunctionArguments();
 
-            return functionCall;
-        }
-
-        private Node ParseFunctionCall(bool inExpression, bool isContructor, Node functionName)
-        {
-            var arguments = new List<Node>();
-            TryMatchCurrent(Seperator.OpenBracket, true);
-
-            if (!MatchCurrent(Seperator.CloseBracket))
-            {
-                while (index < sourceFile.TokenCount)
-                {
-                    Node describer = null;
-                    if (MatchCurrentType(TokenType.Keyword))
-                    {
-                        var keyword = (Keyword)Current;
-                        if (keyword.KeywordType == KeywordType.Describer)
-                            describer = new DescriberKeywordNode(Current as Keyword);
-                        else
-                            describer = PushInvalidToken(keyword);
-                        index++;
-
-                        TryMatchCurrent(Seperator.Colon, true);
-                    }
-
-                    if (describer == null)
-                        arguments.Add(new FunctionCallArgumentNode(ParseExpression(false, false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
-                    else
-                        arguments.Add(new FunctionCallArgumentNode(describer, ParseEntity(false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
-
-                    if (MatchCurrent(Seperator.CloseBracket))
-                        break;
-                    index++;
-                }
-            }
-
-            Node generic = null;
+            GenericCallNode generic = null;
             if (LookAhead() == BinaryOperator.LesserThan)
                 generic = ParseGenericCall(!inExpression);
 
-            Node toReturn;
-            if (isContructor)
-                toReturn = new ConstructorCallNode(new FunctionNameCallNode(functionName), new FunctionCallArgumentsNode(arguments));
+            ExpressionListNode expressions = null;
+            if (MatchToken(Seperator.FlowerOpenBracket, LookAhead(), true))
+                expressions = ParseExpressionList(SeperatorKind.FlowerCloseBracket);
+
+            if (generic == null)
+            {
+                if (expressions == null)
+                    return new ConstructorCallNode(name, arguments);
+                else
+                    return new ConstructorCallNode(name, arguments, expressions);
+            }
+            else if (expressions == null)
+                return new ConstructorCallNode(name, arguments, generic);
             else
-                toReturn = new FunctionCallNode(new FunctionNameCallNode(functionName), new FunctionCallArgumentsNode(arguments));
-
-            if (generic != null)
-                toReturn.AddChild(generic);
-
-            return toReturn;
+                return new ConstructorCallNode(name, arguments, generic, expressions);
         }
 
-        private Node ParsePrintCall()
+        /// <summary>
+        /// Parses Property Declaration
+        /// <para>• Starts at the opening ( </para>
+        /// • Ends on same index after closing ) or GREATERTHAN in case of generic
+        /// </summary>
+        private ParseNodeCollection ParseFunctionCall(bool inExpression, ParseNodeCollection functionName)
         {
-            ForceMatchCurrent(Keyword.Print, true);
-            TryMatchCurrent(Seperator.OpenBracket, true);
+            var arguments = ParseFunctionArguments();
 
-            var argument = new FunctionCallArgumentNode(ParseExpression(false, false, SeperatorKind.CloseBracket));
-            return new PrintNode(new FunctionCallArgumentsNode(argument));
+            GenericCallNode generic = null;
+            if (LookAhead() == BinaryOperator.LesserThan)
+                generic = ParseGenericCall(!inExpression);
+
+            if (generic == null)
+                return new FunctionCallNode(functionName, arguments);
+            else
+                return new FunctionCallNode(functionName, arguments, generic);
         }
 
-        private Node ParseInputCall()
+        private ParseNodeCollection ParsePrintCall()
         {
-            ForceMatchCurrent(Keyword.Input, true);
-            TryMatchCurrent(Seperator.OpenBracket, true);
-
-            var argument = new FunctionCallArgumentNode(ParseExpression(true, false, SeperatorKind.CloseBracket));
-            return argument.NodeType == NodeType.Empty ? new InputNode(new FunctionCallArgumentsNode()) : new InputNode(new FunctionCallArgumentsNode(argument));
-        }
-
-        private Node ParseFunctionDeclaration(Node describer, TypeNode returnType)
-        {
-            Node name = ParseIdentifier(true);
-            var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
-
-            Node generic = null;
-            if (MatchToken(BinaryOperator.LesserThan, LookAhead(), true))
-                generic = ParseGenericDeclaration();
+            ForceMatchCurrent(Keyword.Print);
+            var keyword = (Keyword)Current;
 
             index++;
-            Node extensionTypeNode = null;
+            return new InputNode(keyword, ParseFunctionArguments(true));
+        }
+
+        private ParseNodeCollection ParseInputCall(bool inExpression)
+        {
+            ForceMatchCurrent(Keyword.Input);
+            var keyword = (Keyword)Current;
+
+            index++;
+            return new PrintNode(keyword, ParseFunctionArguments(!inExpression));
+        }
+
+        private FunctionDeclarationNode ParseFunctionDeclaration(DescriberNode describer, TypeNode returnType)
+        {
+            IdentifierNode name = ParseIdentifier(true);
+            var arguments = ParseFunctionParameters();
+
+            GenericDeclarationNode generic = null;            
+            if (MatchCurrent(BinaryOperator.LesserThan))
+                generic = ParseGenericDeclaration();
+
+            TypeNode extension = null;
             if (MatchCurrent(Seperator.Colon, true))
+                extension = ParseType(SeperatorKind.FlowerOpenBracket | SeperatorKind.Lambda);
+
+            var body = ParseStatement(StatementEnum.Scope | (returnType.Type == TypeNodeEnum.Void ? StatementEnum.LambdaStatement : StatementEnum.LambdaExpression));
+
+            if (generic == null)
             {
-                if (returnType.Type == TypeNodeEnum.Constructor)
-                {
-                    TryMatchCurrent(Keyword.Parent, true);
-                    if (MatchCurrent(Seperator.OpenBracket, true))
-                        extensionTypeNode = new ParentFunctionArgumentNode(ParseExpressionList(SeperatorKind.CloseBracket));
-                    else
-                    {
-                        var exception = new TokenExpectedException(Seperator.OpenBracket, Current);
-                        sourceFile.PushException(exception);
-
-                        extensionTypeNode = PanicModeSimple(exception, SeperatorKind.CloseBracket);
-                    }
-
-                    index++;
-                }
+                if(extension == null)
+                    return new FunctionDeclarationNode(describer, returnType, name, arguments, body);
                 else
-                    extensionTypeNode = ParseType(SeperatorKind.FlowerOpenBracket | SeperatorKind.Lambda);
-            }
-
-            var type = returnType.Type == TypeNodeEnum.Constructor || returnType.Type == TypeNodeEnum.Void ? StatementEnum.LambdaStatement : StatementEnum.LambdaExpression;
-            var body = ParseStatement(StatementEnum.Scope | type);
-
-            Node toReturn;
-            if (returnType.Type == TypeNodeEnum.Constructor)
-            {
-                if (extensionTypeNode == null)
-                    toReturn = new ConstructorDeclarationNode(describer, returnType, arguments, body);
-                else
-                    toReturn = new ConstructorDeclarationNode(describer, returnType, arguments, body, extensionTypeNode);
+                    return new ExtensionFunctionDeclarationNode(describer, returnType, name, arguments, body, extension);
             }
             else
             {
-                if (extensionTypeNode == null)
-                    toReturn = new FunctionDeclarationNode(describer, returnType, name, arguments, body);
+                if (extension == null)
+                    return new FunctionDeclarationNode(describer, returnType, name, arguments, body, generic);
                 else
-                    toReturn = new ExtensionFunctionDeclarationNode(describer, returnType, name, arguments, body, extensionTypeNode);
+                    return new ExtensionFunctionDeclarationNode(describer, returnType, name, arguments, body, extension, generic);
             }
-
-            if (generic != null)
-                toReturn.AddChild(generic);
-
-            return toReturn;
         }
 
-        private Node ParseOperatorOverload(Node describer)
+        private ConstructorDeclarationNode ParseConstructorDeclaration(DescriberNode describer, TypeNode returnType)
+        {
+            var arguments = ParseFunctionParameters();
+
+            ExpressionListNode extension = null;
+            if(MatchCurrent(Seperator.Colon, true))
+            {
+                TryMatchCurrent(Keyword.Parent, true);
+                TryMatchCurrent(Seperator.OpenBracket, true);
+
+                extension = ParseExpressionList(SeperatorKind.CloseBracket, true);
+            }
+
+            var body = ParseStatement(StatementEnum.Scope | StatementEnum.LambdaStatement);
+
+            if (extension == null)
+                return new ConstructorDeclarationNode(describer, returnType, arguments, body);
+            else
+                return new ConstructorDeclarationNode(describer, returnType, arguments, body, extension);
+        }
+
+        private ParseNodeCollection ParseOperatorOverload(DescriberNode describer)
         {
             ForceMatchCurrent(FunctionKeyword.Operator, true);
-            var returnType = ParseType(SeperatorKind.Any);
+            var returnType = ParseType(SeperatorKind.None);
 
             index++;
             Operator operatorToOverload = null;
             if (TryMatchCurrentType(TokenType.Operator, false))
+            {
                 operatorToOverload = Current as Operator;
+                index++;
+            }
 
-            index++;
-            var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
+            var arguments = ParseFunctionParameters();
 
-            Node generic = null;
+            GenericDeclarationNode generic = null;
             if (MatchToken(BinaryOperator.LesserThan, LookAhead(), true))
                 generic = ParseGenericDeclaration();
 
-            index++;
-
             var body = ParseStatement(StatementEnum.Scope | StatementEnum.LambdaExpression);
-            var toReturn = new OperatorOverloadFunctionDeclarationNode(describer, returnType, arguments, body, operatorToOverload);
-
-            if (generic != null)
-                toReturn.AddChild(generic);
-
-            return toReturn;
+     
+            if (generic == null)
+                return new OperatorOverloadFunctionDeclarationNode(describer, returnType, arguments, body, operatorToOverload);
+            else
+                return new OperatorOverloadFunctionDeclarationNode(describer, returnType, arguments, body, operatorToOverload, generic);
         }
 
-        private Node ParseConversionOverload(Node describer)
+        private BaseFunctionDeclarationNode ParseConversionOverload(DescriberNode describer)
         {
             var keyword = Current;
             index++;
 
             var returnType = ParseType(SeperatorKind.OpenBracket);
-            var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
+            var arguments = ParseFunctionParameters();
 
-            Node generic = null;
+            GenericDeclarationNode generic = null;
             if (MatchToken(BinaryOperator.LesserThan, LookAhead(), true))
                 generic = ParseGenericDeclaration();
 
-            index++;
             var body = ParseStatement(StatementEnum.Scope | StatementEnum.LambdaExpression);
 
-            Node toReturn;
             if (keyword == FunctionKeyword.Explicit)
-                toReturn = new ExplicitCastDeclarationNode(describer, returnType, arguments, body);
+            {
+                if (generic == null)
+                    return new ExplicitCastDeclarationNode(describer, returnType, arguments, body);
+                else
+                    return new ExplicitCastDeclarationNode(describer, returnType, arguments, body, generic);
+            }
             else
-                toReturn = new ImplicitCastDeclarationNode(describer, returnType, arguments, body);
-
-            if (generic != null)
-                toReturn.AddChild(generic);
-
-            return toReturn;
+            {
+                if (generic == null)
+                    return new ImplicitCastDeclarationNode(describer, returnType, arguments, body);
+                else
+                    return new ImplicitCastDeclarationNode(describer, returnType, arguments, body, generic);
+            }
         }
 
-        private Node ParseIndexerDeclaration(Node describer)
+        private ParseNodeCollection ParseIndexerDeclaration(DescriberNode describer)
         {
             ForceMatchCurrent(FunctionKeyword.Indexer, true);
             var returnType = ParseType(SeperatorKind.OpenBracket);
 
-            var arguments = new FunctionDeclarationArgumentsNode(ParseDeclarationArguments());
+            var arguments = ParseFunctionParameters();
 
-            Node generic = null;
+            GenericDeclarationNode generic = null;
             if (MatchToken(BinaryOperator.LesserThan, LookAhead(), true))
                 generic = ParseGenericDeclaration();
 
-            var body = ParseProperty(returnType, returnType);
+            var body = ParseProperty(describer, returnType);
 
-            Node toReturn = new IndexerDeclarationNode(describer, returnType, arguments, body);
-
-            if (generic != null)
-                toReturn.AddChild(generic);
-
-            return toReturn;
+            if(generic == null)
+                return new IndexerDeclarationNode(describer, returnType, arguments, body);
+            else
+                return new IndexerDeclarationNode(describer, returnType, arguments, body, generic);
         }
 
-        private List<Node> ParseDeclarationArguments()
+        /// <summary>
+        /// Parses Function Arguments (Calling)
+        /// <para>• Starts at the opening ( </para>
+        /// • Ends one index after closing ) if <paramref name="increment"/> is true
+        /// </summary>
+        private FunctionArgumentsNode ParseFunctionArguments(bool increment = false)
         {
             TryMatchCurrent(Seperator.OpenBracket, true);
 
-            var arguments = new List<Node>();
+            var arguments = new FunctionArgumentsNode();
             if (MatchCurrent(Seperator.CloseBracket))
                 return arguments;
 
-            Node describer, type, variable, defaultValue;
             while (index < sourceFile.TokenCount)
             {
-                describer = MatchCurrent(Seperator.BoxOpenBracket) ? ParseDescribers() : new DescriberNode();
-
-                switch (Current.Type)
+                if (MatchCurrent(Seperator.BoxOpenBracket))
                 {
-                    case TokenType.Keyword:
-                    case TokenType.Identifier:
-                        type = ParseType(SeperatorKind.Colon);
+                    DescriberNode describer = ParseDescribers();
 
-                        TryMatchCurrent(Seperator.Colon, true);
-                        variable = ParseIdentifier();
-
-                        defaultValue = null;
-                        if (LookAhead() == AssignmentOperator.Assignment)
-                        {
-                            index += 2;
-                            defaultValue = ParseExpression(false, false, SeperatorKind.Comma | SeperatorKind.CloseBracket);
-
-                            index--;
-                        }
-
-                        if (defaultValue == null)
-                            arguments.Add(new FunctionDeclarationArgumentNode(describer, type, variable));
-                        else
-                            arguments.Add(new FunctionDeclarationArgumentNode(describer, type, variable, defaultValue));
-
-                        index++;
-                        break;
-                    default:
-                        arguments.Add(PanicModeSimple(PushInvalidCurrentException(), SeperatorKind.CloseBracket | SeperatorKind.Comma));
-                        break;
+                    arguments.AddChild(new FunctionArgumentNode(describer, ParseNonEmptyExpression(false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
+                }
+                else
+                {
+                    arguments.AddChild(new FunctionArgumentNode(new DescriberNode(), ParseNonEmptyExpression(false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
                 }
 
+                if (MatchCurrent(Seperator.CloseBracket))
+                {
+                    break;
+                }
+
+                index++;
+            }
+
+            TryMatchCurrent(Seperator.CloseBracket, increment);
+            return arguments;
+        }
+
+        /// <summary>
+        /// Parses Function Paramaters (Declaration)
+        /// <para>• Starts at the opening ( </para>
+        /// • Ends one index after closing )
+        /// </summary>
+        private FunctionParamatersNode ParseFunctionParameters()
+        {
+            TryMatchCurrent(Seperator.OpenBracket, true);
+
+            var arguments = new FunctionParamatersNode();
+            if (MatchCurrent(Seperator.CloseBracket, true))
+                return arguments;
+
+            while (index < sourceFile.TokenCount)
+            {
+                DescriberNode describer;
+                if (MatchCurrent(Seperator.BoxOpenBracket))
+                    describer = ParseDescribers();
+                else
+                    describer = new DescriberNode();
+
+                var type = ParseType(SeperatorKind.Colon);
+                TryMatchCurrent(Seperator.Colon, true);
+
+                var variable = ParseIdentifier();
+                if (LookAhead() == AssignmentOperator.Assignment)
+                {
+                    index += 2;
+                    arguments.AddChild(new FunctionParamaterNode(describer, type, variable, ParseNonEmptyExpression(false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
+
+                    index--;
+                }
+                else
+                    arguments.AddChild(new FunctionParamaterNode(describer, type, variable));
+
+                index++;
+  
                 if (MatchCurrent(Seperator.Comma, true))
                     continue;
                 else if (MatchCurrent(Seperator.CloseBracket))
@@ -2246,14 +2282,20 @@ namespace Sugar.Language.Parsing.Parser
                 break;
             }
 
-            TryMatchCurrent(Seperator.CloseBracket);
+            TryMatchCurrent(Seperator.CloseBracket, true);
             return arguments;
         }
 
         //User Defined Types and Namespaces
-        private Node ParseScopedEntity(Node describer, Keyword keyword) => keyword == EntityKeyword.Namespace ? ParseNamespaceDeclaration(describer) : ParseTypeDeclaration(describer, keyword);
+        private ParseNodeCollection ParseScopedEntity(DescriberNode describer, Keyword keyword)
+        {
+            if (keyword == EntityKeyword.Namespace)
+                return ParseNamespaceDeclaration(describer);
+            else
+                return ParseTypeDeclaration(describer, keyword);
+        }
 
-        private Node ParseNamespaceDeclaration(Node describer)
+        private ParseNodeCollection ParseNamespaceDeclaration(DescriberNode describer)
         {
             index++;
             var name = ParseVariable(SeperatorKind.FlowerOpenBracket);
@@ -2262,50 +2304,100 @@ namespace Sugar.Language.Parsing.Parser
             return new NamespaceNode(describer, name, ParseScope());
         }
 
-        private Node ParseTypeDeclaration(Node describer, Keyword keyword)
+        private ParseNodeCollection ParseTypeDeclaration(DescriberNode describer, Keyword keyword)
         {
             index++;
-            var name = ParseIdentifier(true);
-
-            Node generic = null, inherits = null;
-            if (MatchCurrent(BinaryOperator.LesserThan))
+ 
+            switch(keyword.SyntaxKind)
             {
-                generic = ParseGenericDeclaration();
-                index++;
+                case SyntaxKind.Enum:
+                    return ParseEnumDeclaration(describer, ParseIdentifier(true));
+                case SyntaxKind.Struct:
+                    return ParseStructDeclaration(describer, ParseIdentifier(true));
+                case SyntaxKind.Class:
+                    return ParseClassDeclaration(describer, ParseIdentifier(true));
+                default:
+                    return ParseInterfaceDeclaration(describer, ParseIdentifier(true));
             }
+        }
 
+        private EnumNode ParseEnumDeclaration(DescriberNode describer, IdentifierNode name)
+        {
+            InheritanceNode inherits = null;
             if (MatchCurrent(Seperator.Colon))
-                inherits = ParseInheritanceTypes();
+                inherits = ParseInheritanceTypes(SeperatorKind.FlowerOpenBracket);
+
+            if (inherits == null)
+                return new EnumNode(describer, name, ParseExpressionList(SeperatorKind.FlowerCloseBracket));
+            else
+                return new EnumNode(describer, name, ParseExpressionList(SeperatorKind.FlowerCloseBracket), inherits);
+        }
+
+        private StructNode ParseStructDeclaration(DescriberNode describer, IdentifierNode name)
+        {
+            GenericDeclarationNode generic = null;
+            if (MatchCurrent(BinaryOperator.LesserThan))
+                generic = ParseGenericDeclaration();
 
             TryMatchCurrent(Seperator.FlowerOpenBracket);
 
-            Node body;
-            if (keyword == EntityKeyword.Enum)
-                body = ParseExpressionList(SeperatorKind.FlowerCloseBracket);
+            if (generic == null)
+                return new StructNode(describer, name, ParseScope());
             else
-                body = ParseScope();
+                return new StructNode(describer, name, ParseScope(), generic);
+        }
 
-            Node toReturn = keyword.SyntaxKind switch
-            {
-                SyntaxKind.Enum => new EnumNode(describer, name, body),
-                SyntaxKind.Class => new ClassNode(describer, name, body),
-                SyntaxKind.Struct => new StructNode(describer, name, body),
-                SyntaxKind.Interface => new InterfaceNode(describer, name, body),
-                _ => throw new InvalidTokenException(keyword)
-            };
+        private ClassNode ParseClassDeclaration(DescriberNode describer, IdentifierNode name)
+        {
+            GenericDeclarationNode generic = null;
+            if (MatchCurrent(BinaryOperator.LesserThan))
+                generic = ParseGenericDeclaration();
+
+            InheritanceNode inherits = null;
+            if (MatchCurrent(Seperator.Colon))
+                inherits = ParseInheritanceTypes(SeperatorKind.FlowerOpenBracket);
+
+            TryMatchCurrent(Seperator.FlowerOpenBracket);
 
             if (generic != null)
-                toReturn.AddChild(generic);
-            if (inherits != null)
-                toReturn.AddChild(inherits);
+            {
+                if (inherits == null)
+                    return new ClassNode(describer, name, ParseScope(), generic);
+                else
+                    return new ClassNode(describer, name, ParseScope(), generic, inherits);
+            }
+            else if (inherits != null)
+                return new ClassNode(describer, name, ParseScope(), inherits);
+            else
+                return new ClassNode(describer, name, ParseScope());
+        }
 
-            return toReturn;
+        private InterfaceNode ParseInterfaceDeclaration(DescriberNode describer, IdentifierNode name)
+        {
+            GenericDeclarationNode generic = null;
+            if (MatchCurrent(BinaryOperator.LesserThan))
+                generic = ParseGenericDeclaration();
+
+            InheritanceNode inherits = null;
+            if (MatchCurrent(Seperator.Colon))
+                inherits = ParseInheritanceTypes(SeperatorKind.FlowerOpenBracket);
+
+            TryMatchCurrent(Seperator.FlowerOpenBracket);
+
+            if (generic != null)
+            {
+                if (inherits == null)
+                    return new InterfaceNode(describer, name, ParseScope(), generic);
+                else
+                    return new InterfaceNode(describer, name, ParseScope(), generic, inherits);
+            }
+            else if (inherits != null)
+                return new InterfaceNode(describer, name, ParseScope(), inherits);
+            else
+                return new InterfaceNode(describer, name, ParseScope());
         }
 
         //Error Handling
-        private InvalidTokenNode PushInvalidCurrentToken() => PushInvalidToken(Current);
-        private InvalidTokenNode PushInvalidToken(Token token) => new InvalidTokenNode(PushInvalidTokenException(token), token);
-
         private InvalidTokenException PushInvalidCurrentException() => PushInvalidTokenException(Current);
         private InvalidTokenException PushInvalidTokenException(Token token)
         {
@@ -2315,12 +2407,7 @@ namespace Sugar.Language.Parsing.Parser
             return exception;
         }
 
-        private InvalidEntityNode PushInvalidEntityNodeCurrent(Node invalid, NodeType expected) => new InvalidEntityNode(PushInvalidEntityException(Current.Index), invalid, expected);
-
-        private InvalidStatementException PushCurrentInvalidStatement() => PushInvalidStatement(index);
-        private InvalidStatementException PushInvalidStatement(int curIndex) => new InvalidStatementException(curIndex);
-
-        private InvalidStatementException PushInvalidEntityException(int index)
+        private InvalidStatementException PushInvalidStatementException()
         {
             var exception = new InvalidStatementException(index);
             sourceFile.PushException(exception);
@@ -2328,19 +2415,40 @@ namespace Sugar.Language.Parsing.Parser
             return exception;
         }
 
-        private Node PanicModeSimple(CompileException exception, SeperatorKind breakOutSeperators)
+        private TokenExpectedException PushExpectedCurrentException(TokenType expected) => PushExpectedTokenException(expected, Current);
+        private TokenExpectedException PushExpectedTokenException(TokenType expected, Token token) => PushException(new TokenExpectedException(expected, token));
+
+        private TokenExpectedException PushExpectedCurrentException(Token expected) => PushExpectedTokenException(expected, Current);
+        private TokenExpectedException PushExpectedTokenException(Token expected, Token token) => PushException(new TokenExpectedException(expected, token));
+
+        private TokenExpectedException PushExpectedCurrentException(string expected) => PushExpectedTokenException(expected, Current);
+        private TokenExpectedException PushExpectedTokenException(string expected, Token token) => PushException(new TokenExpectedException(expected, token));
+
+        private Exception PushException<Exception>(Exception exception) where Exception : CompileException
+        {
+            sourceFile.PushException(exception);
+
+            return exception;
+        }
+
+        /// <summary>
+        /// Returns a TokenCollection containing all Tokens until
+        /// <para>1. Expected <paramref name="breakOutSeperators"/> is found (inclusive)</para>
+        /// 2. Default Seperator: ; { } is found (exclusive, overrides <paramref name="breakOutSeperators"/>)
+        /// </summary>
+        private TokenCollection PanicModeSimple(SeperatorKind breakOutSeperators)
         {
             var invalid = new List<Token>();
-            var extra = SeperatorKind.Semicolon | SeperatorKind.FlowerOpenBracket | SeperatorKind.FlowerCloseBracket; 
-            breakOutSeperators = breakOutSeperators | extra;
+            var extra = SeperatorKind.Semicolon | SeperatorKind.FlowerOpenBracket | SeperatorKind.FlowerCloseBracket;
+            var match = breakOutSeperators | extra;
 
-            while(index < sourceFile.TokenCount)
+            while (index < sourceFile.TokenCount)
             {
                 var current = Current;
 
-                if (MatchBreakOutSeperator(current, breakOutSeperators))
+                if (MatchBreakOutSeperator(current, match))
                 {
-                    if (MatchBreakOutSeperator(current, extra))
+                    if (MatchBreakOutSeperator(current, extra) && !MatchBreakOutSeperator(current, breakOutSeperators))
                         index--;
 
                     break;
@@ -2350,10 +2458,7 @@ namespace Sugar.Language.Parsing.Parser
                 index++;
             }
 
-            if (index >= sourceFile.TokenCount)
-                exception = new CompoundCompileException(exception, new TokenExpectedException($"{breakOutSeperators}", Final));
-
-            return new InvalidTokenCollectionNode(exception, invalid);
+            return new TokenCollection(invalid);
         }
     }
 }

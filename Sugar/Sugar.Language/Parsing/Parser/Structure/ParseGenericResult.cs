@@ -1,22 +1,31 @@
 ﻿using System;
 
-using Sugar.Language.Parsing.Nodes;
-
 using Sugar.Language.Exceptions;
+
+using Sugar.Language.Parsing.Nodes.Values.Generics;
 
 namespace Sugar.Language.Parsing.Parser.Structure
 {
     internal struct ParseGenericResult
     {
-        public bool Success { get => Generic != null; }
+        public bool Success { get => generic != null; }
 
-        public Node Generic { get; private set; }
-        public CompileException Exception { get; private set; }
+        private CompileException exception;
+        public CompileException Exception { get => exception; }
 
-        public ParseGenericResult(Node node, CompileException exception)
+        private GenericCallNode generic;
+        public GenericCallNode Generic { get => generic; }
+
+        public ParseGenericResult(CompileException _exception)
         {
-            Generic = node;
-            Exception = exception;
+            generic = null;
+            exception = _exception;
+        }
+
+        public ParseGenericResult(GenericCallNode _generic)
+        {
+            generic = _generic;
+            exception = null;
         }
     }
 }

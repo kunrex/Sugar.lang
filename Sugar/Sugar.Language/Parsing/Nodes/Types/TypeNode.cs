@@ -3,15 +3,24 @@
 using Sugar.Language.Parsing.Nodes.Enums;
 using Sugar.Language.Parsing.Nodes.Types.Enums;
 
-using Sugar.Language.Semantics.Analysis.BuiltInTypes.Enums;
-
 namespace Sugar.Language.Parsing.Nodes.Types
 {
-    internal abstract class TypeNode : Node
+    internal abstract class TypeNode : ParseNodeCollection
     {
-        public abstract TypeNodeEnum Type { get; }
-        public override NodeType NodeType => NodeType.Type;
+        public override ParseNodeType NodeType { get => ParseNodeType.Type; }
 
-        public virtual TypeEnum ReturnType() => throw new InvalidOperationException();
+        public abstract TypeNodeEnum Type { get; }
+
+        public TypeNode() : base()
+        {
+
+        }
+
+        public TypeNode(params ParseNode[] _children) : base(_children)
+        {
+
+        }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
     }
 }

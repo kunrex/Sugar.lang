@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
+
+using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
 
 namespace Sugar.Language.Parsing.Nodes.TryCatchFinally.Blocks
 {
-    internal abstract class BlockNode : Node
+    internal abstract class BlockNode : ParseNodeCollection, ICreationNode_Body
     {
-        public virtual Node Body { get => Children[0]; }
+        private readonly ParseNode body;
+        public ParseNode Body { get => body; }
 
-        public BlockNode(Node _body)
+        public BlockNode(ParseNode _body) : base(_body)
         {
-            Children = new List<Node>() { _body };
+            body = _body;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
     }
 }

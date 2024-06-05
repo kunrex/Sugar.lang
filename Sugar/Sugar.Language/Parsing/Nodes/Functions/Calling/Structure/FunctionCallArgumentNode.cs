@@ -1,27 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.Describers;
+
+using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
+
 namespace Sugar.Language.Parsing.Nodes.Functions.Calling.Structure
 {
-    internal sealed class FunctionCallArgumentNode : Node
+    internal sealed class FunctionArgumentNode : ParseNodeCollection, ICreationNode_Value
     {
-        public Node Value { get => Children[ChildCount - 1]; }
-        public Node Describer { get => ChildCount == 2 ? null : Children[0]; }
+        public override ParseNodeType NodeType { get => ParseNodeType.ArgumentCall; }
 
-        public override NodeType NodeType => NodeType.ArgumentCall;
+        private readonly DescriberNode describer;
+        public DescriberNode Describer { get => describer; }
 
-        public FunctionCallArgumentNode(Node _value)
+        private readonly ParseNodeCollection value;
+        public ParseNodeCollection Value { get => value; }
+        
+        public FunctionArgumentNode(ParseNodeCollection _value) : base(_value)
         {
-            Children = new List<Node> { _value };
+            describer = null;
+            value = _value;
         }
 
-        public FunctionCallArgumentNode(Node _desrciber, Node _value)
+        public FunctionArgumentNode(DescriberNode _describer, ParseNodeCollection _value) : base(_describer, _value)
         {
-            Children = new List<Node> { _desrciber, _value };
+            describer = _describer;
+            value = _value;
         }
 
-        public override string ToString() => $"Function Call Argument Node";
+        public override string ToString() => $"Function Argument Node";
     }
 }

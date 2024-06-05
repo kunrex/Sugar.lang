@@ -5,23 +5,23 @@ namespace Sugar.Language.Tokens.Enums
     [Flags]
     internal enum SeperatorKind : ushort
     {
-        Any = 0,
+        None = 0,
 
-        Colon = 4,
-        Semicolon = 8,
+        Colon = 2,
+        Semicolon = 4,
 
-        Dot = 16,
-        Comma = 32,
-        Lambda = 64,
-        QuestionMark = 128,
+        Dot = 8,
+        Comma = 16,
+        Lambda = 32,
+        QuestionMark = 64,
 
-        OpenBracket = 256,
-        CloseBracket = 512,
+        OpenBracket = 128,
+        CloseBracket = 256,
 
-        BoxOpenBracket = 1024,
-        BoxCloseBracket = 2048,
+        BoxOpenBracket = 512,
+        BoxCloseBracket = 1024,
 
-        FlowerOpenBracket = 4096,
-        FlowerCloseBracket = 8192,
+        FlowerOpenBracket = 2048,
+        FlowerCloseBracket = 5096,
     }
 }

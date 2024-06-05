@@ -1,21 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
+
 namespace Sugar.Language.Parsing.Nodes.Conditions.SwitchConditions
 {
-    internal sealed class WhenNode : Node
+    internal sealed class WhenNode : ParseNodeCollection
     {
-        public override NodeType NodeType => NodeType.Switch;
+        public override ParseNodeType NodeType { get => ParseNodeType.When; }
 
-        public Node Declaration { get => Children[0]; }
-        public Node Expression { get => Children[1]; }
+        private readonly DeclarationNode declaration;
+        public DeclarationNode Declaration { get => declaration; }
 
-        public WhenNode(Node _declaration, Node _expresssion)
+        private readonly ParseNodeCollection expression;
+        public ParseNodeCollection Expression { get => expression; }
+
+        public WhenNode(DeclarationNode _declaration, ParseNodeCollection _expresssion) : base(_declaration, _expresssion)
         {
-            Children = new List<Node>() { _declaration, _expresssion };
+            declaration = _declaration;
+            expression = _expresssion;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
 
         public override string ToString() => $"When Node";
     }

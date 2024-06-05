@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
@@ -7,15 +6,23 @@ namespace Sugar.Language.Parsing.Nodes.Expressions.Operative
 {
     internal sealed class TernaryExpression : ExpressionNode
     {
-        public override NodeType NodeType => NodeType.Ternary;
+        public override ParseNodeType NodeType { get => ParseNodeType.Ternary; }
 
-        public Node Condition { get => Children[0]; }
-        public Node TrueExpression { get => Children[1]; }
-        public Node FalseExpression { get => Children[2]; }
+        private readonly ParseNodeCollection condition;
+        public ParseNodeCollection Condition { get => condition; }
 
-        public TernaryExpression(Node _condition, Node _trueExpression, Node _falseExpression)
+        private readonly ParseNodeCollection trueExpression;
+        public ParseNodeCollection TrueExpression { get => trueExpression; }
+
+        private readonly ParseNodeCollection falseExpression;
+        public ParseNodeCollection FalseExpression { get => falseExpression; }
+
+        public TernaryExpression(ParseNodeCollection _condition, ParseNodeCollection _trueExpression, ParseNodeCollection _falseExpression) : base(_condition, _trueExpression, _falseExpression)
         {
-            Children = new List<Node>() { _condition, _trueExpression, _falseExpression };
+            condition = _condition;
+
+            trueExpression = _trueExpression;
+            falseExpression = _falseExpression;
         }
 
         public override string ToString() => $"Ternary Expression Node";

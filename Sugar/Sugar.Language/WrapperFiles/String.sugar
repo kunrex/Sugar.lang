@@ -1,0 +1,104 @@
+﻿class String
+{
+    [private] Array<char>: value;
+
+    [public] int: Length { get => value.Length; }
+    [public] bool: Empty { get => value.Length == 0; }
+
+    [public]
+    constructor String(string: defaultValue)
+    {
+        value = defaultValue;
+    }
+
+    [private]
+    constructor String(Array<char>: characters)
+    {
+        value = characters;
+    }
+        
+    [public]
+    string ToString() => value;
+
+    [public, static]
+    operator string +(String: a, String: b) => a.value + b.value;
+
+    [public]
+    string Clone() => create String(value);
+
+    [public]
+    Array<char> ToCharArray() => value.Clone();
+
+    /*[public]
+    bool Contains(char: c)
+    {
+        foreach(char s in value)
+            if(s == c)
+                return true;
+
+        return false;
+    }
+
+    [public]
+    bool Contains(string: c)
+    {
+
+        for(int: i = 0; i < value.Length i++)
+        {
+            if(value[i] == c[0])
+                if(SubString(i, i + c.Length) == c)
+                    return true;
+
+            return false;
+        }
+
+        return false;
+    }
+
+    [public]
+    int IndexOf(char: c)
+    {
+        for(int: i = 0; i < value.Length; i++)
+            if(value[i] == c)
+                return i;
+
+        reurn -1;
+    }
+
+    [public]
+    int LastIndexOf(char: c)
+    {
+        for(int: i = value.Length - 1; i >= 0; i--)
+            if(value[i] == c)
+                return i;
+
+        return -1;
+    }
+
+    [public]
+    string SubString(int: start, int: last)
+    {
+        Array<char> substring = create Array<char>(
+        for(int: i = start; i <= Math.min(last, Value.Length; i++)
+            substring[i - start] = value[i];
+
+        return create String(ubstring);
+    }
+
+    [public]
+    string SubString(int: start, int: last)
+    {
+        Array<char> substring = create Array<char>(last - start);
+        for(int: i = start; i <= Math.min(last, Value.Length; i++)
+            substring[i - start] = value[i];
+
+        return create String(ubstring);
+    }
+
+    [public]
+    Remove(string: s)
+    {
+        Array<char> new = create Array<char>(value.Length - s.Length);
+        
+    }*/
+}

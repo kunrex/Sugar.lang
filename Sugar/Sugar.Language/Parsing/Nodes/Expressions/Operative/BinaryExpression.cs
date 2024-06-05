@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Tokens.Operators;
+
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.Interfaces.Expressions;
 
 namespace Sugar.Language.Parsing.Nodes.Expressions.Operative
 {
-    internal sealed class BinaryExpression : ExpressionNode, IBinaryExpression
+    internal sealed class BinaryExpression : BaseBinaryNode<ParseNodeCollection, ParseNodeCollection>
     {
-        public Operator Operator { get; private set; }
-        public override NodeType NodeType => NodeType.Binary; 
+        public override ParseNodeType NodeType { get => ParseNodeType.Binary; }
 
-        public Node LHS { get => Children[0]; }
-        public Node RHS { get => Children[1]; }
+        private readonly Operator binaryOperator;
+        public Operator Operator { get => binaryOperator; }
 
-        public BinaryExpression(Operator _operator, Node _lhs, Node _rhs) 
+        public BinaryExpression(Operator _operator, ParseNodeCollection _lhs, ParseNodeCollection _rhs) : base(_lhs, _rhs)
         {
-            Operator = _operator;
-            Children = new List<Node>() { _lhs, _rhs };
+            binaryOperator = _operator;
         }
 
         public override string ToString() => $"Binary Expression [Operator: {Operator.Value}]";

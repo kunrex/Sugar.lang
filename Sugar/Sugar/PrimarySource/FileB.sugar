@@ -1,5 +1,6 @@
-﻿import X.Y;
+﻿import class A.B;
 
-struct S {
+class C
+{
     
-  }  
+}

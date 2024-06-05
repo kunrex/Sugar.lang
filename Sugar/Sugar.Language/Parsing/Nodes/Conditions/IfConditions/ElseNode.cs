@@ -1,19 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
+
 namespace Sugar.Language.Parsing.Nodes.Conditions.IfConditions
 {
-    internal sealed class ElseNode : Node
+    internal sealed class ElseNode : ParseNodeCollection, ICreationNode_Body
     {
-        public override NodeType NodeType => NodeType.Else;
-        private Node Body { get => Children[0]; }
+        public override ParseNodeType NodeType { get => ParseNodeType.Else; }
 
-        public ElseNode(Node _body)
+        private readonly ParseNode body;
+        public ParseNode Body { get => body; }
+
+        public ElseNode(ParseNode _body) : base(_body)
         {
-            Children = new List<Node>() { _body };
+            body = _body;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
 
         public override string ToString() => $"Else Node";
     }

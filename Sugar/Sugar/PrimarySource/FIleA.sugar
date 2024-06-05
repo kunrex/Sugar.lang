@@ -1,5 +1,7 @@
-﻿namespace X {
-    class Y {
-        int: x;
+﻿namespace A
+{
+    class B
+    {
+
     }
 }

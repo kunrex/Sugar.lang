@@ -1,20 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.Interfaces.Creation;
+
 namespace Sugar.Language.Parsing.Nodes.Conditions.IfConditions
 {
-    internal sealed class IfNode : Node
+    internal sealed class IfNode : ParseNodeCollection, ICreationNode_Body
     {
-        public override NodeType NodeType => NodeType.If;
+        public override ParseNodeType NodeType { get => ParseNodeType.If; }
 
-        public Node Condition { get => Children[0] ; }
-        public Node Body { get => Children[1] ; }
+        private readonly ParseNodeCollection condition;
+        public ParseNodeCollection Condition { get => condition; }
 
-        public IfNode(Node _condition, Node _body)
+        private readonly ParseNode body;
+        public ParseNode Body { get => body; }
+
+        public IfNode(ParseNodeCollection _condition, ParseNode _body) : base(_condition, _body)
         {
-            Children = new List<Node>() { _condition, _body };
+            condition = _condition;
+            body = _body;
         }
 
         public override string ToString() => "If Node";

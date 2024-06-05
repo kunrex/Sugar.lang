@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.Interfaces.Expressions;
+
+using Sugar.Language.Parsing.Nodes.NodeGroups;
 
 namespace Sugar.Language.Parsing.Nodes.Expressions.Associative
 {
-    internal sealed class IndexerExpression : ExpressionNode, IBinaryExpression
+    internal class IndexerExpression : BaseBinaryNode<ParseNodeCollection, ExpressionListNode>
     {
-        public override NodeType NodeType => NodeType.Indexer;
+        public override ParseNodeType NodeType { get => ParseNodeType.Indexer; }
 
-        public Node LHS { get => Children[0]; }
-        public Node RHS { get => Children[1]; }
-
-        public IndexerExpression(Node _operhand, Node _arguments) 
+        public IndexerExpression(ParseNodeCollection _operhand, ExpressionListNode _arguments) : base(_operhand, _arguments)
         {
-            Children = new List<Node>() { _operhand, _arguments };
+           
         }
-
         public override string ToString() => $"Indexer Expression";
     }
 }

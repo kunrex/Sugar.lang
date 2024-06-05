@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.Interfaces.Expressions;
+
+using Sugar.Language.Parsing.Nodes.Types;
 
 namespace Sugar.Language.Parsing.Nodes.Expressions.Associative
 {
-    internal sealed class CastExpression : ExpressionNode, IBinaryExpression
+    internal sealed class CastExpression : BaseBinaryNode<ParseNodeCollection, TypeNode>
     {
-        public override NodeType NodeType => NodeType.Cast;
+        public override ParseNodeType NodeType { get => ParseNodeType.Cast; }
 
-        public Node LHS { get => Children[0]; }
-        public Node RHS { get => Children[1]; }
-
-        public CastExpression(Node _operhand, Node _type)
+        public CastExpression(ParseNodeCollection _operhand, TypeNode _type) : base(_operhand, _type)
         {
-            Children = new List<Node>() { _operhand, _type };
+          
         }
 
         public override string ToString() => $"Cast Node";

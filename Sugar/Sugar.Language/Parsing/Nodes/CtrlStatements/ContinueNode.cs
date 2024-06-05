@@ -5,7 +5,7 @@ namespace Sugar.Language.Parsing.Nodes.CtrlStatements
 {
     internal sealed class ContinueNode : ControlStatement
     {
-        public override NodeType NodeType => NodeType.Continue;
+        public override ParseNodeType NodeType { get => ParseNodeType.Continue; }
 
         public ContinueNode()
         {

@@ -2,8 +2,13 @@
 
 namespace Sugar.Language.Parsing.Nodes.Expressions
 {
-    internal abstract class ExpressionNode : Node
+    internal abstract class ExpressionNode : ParseNodeCollection
     {
-        public override Node AddChild(Node _node) => throw new NotImplementedException();
+        public ExpressionNode(params ParseNodeCollection[] _children) : base(_children)
+        {
+
+        }
+
+        public override ParseNode AddChild(ParseNode _node) { return this; }
     }
 }

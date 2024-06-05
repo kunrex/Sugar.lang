@@ -1,9 +1,16 @@
 ﻿using System;
 
+using Sugar.Language.Parsing.Nodes.NodeGroups;
+
 namespace Sugar.Language.Parsing.Nodes.Statements
 {
-    internal abstract class StatementNode : Node
+    internal abstract class StatementNode : CompoundStatementNode
     {
-        public override Node AddChild(Node _node) => throw new NotImplementedException();
+        public StatementNode(params ParseNode[] _children) : base(_children)
+        {
+            
+        }
+
+        public override ParseNode AddChild(ParseNode _node) { return this; }
     }
 }

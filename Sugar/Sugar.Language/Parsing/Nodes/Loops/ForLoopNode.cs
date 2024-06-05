@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
@@ -7,17 +6,21 @@ namespace Sugar.Language.Parsing.Nodes.Loops
 {
     internal sealed class ForLoopNode : LoopNode
     {
-        public override NodeType NodeType => NodeType.For;
+        public override ParseNodeType NodeType { get => ParseNodeType.For; }
 
-        public Node Initialise { get => Children[0]; }
-        public override Node Condition { get => Children[1]; }
-        public Node Increment { get => Children[2]; }
+        private readonly ParseNode initialise;
+        public ParseNode Initialise { get => initialise; }
 
-        public override Node Body { get => Children[3]; }
+        private readonly ParseNode increment;
+        public ParseNode Increment { get => increment; }
 
-        public ForLoopNode(Node _initialise, Node _condition, Node _increment, Node _body)
+        public ForLoopNode(ParseNode _initialise, ParseNodeCollection _condition, ParseNode _increment, ParseNode _body) : base(_condition, _body)
         {
-            Children = new List<Node>() { _initialise, _condition, _increment, _body };
+            initialise = _initialise;
+            Add(initialise);
+
+            increment = _increment;
+            Add(initialise);
         }
 
         public override string ToString() => $"For Loop Node";

@@ -2,7 +2,7 @@
 
 namespace Sugar.Language.Parsing.Nodes.Enums
 {
-    internal enum NodeType : byte
+    internal enum ParseNodeType : byte
     {
         Scope,
         Compound,
@@ -15,7 +15,8 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         This,
         Empty,
         Default,
-        Generic,
+        GenericCall,
+        GenericDeclarataion,
 
         Type,
 
@@ -41,11 +42,15 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         FunctionCall,
         ArgumentCall,
         ConstructorCall,
-        MethodDeclaration,
+        FunctionDeclaration,
         ArgumentDeclaration,
+        ExtensionDeclaration,
         ConstructorDeclaration,
 
-        Lambda,
+        LambdaStatement,
+        LambdaExpression,
+
+        BuiltInFunction,
 
         Dot,
         Cast,
@@ -69,6 +74,7 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         If,
         Else,
         Case,
+        When,
         Switch,
         IfElseChain,
 
@@ -87,13 +93,11 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         ImplicitDeclaration,
         ExplicitDeclaration,
 
-        Parent,
-
         Input,
-        Action,
-        Function,
+        Print,
+
+        Delegate,
 
         Invalid,
-        NonParsed
     }
 }

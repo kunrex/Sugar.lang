@@ -1,0 +1,127 @@
+﻿struct Integer
+{
+    [private] int: value;
+
+    [public]
+    constructor Integer()
+    {
+        value = 0;
+    }
+
+    [public]
+    constructor Integer(int: c)
+    {
+        value = c;
+    }
+
+    [public, static]
+    implicit int(Integer: i) => i.value;
+
+    [public, static]
+    implicit Integer(int: i) => create Integer(i);
+
+    [public, static]
+    implicit char(Integer: i) => i.value as char;
+
+    [public, static]
+    implicit byte(Integer: i) => i.value as byte;
+
+    [public, static]
+    implicit sbyte(Integer: i) => i.value as sbyte;
+
+    [public, static]
+    implicit short(Integer: i) => i.value as short;
+
+    [public, static]
+    implicit ushort(Integer: i) => i.value as ushort;
+
+    [public, static]
+    implicit uint(Integer: i) => i.value as uint;
+
+    [public, static]
+    implicit long(Integer: i) => i.value as long;
+
+    [public, static]
+    implicit ulong(Integer: i) => i.value as ulong;
+
+    [public, static]
+    implicit float(Integer: i) => i.value as float;
+
+    [public, static]
+    implicit double(Integer: i) => i.value as double;
+
+    [public, static]
+    implicit decimal(Integer: i) => i.value as decimal;
+
+    [public, static]
+    explicit bool(Integer: i)
+    {
+        if(i.value == 0)
+            return true;
+        else
+            return false;
+    }
+
+    [public]
+    string ToString() => value + "";
+
+    [public, static]
+    operator int +(Integer: a, Integer: b) => a.value + b.value;
+
+    [public, static]
+    operator int -(Integer: a, Integer: b) => a.value - b.value;
+
+    [public, static]
+    operator int *(Integer: a, Integer: b) => a.value * b.value;
+
+    [public, static]
+    operator int /(Integer: a, Integer: b) => a.value / b.value;
+
+    [public, static]
+    operator int %(Integer: a, Integer: b) => a.value % b.value;
+
+    [public, static]
+    operator int ++(Integer: a) => a++;
+
+    [public, static]
+    operator int --(Integer: a) => a--;
+
+    [public, static]
+    operator int -(Integer: a) => -a;
+
+    [public, static]
+    operator int &(Integer: a, Integer: b) => a.value & b.value;
+
+    [public, static]
+    operator int |(Integer: a, Integer: b) => a.value | b.value;
+
+    [public, static]
+    operator int <<(Integer: a, Integer: b) => a.value << b.value;
+
+    [public, static]
+    operator int >>(Integer: a, Integer: b) => a.value >> b.value;
+
+    [public, static]
+    operator int ~(Integer: a) => ~a.value;
+
+    [public, static]
+    operator bool ==(Integer: a, Integer: b) => a.value == b.value;
+
+    [public, static]
+    operator bool !=(Integer: a, Integer: b) => a.value != b.value;
+
+    [public, static]
+    operator bool >=(Integer: a, Integer: b) => a.value >= b.value;
+
+    [public, static]
+    operator bool <=(Integer: a, Integer: b) => a.value <= b.value;
+
+    [public, static]
+    operator bool <(Integer: a, Integer: b) => a.value < b.value;
+
+    [public, static]
+    operator bool >(Integer: a, Integer: b) => a.value > b.value;
+
+    [public, static]
+    operator int +(Integer: a) => +a.value; 
+}

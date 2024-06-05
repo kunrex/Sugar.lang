@@ -1,12 +1,13 @@
 ﻿using System;
+
+using Sugar.Language.Exceptions;
+
 using Sugar.Language.Lexing;
 
 using Sugar.Language.Parsing.Parser;
 
-using Sugar.Language.Exceptions;
-
-using Sugar.Language.Semantics.Analysis;
-using Sugar.Language.Semantics.ActionTrees.Namespaces;
+using Sugar.Language.Analysis;
+using Sugar.Language.Analysis.ProjectStructure.ProjectNodes;
 
 namespace Sugar.Language.Compilers
 {
@@ -16,31 +17,29 @@ namespace Sugar.Language.Compilers
         {
             Lexer.CreateInstance();
             Parser.CreateInstance();
+            SemanticAnalyser.CreateInstance();
         }
 
         public bool Compile(string[] source, string[] wrappers)
         {
             try
             {
-                var collection = CreateSyntaxTree(source);
+                SugarFileCollection collection = CreateSyntaxTree(source);
                 if (collection.Length == 0)
                 {
                     Console.WriteLine("No Output");
                     return true;
                 }
 
-                var wrapperCollection = CreateSyntaxTree(wrappers);
+                /*SugarFileCollection wrapperTree = CreateSyntaxTree(wrappers);
                 if(!collection.Valid)
                 {
                     collection.PrintExceptions();
                     return false;
-                }
+                }*/
 
-                var fileTree = collection.SyntaxTree;
-                var wrapperTree = wrapperCollection.SyntaxTree;
-
-                SemanticAnalyser.CreateInstance();
-                SemanticAnalyser.Instance.Analyse(wrapperTree, fileTree);
+                ProjectTree tree = SemanticAnalyser.Instance.WithTrees(null, collection.SyntaxTree).Analyse();
+                tree.Print("", true);
 
                 return true;
             }
@@ -56,7 +55,13 @@ namespace Sugar.Language.Compilers
             var treeCollection = new SugarFileCollection();
 
             foreach (var file in files)
-                treeCollection.Add(ReadFile(file));
+            {
+                var p = ReadFile(file);
+                if (p.ExceptionCount > 0)
+                    p.PrintExceptions();
+
+                treeCollection.Add(p);
+            }
 
             return treeCollection;
         }

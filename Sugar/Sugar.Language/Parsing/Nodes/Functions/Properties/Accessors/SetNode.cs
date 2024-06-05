@@ -1,20 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
+
+using Sugar.Language.Parsing.Nodes.Describers;
+using Sugar.Language.Parsing.Nodes.Statements.VariableCreation;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Properties.Accessors
 {
     internal sealed class SetNode : AccessorNode
     {
-        public override NodeType NodeType => NodeType.Set;
+        public override ParseNodeType NodeType { get => ParseNodeType.Set; }
 
-        public Node ValueNode { get => Children[1]; }
-        public override Node Body { get => Children[2]; }
+        private readonly DeclarationNode value;
+        public ParseNodeCollection ValueNode { get => value; }
 
-        public SetNode(Node _describer, Node _valueDeclaration, Node _body) : base(_describer, _body)
+        public SetNode(DescriberNode _describer, DeclarationNode _valueDeclaration, ParseNode _body) : base(_describer, _body)
         {
-            Children = new List<Node>() { _describer, _valueDeclaration, _body };
+            value = _valueDeclaration;
+            Add(_valueDeclaration);
         }
 
         public override string ToString() => $"Set Node";

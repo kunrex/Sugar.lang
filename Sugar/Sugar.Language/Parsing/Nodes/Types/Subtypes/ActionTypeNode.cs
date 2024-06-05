@@ -6,7 +6,7 @@ namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
 {
     internal sealed class ActionTypeNode : VoidNode
     {
-        public override TypeNodeEnum Type => TypeNodeEnum.Action;
+        public override TypeNodeEnum Type { get => TypeNodeEnum.Action; }
 
         public ActionTypeNode()
         {

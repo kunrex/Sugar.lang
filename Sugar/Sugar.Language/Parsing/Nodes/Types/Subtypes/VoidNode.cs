@@ -6,7 +6,7 @@ namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
 {
     internal class VoidNode : TypeNode
     {
-        public override TypeNodeEnum Type => TypeNodeEnum.Void;
+        public override TypeNodeEnum Type { get => TypeNodeEnum.Void; }
 
         public VoidNode()
         {

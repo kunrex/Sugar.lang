@@ -1,18 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Types.Enums;
+
+using Sugar.Language.Parsing.Nodes.Values.Generics;
 
 namespace Sugar.Language.Parsing.Nodes.Types.Subtypes
 {
     internal sealed class ArrayTypeNode : TypeNode
     {
-        public Node ArrayType { get => Children[0]; }
-        public override TypeNodeEnum Type => TypeNodeEnum.Array;
+        public override TypeNodeEnum Type { get => TypeNodeEnum.Array; }
 
-        public ArrayTypeNode(Node _type)
+        private readonly GenericCallNode generic;
+        public GenericCallNode Generic { get => generic; }
+
+        public ArrayTypeNode(GenericCallNode _generic) : base(_generic)
         {
-            Children = new List<Node>() { _type };
+            generic = _generic;
         }
 
         public override string ToString() => $"Array Type Node";

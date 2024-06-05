@@ -1,20 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
+
+using Sugar.Language.Parsing.Nodes.Types;
+
+using Sugar.Language.Parsing.Nodes.Describers;
+
+using Sugar.Language.Parsing.Nodes.Functions.Properties.Accessors;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Properties
 {
     internal sealed class PropertySetNode : PropertyNode
     {
-        public Node Set { get => Children[2]; }
+        public override ParseNodeType NodeType { get => ParseNodeType.PropertySet; }
 
-        public override NodeType NodeType => NodeType.PropertySet;
+        private readonly SetNode setNode;
+        public SetNode Set { get => setNode; }
 
-        public PropertySetNode(Node _name, Node _type, Node _set) : base(_name, _type)
+        public PropertySetNode(DescriberNode _describer, TypeNode _type, SetNode _setNode) : base(_describer, _type)
         {
-            Children = new List<Node>() { _name, _type, _set };
+            setNode = _setNode;
+            Add(setNode);
         }
+
         public override string ToString() => $"Only Set property Node";
     }
 }

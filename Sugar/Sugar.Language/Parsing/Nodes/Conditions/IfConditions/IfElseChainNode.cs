@@ -3,15 +3,18 @@ using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
+using Sugar.Language.Parsing.Nodes.NodeGroups;
+
 namespace Sugar.Language.Parsing.Nodes.Conditions.IfConditions
 {
-    internal sealed class IfElseChainNode : Node
+    internal sealed class IfElseChainNode : CompoundStatementNode
     {
-        public override NodeType NodeType => NodeType.IfElseChain;
+        public override ParseNodeType NodeType { get => ParseNodeType.IfElseChain; }
 
-        public IfElseChainNode(List<Node> _nodes)
+        public IfElseChainNode(List<ParseNodeCollection> _conditions) : base()
         {
-            Children = _nodes;
+            foreach (var condition in _conditions)
+                Add(condition);
         }
 
         public override string ToString() => $"If Else Chain";

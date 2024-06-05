@@ -1,30 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.NodeGroups;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Calling.Structure
 {
-    internal sealed class FunctionCallArgumentsNode : ExpressionListNode
+    internal sealed class FunctionArgumentsNode : NodeCollection<FunctionArgumentNode>
     {
-        public override NodeType NodeType => NodeType.ArgumentCall;
+        public override ParseNodeType NodeType { get => ParseNodeType.ArgumentCall; }
 
-        public FunctionCallArgumentsNode()
+        public FunctionArgumentsNode() : base()
         {
             
         }
 
-        public FunctionCallArgumentsNode(Node _argument) : base(_argument)
+        public FunctionArgumentsNode AddChild(FunctionArgumentNode node)
         {
-            
+            Add(node);
+
+            return this;
         }
 
-        public FunctionCallArgumentsNode(List<Node> _arguments) : base(_arguments)
-        {
-            
-        }
-
-        public override string ToString() => $"Function Call Arguments Node";
+        public override string ToString() => $"Function Arguments Node";
     }
 }

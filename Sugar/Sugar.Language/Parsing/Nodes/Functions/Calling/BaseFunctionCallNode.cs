@@ -1,33 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
-using Sugar.Language.Parsing.Nodes.Interfaces;
+
+using Sugar.Language.Parsing.Nodes.Values.Generics;
+
+using Sugar.Language.Parsing.Nodes.Interfaces.Generic;
+
 using Sugar.Language.Parsing.Nodes.Functions.Calling.Structure;
 
 namespace Sugar.Language.Parsing.Nodes.Functions.Calling
 {
-    internal abstract class BaseFunctionCallNode : Node, IGenericNode
+    internal abstract class BaseFunctionCallNode : ParseNodeCollection, IGenericCall
     {
-        public Node Value { get => Children[0]; }
-        public Node Arguments { get => Children[1]; }
-        public override NodeType NodeType => NodeType.FunctionCall;
+        protected readonly ParseNodeCollection name;
+        public ParseNodeCollection Name { get => name; }
 
-        private int genericIndex = -1;
-        public Node Generic { get => genericIndex == -1 ? null : Children[genericIndex]; }
+        protected readonly FunctionArgumentsNode arguments;
+        public FunctionArgumentsNode Arguments { get => arguments; }
 
-        public BaseFunctionCallNode(FunctionNameCallNode _value, FunctionCallArgumentsNode _arguments)
+        protected readonly GenericCallNode generic;
+        public GenericCallNode Generic { get => generic; }
+
+        public BaseFunctionCallNode(ParseNodeCollection _name, FunctionArgumentsNode _arguments) : base(_name, _arguments)
         {
-            Children = new List<Node>() { _value, _arguments };
+            name = _name;
+            arguments = _arguments;
         }
 
-        public override Node AddChild(Node _node)
+        public BaseFunctionCallNode(ParseNodeCollection _name, FunctionArgumentsNode _arguments, GenericCallNode _generic) : base(_name, _arguments, _generic)
         {
-            Children.Add(_node);
-            if (_node.NodeType == NodeType.Generic)
-                genericIndex = Children.Count - 1;
+            name = _name;
+            arguments = _arguments;
 
-            return this;
+            generic = _generic;
         }
+
+        public override ParseNode AddChild(ParseNode node) { return this; }
     }
 }

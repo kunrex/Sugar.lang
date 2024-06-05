@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
+
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 namespace Sugar.Language.Parsing.Nodes.TryCatchFinally.Blocks
 {
     internal sealed class CatchBlockNode : BlockNode
     {
-        public override NodeType NodeType => NodeType.Catch;
+        public override ParseNodeType NodeType { get => ParseNodeType.Catch; }
 
-        public Node Arguments { get => Children[0]; }
-        public override Node Body { get => Children[1]; }
+        private readonly FunctionParamatersNode arguments;
+        public FunctionParamatersNode Arguments { get => arguments; }
 
-        public CatchBlockNode(Node _arguments, Node _body) : base(_body)
+        public CatchBlockNode(FunctionParamatersNode _arguments, ParseNode _body) : base(_body)
         {
-            Children = new List<Node>() { _arguments, _body };
+            arguments = _arguments;
+            Add(arguments);
         }
 
         public override string ToString() => $"Catch Node";

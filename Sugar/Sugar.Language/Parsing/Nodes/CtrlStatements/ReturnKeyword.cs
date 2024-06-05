@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Sugar.Language.Parsing.Nodes.Enums;
 
@@ -7,16 +6,19 @@ namespace Sugar.Language.Parsing.Nodes.CtrlStatements
 {
     internal sealed class ReturnKeyword : ControlStatement
     {
-        public override NodeType NodeType => NodeType.Return; 
+        public override ParseNodeType NodeType { get => ParseNodeType.Return; }
 
-        public ReturnKeyword()
+        private readonly ParseNodeCollection child;
+        public ParseNodeCollection Child { get => child; }
+
+        public ReturnKeyword() : base()
         {
-
+            child = null;
         }
 
-        public ReturnKeyword(Node value)
+        public ReturnKeyword(ParseNodeCollection _child) : base(_child)
         {
-            Children = new List<Node>() { value };
+            child = _child;
         }
 
         public override string ToString() => $"Return Node";
