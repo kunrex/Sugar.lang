@@ -10,7 +10,7 @@ namespace Sugar.Language.Parsing.Nodes.Values
     {
         public static IdentifierNode ValueIdentifier = new IdentifierNode(new Identifier("value", -1));
 
-        public override ParseNodeType NodeType { get => ParseNodeType.Variable; }
+        public override ParseNodeType NodeType { get => ParseNodeType.Identifier; }
 
         public IdentifierNode(Identifier _variable) : base(_variable)
         {

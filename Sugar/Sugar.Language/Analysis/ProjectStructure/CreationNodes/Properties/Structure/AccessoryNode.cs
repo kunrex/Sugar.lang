@@ -13,19 +13,19 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties.Stru
 {
     internal abstract class AccessoryNode : Scope, IDescribable, IBody
     {
-        protected readonly Describer describer;
+        private readonly Describer describer;
         public Describer Describers { get => describer; }
 
-        protected readonly ParseNodeCollection body;
-        public ParseNodeCollection Body { get => body; }
+        private readonly ParseNode body;
+        public ParseNode Body { get => body; }
 
-        public AccessoryNode(Describer _describer, ParseNodeCollection _body) : base()
+        protected AccessoryNode(Describer _describer, ParseNode _body) : base()
         {
             body = _body;
             describer = _describer;
         }
 
-        public bool ValidateDescribers() => describer.ValidateDescription(DescriberEnum.AccessModifiers);
-        public bool MatchDescriber(Describer tomatch) => tomatch.ValidateDescriber(describer);
+        public bool MatchDescriber(Describer toMatch) => Describer.ValidateDescriber(toMatch, describer);
+        public bool ValidateDescribers() => Describer.ValidateDescription(describer, DescriberEnum.AccessModifiers);
     }
 }

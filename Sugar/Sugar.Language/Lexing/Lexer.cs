@@ -26,7 +26,8 @@ namespace Sugar.Language.Lexing
         private SugarFile sourceFile;
 
         private string source;
-        private List<Token> Tokens;
+        private List<Token> tokens;
+        private StringBuilder value;
 
         private char? LookAhead()
         {
@@ -36,14 +37,15 @@ namespace Sugar.Language.Lexing
             return source[index + 1];
         }
 
-        private void CloneToken(Token token) => Tokens.Add(token.Clone(index));
+        private void CloneToken(Token token) => tokens.Add(token.Clone(index));
 
         internal void Lex(SugarFile _source)
         {
             sourceFile = _source;
 
             source = sourceFile.Source;
-            Tokens = new List<Token>();
+            tokens = new List<Token>();
+            value = new StringBuilder();
 
             for (index = 0; index < source.Length; index++)
             {
@@ -186,14 +188,14 @@ namespace Sugar.Language.Lexing
                         }
                         else
                         {
-                            var prev = Tokens.Count == 0 ? null : Tokens[Tokens.Count - 1];
+                            var prev = tokens.Count == 0 ? null : tokens[tokens.Count - 1];
 
                             if (next.HasValue && char.IsNumber(next.Value))
                             {
                                 if (prev == null)
                                 {
                                     index++;
-                                    Tokens.Add(ReadNumber());
+                                    tokens.Add(ReadNumber());
                                     break;
                                 }
 
@@ -209,13 +211,13 @@ namespace Sugar.Language.Lexing
                                         else
                                         {
                                             index++;
-                                            Tokens.Add(ReadNumber());
+                                            tokens.Add(ReadNumber());
                                         }
                                         break;
                                     default:
                                         {
                                             index++;
-                                            Tokens.Add(ReadNumber());
+                                            tokens.Add(ReadNumber());
                                         }
                                         break;
                                 }
@@ -262,13 +264,13 @@ namespace Sugar.Language.Lexing
                         }
                         else
                         {
-                            var prev = Tokens.Count == 0 ? null : Tokens[Tokens.Count - 1];
+                            var prev = tokens.Count == 0 ? null : tokens[tokens.Count - 1];
 
                             if (next.HasValue && char.IsNumber(next.Value))
                             {
                                 if (prev == null)
                                 {
-                                    Tokens.Add(ReadNumber());
+                                    tokens.Add(ReadNumber());
                                     break;
                                 }
 
@@ -282,10 +284,10 @@ namespace Sugar.Language.Lexing
                                         if (prev == Seperator.CloseBracket || prev == Seperator.BoxCloseBracket)
                                             CloneToken(BinaryOperator.Subtraction);
                                         else
-                                            Tokens.Add(ReadNumber());
+                                            tokens.Add(ReadNumber());
                                         break;
                                     default:
-                                        Tokens.Add(ReadNumber());
+                                        tokens.Add(ReadNumber());
                                         break;
                                 }
                             }
@@ -378,10 +380,10 @@ namespace Sugar.Language.Lexing
 
                     //Constants
                     case '"':
-                        Tokens.Add(ReadString());
+                        tokens.Add(ReadString());
                         break;
                     case '\'':
-                        Tokens.Add(ReadCharacter());
+                        tokens.Add(ReadCharacter());
                         break;
 
                     case '0':
@@ -394,16 +396,16 @@ namespace Sugar.Language.Lexing
                     case '7':
                     case '8':
                     case '9':
-                        Tokens.Add(ReadNumber());
+                        tokens.Add(ReadNumber());
                         break;
 
                     default:
-                        Tokens.Add(ReadEntity());
+                        tokens.Add(ReadEntity());
                         break;
                 }
             }
 
-            sourceFile.WithTokens(new TokenCollection(Tokens));
+            sourceFile.WithTokens(new TokenCollection(tokens));
 
             index = 0;
             sourceFile = null;
@@ -445,7 +447,7 @@ namespace Sugar.Language.Lexing
         private Token ReadString()
         {
             index++;
-            StringBuilder value = new StringBuilder();
+            value.Clear();
 
             while(index < source.Length)
             {
@@ -497,10 +499,9 @@ namespace Sugar.Language.Lexing
         /// </summary>
         private Token ReadNumber()
         {
-            StringBuilder value = new StringBuilder();
-
+            value.Clear();
             bool isReal = false;
-
+            
             while (index < source.Length)
             {
                 var current = source[index];
@@ -509,10 +510,7 @@ namespace Sugar.Language.Lexing
                 {
                     case '-':
                         if (value.Length > 0)
-                        {
                             index--;
-                            break;
-                        }
                         else
                             value.Append('-');
                         break;
@@ -552,7 +550,7 @@ namespace Sugar.Language.Lexing
                             index--;
                             return Extract();
                         }
-                        else if (char.IsNumber(next.Value))
+                        if (char.IsNumber(next.Value))
                         {
                             if (isReal)
                             {
@@ -579,29 +577,25 @@ namespace Sugar.Language.Lexing
             Token Extract()
             {
                 var constant = value.ToString();
-                if (isReal)
-                    switch (constant[constant.Length - 1])
-                    {
-                        case 'd':
-                            return new DoubleConstant(constant, index);
-                        case 'm':
-                            return new DecimalConstant(constant, index);
-                        default:
+                switch (constant[constant.Length - 1])
+                {
+                    case 'd':
+                        return new DoubleConstant(constant, index);
+                    case 'm':
+                        return new DecimalConstant(constant, index);
+                    case 'u':
+                        return new UIntegerConstant(constant, index);
+                    case 'l':
+                        if (constant[constant.Length - 2] == 'u')
+                            return new ULongConstant(constant, index);
+                        else
+                            return new LongConstant(constant, index);
+                    default:
+                        if(isReal) 
                             return new FloatConstant(constant, index);
-                    }
-                else
-                    switch (constant[constant.Length - 1])
-                    {
-                        case 'u':
-                            return new UIntegerConstant(constant, index);
-                        case 'l':
-                            if (constant[constant.Length - 2] == 'u')
-                                return new ULongConstant(constant, index);
-                            else
-                                return new LongConstant(constant, index);
-                        default:
+                        else
                             return new IntegerConstant(constant, index);
-                    }
+                }
             }
         }
 
@@ -610,7 +604,7 @@ namespace Sugar.Language.Lexing
         /// </summary>
         private Token ReadEntity()
         {
-            StringBuilder value = new StringBuilder();
+            value.Clear();
 
             while (index < source.Length)
             {
@@ -692,17 +686,17 @@ namespace Sugar.Language.Lexing
             return null;
         }
 
-        private InvalidCharacterException PushException(char character, int index)
+        private InvalidCharacterException PushException(char character, int errorIndex)
         {
-            var exception = new InvalidCharacterException(character, index);
+            var exception = new InvalidCharacterException(character, errorIndex);
 
             sourceFile.PushException(exception);
             return exception;
         }
 
-        private InvalidCharacterException PushException(char character, char expected, int index)
+        private InvalidCharacterException PushException(char character, char expected, int errorIndex)
         {
-            var exception = new InvalidCharacterException(character, expected, index);
+            var exception = new InvalidCharacterException(character, expected, errorIndex);
 
             sourceFile.PushException(exception);
             return exception;

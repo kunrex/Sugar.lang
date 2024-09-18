@@ -207,7 +207,6 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes
 
             return null;
         }
-
         public override string ToString() => $"Class [Name: {name}]";
     }
 }

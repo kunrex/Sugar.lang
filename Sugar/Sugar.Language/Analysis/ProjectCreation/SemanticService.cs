@@ -1,29 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Data;
 using Sugar.Language.Tokens.Enums;
+using Sugar.Language.Tokens.Keywords;
 
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Enums;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Describers;
-using Sugar.Language.Parsing.Nodes.Expressions.Associative;
+using Sugar.Language.Parsing.Nodes.Types.Enums;
+using Sugar.Language.Parsing.Nodes.Types.Subtypes;
+
+using Sugar.Language.Analysis.ProjectCreation.Utilities;
 
 using Sugar.Language.Analysis.ProjectStructure;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
-
+using Sugar.Language.Analysis.ProjectStructure.Interfaces.Nodes;
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes;
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes;
 
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Referencing;
+using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes.Generics;
+using Sugar.Language.Parsing.Nodes.Types;
+using Sugar.Language.Parsing.Nodes.Values.Generics;
 
 namespace Sugar.Language.Analysis.ProjectCreation
 {
     internal abstract class SemanticService 
     {
         protected readonly ProjectTree projectTree;
-
+        private readonly Queue<FindResult> references;
+        
         public SemanticService(ProjectTree _projectTree)
         {
             projectTree = _projectTree;
@@ -83,35 +91,56 @@ namespace Sugar.Language.Analysis.ProjectCreation
 
             return new Describer(describerEnum);
         }
+        protected IReadOnlyCollection<FindResult> FindReferences(DataType dataType, IdentifierNode identifier)
+        {
+            var references = EnqueueIntialReferences(dataType, identifier.Value);
+            var finalReferences = new Queue<FindResult>();
 
-        protected IReadOnlyCollection<Tuple<IReferencable, ParseNode>>FindReferences(DataType dataType, ParseNode node)
+            int length = references.Count;
+            for(int i = 0; i < length; i++)
+                finalReferences.Enqueue(new FindResult(1, references.Dequeue()));
+
+            return finalReferences;
+        }
+
+        protected IReadOnlyCollection<FindResult> FindReferences(DataType dataType, LongIdentiferNode identifier)
+        {
+            var references = EnqueueIntialReferences(dataType, identifier.NameAt(0));
+            var finalReferences = new Queue<FindResult>();
+            
+            for(int i = 1; i < identifier.SplitLength; i++)
+            { 
+                int length = references.Count;
+ 
+                for (int j = 0; j < length; j++)
+                {
+                    var bottom = references.Dequeue();
+                    var result = bottom.GetChildReference(identifier.NameAt(i));
+
+                    if (result == null)
+                        finalReferences.Enqueue(new FindResult(i + 1, bottom));
+                    else
+                    {
+                        foreach (var reference in result)
+                            references.Enqueue(reference);
+                    }
+                }
+            }
+
+            return finalReferences;
+        }
+
+        private Queue<IReferencable> EnqueueIntialReferences(DataType dataType, string value)
         {
             var references = new Queue<IReferencable>();
-            var finalRefences = new Queue<Tuple<IReferencable, ParseNode>>();
 
-            string value;
-            ParseNode current;
-            if(node.NodeType == ParseNodeType.Variable)
-            {
-                value = ((IdentifierNode)node).Value;
-                current = null;
-            }
-            else
-            {
-                var dot = (DotExpression)node;
-
-                value = ((IdentifierNode)dot.LHS).Value;
-                current = dot.RHS;
-            }
-
-            
             foreach (var child in projectTree.DefaultNamespace)
                 if (child.Name == value)
                     references.Enqueue(child);
 
             foreach (var reference in dataType.References)
             {
-                if(reference.Name == value)
+                if (reference.Name == value)
                     references.Enqueue(reference);
 
                 var sub = reference.GetChildReference(value);
@@ -120,45 +149,174 @@ namespace Sugar.Language.Analysis.ProjectCreation
                         references.Enqueue(subref);
             }
 
-            while(current != null)
+            return references;
+        }
+
+        protected DataType FindType(DataType dataType, TypeNode typeNode)
+        {
+            switch (typeNode.Type)
             {
-                switch(current.NodeType)
+                case TypeNodeEnum.BuiltIn:
+                    return FindType((TypeKeywordNode)typeNode);
+                case TypeNodeEnum.Array:
+                    return FindType(dataType, (ArrayTypeNode)typeNode);
+                case TypeNodeEnum.Created:
+                    return FindType(dataType, (CreatedTypeNode)typeNode);
+                case TypeNodeEnum.Function:
+                    return FindType(dataType, (FunctionTypeNode)typeNode);
+                default://function
+                    //errror
+                    return new InvalidDataType();
+            }
+        }
+
+        protected DataType FindType(TypeKeywordNode type)
+        {
+            return projectTree.DefaultNamespace.GetInternalDataType(FindInternalType(type.Keyword));
+        }
+
+        protected DataType FindType(DataType dataType, CreatedTypeNode type)
+        {
+            Queue<DataType> references = new Queue<DataType>();
+            if (type.Identifier.NodeType == ParseNodeType.Identifier)
+            {
+                foreach (var reference in FindReferences(dataType, (IdentifierNode)type.Identifier))
                 {
-                    case ParseNodeType.Dot:
-                        var dot = (DotExpression)current;
-                        EnqeueReferences(((IdentifierNode)dot.LHS).Value);
+                    if ((reference.Referencable.ProjectMemberType & ProjectMemberEnum.DataTypes) != reference.Referencable.ProjectMemberType)
+                        continue;
 
-                        current = dot.RHS;
-                        break;
-                    case ParseNodeType.Variable:
-                        EnqeueReferences(((IdentifierNode)current).Value);
-
-                        current = null;
-                        break;
+                    references.Enqueue(dataType);
                 }
+            }
+            else
+            {
+                var identifier = (LongIdentiferNode)type.Identifier;
 
-                if (references.Count == 0)
-                    break;
-        
-                void EnqeueReferences(string value)
+                foreach (var reference in FindReferences(dataType, identifier))
                 {
-                    int length = references.Count;
-                    for (int i = 0; i < length; i++)
-                    {
-                        var bottom = references.Dequeue();
-                        var result = bottom.GetChildReference(value);
-                        if (result == null)
-                            finalRefences.Enqueue(new Tuple<IReferencable, ParseNode>(bottom, current));
-                        else
-                        {
-                            foreach (var reference in result)
-                                references.Enqueue(reference);
-                        }
-                    }
+                    if (reference.Index != identifier.SplitLength - 1)
+                        continue;
+                    if ((reference.Referencable.ProjectMemberType & ProjectMemberEnum.DataTypes) != reference.Referencable.ProjectMemberType)
+                        continue;
+                    
+                    references.Enqueue(dataType);
                 }
             }
 
-            return finalRefences;
+            if (type.Generic != null)
+                CheckGeneric(dataType, type.Generic, references);
+            
+            return references.Dequeue();
+        }
+
+        protected void CheckGeneric(DataType dataType, GenericCallNode genericCallNode, Queue<DataType> references)
+        {
+            int length = references.Count;
+            for (int i = 0; i < length; i++)
+            {
+                var current = references.Dequeue();
+                if(current.GenericCount != genericCallNode.Length)
+                    continue;
+
+                DataType genericReference;
+                switch (current.ProjectMemberType)
+                {
+                    case ProjectMemberEnum.Class:
+                        genericReference = new GenericClass((Class)current);
+                        break;
+                    case ProjectMemberEnum.Struct:
+                        genericReference = new GenericStruct((Struct)current);
+                        break;
+                    default://interface
+                        genericReference = new GenericInterface((Interface)current);
+                        break;
+                }
+                
+                //check inheritance
+                    
+                foreach (TypeNode typeNode in genericCallNode)
+                    genericReference.AddEntity(FindType(dataType, typeNode));
+                    
+                references.Enqueue(genericReference);
+            }
+        }
+        
+        protected DataType FindType(DataType dataType, FunctionTypeNode type)
+        {
+            if (type.Generic.Length != 1)
+            {
+                //error
+                return new InvalidDataType();
+            }
+
+            if(type.Generic[0].Type == TypeNodeEnum.BuiltIn)
+                return FindType((TypeKeywordNode)type.Generic[0]);
+            else
+                return FindType(dataType, (CreatedTypeNode)type.Generic[0]);
+        }
+        
+        protected DataType FindType(DataType dataType, ArrayTypeNode type)
+        {
+            if (type.Generic.Length != 1)
+            {
+                //error
+                return new InvalidDataType();
+            }
+
+            DataType arrayType = new GenericClass((Class)projectTree.DefaultNamespace.GetInternalDataType(FindInternalType(null)));
+            
+            if (type.Generic[0].Type == TypeNodeEnum.BuiltIn)
+                arrayType.AddEntity(FindType((TypeKeywordNode)type.Generic[0]));
+            else
+            {
+                var returnType = FindType(dataType, (CreatedTypeNode)type.Generic[0]);
+                if (returnType == null)
+                {
+                    //error
+                    arrayType.AddEntity(new InvalidDataType());
+                }
+                else
+                    arrayType.AddEntity(returnType);
+            }
+            
+            return arrayType;
+        }
+
+        protected InternalTypeEnum FindInternalType(Keyword keyword)
+        {
+            switch(keyword.SyntaxKind)
+            {
+                case SyntaxKind.Byte:
+                    return InternalTypeEnum.Byte;
+                case SyntaxKind.SByte:
+                    return InternalTypeEnum.SByte;
+                case SyntaxKind.Short:
+                    return InternalTypeEnum.Short;
+                case SyntaxKind.UShort:
+                    return InternalTypeEnum.UShort;
+                case SyntaxKind.Int:
+                    return InternalTypeEnum.Integer;
+                case SyntaxKind.UInt:
+                    return InternalTypeEnum.UInteger;
+                case SyntaxKind.Long:
+                    return InternalTypeEnum.Long;
+                case SyntaxKind.Ulong:
+                    return InternalTypeEnum.ULong;
+                case SyntaxKind.Float:
+                    return InternalTypeEnum.Float;
+                case SyntaxKind.Double:
+                    return InternalTypeEnum.Double;
+                case SyntaxKind.Decimal:
+                    return InternalTypeEnum.Decimal;
+                case SyntaxKind.Char:
+                    return InternalTypeEnum.Character;
+                case SyntaxKind.String:
+                    return InternalTypeEnum.String;
+                case SyntaxKind.Bool:
+                    return InternalTypeEnum.Boolean;
+                default:
+                    return 0;
+            }
         }
     }
 }

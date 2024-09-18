@@ -39,10 +39,8 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
             return this;
         }
 
-        public CreatedNamespaceNode TryFindNameSpace(IdentifierNode identifier)
+        public CreatedNamespaceNode TryFindNameSpace(string value)
         {
-            var value = identifier.Value;
-
             foreach (var name in namespaces)
                 if (name.Name == value)
                     return name;

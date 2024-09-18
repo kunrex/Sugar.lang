@@ -47,13 +47,12 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
         public DataType GetInternalDataType(WrapperTypeEnum dataTypeEnum) => internalTypes[dataTypeEnum.ToString()];
         public DataType GetInternalDataType(InternalTypeEnum dataTypeEnum) => GetInternalDataType((WrapperTypeEnum)dataTypeEnum);
 
-        public override DataType TryFindDataType(IdentifierNode identifier)
+        public override DataType TryFindDataType(string value)
         {
-            var result = base.TryFindDataType(identifier);
+            var result = base.TryFindDataType(value);
             if (result != null)
                 return result;
 
-            var value = identifier.Value;
             foreach (var child in internalTypes.Values)
                 if (child.Name == value)
                     return child;

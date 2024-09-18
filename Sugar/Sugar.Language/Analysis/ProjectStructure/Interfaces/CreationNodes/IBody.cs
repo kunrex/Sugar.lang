@@ -6,6 +6,6 @@ namespace Sugar.Language.Analysis.ProjectStructure.Interfaces.CreationNodes
 {
     internal interface IBody
     {
-        public ParseNodeCollection Body { get; }
+        public ParseNode Body { get; }
     }
 }

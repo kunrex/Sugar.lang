@@ -19,8 +19,8 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Functions
 {
     internal abstract class VoidCreationNode<Parent> : CreationNode, IFunction, IBody where Parent : IFunctionParent 
     {
-        protected readonly ParseNodeCollection body;
-        public ParseNodeCollection Body { get => body; }
+        protected readonly ParseNode body;
+        public ParseNode Body { get => body; }
 
         private readonly List<FunctionArgument> arguments;
         public FunctionArgument this[int index] { get => arguments[index]; }
@@ -30,7 +30,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Functions
         private readonly Scope scope;
         public Scope Scope { get => scope; }
 
-        public VoidCreationNode(string _name, Describer _describer, ParseNodeCollection _body) : base(_name, _describer)
+        public VoidCreationNode(string _name, Describer _describer, ParseNode _body) : base(_name, _describer)
         {
             body = _body;
 

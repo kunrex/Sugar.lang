@@ -10,7 +10,6 @@ using Sugar.Language.Parsing.Nodes.Enums;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.DataTypes;
 using Sugar.Language.Parsing.Nodes.Statements;
-using Sugar.Language.Parsing.Nodes.Expressions.Associative;
 
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Collections;
 
@@ -82,7 +81,7 @@ namespace Sugar.Language.Analysis.ProjectCreation
                         allowImports = false;
                         var dataType = (DataTypeNode)child;
 
-                        if (projectTree.DefaultNamespace.TryFindDataType(dataType.Name) == null)
+                        if (projectTree.DefaultNamespace.TryFindDataType(dataType.Name.Value) == null)
                             defaultTypeFunctionCall.Invoke(CreateDataType(dataType, references));
                         else
                             projectTree.WithException(new DuplicateDataTypeException(dataType.Name.Value));
@@ -96,27 +95,16 @@ namespace Sugar.Language.Analysis.ProjectCreation
 
         private void AnalyseNameSpace(NamespaceNode node, ReferenceCollection references)
         {
-            var name = node.Name;
             INamespaceCollection collection = projectTree.ProjectNamespace;
 
-            while (name != null)
+            if(node.Name.NodeType == ParseNodeType.Identifier)
+                collection = EvaluateResult(((IdentifierNode)node.Name).Value);
+            else
             {
-                switch (name.NodeType)
-                {
-                    case ParseNodeType.Dot:
-                        var dotExpression = (DotExpression)name;
-                        var lhs = (IdentifierNode)dotExpression.LHS;
+                var longIdentifier = (LongIdentiferNode)node.Name;
 
-                        collection = EvaluateResult(lhs);
-                        name = dotExpression.RHS;
-                        break;
-                    case ParseNodeType.Variable:
-                        var converted = (IdentifierNode)name;
-                        collection = EvaluateResult(converted);
-
-                        name = null;
-                        break;
-                }
+                for(int i = 0; i < longIdentifier.SplitLength; i++)
+                    collection = EvaluateResult(longIdentifier.NameAt(i));
             }
 
             var dataTypeCollection = (IDataTypeCollection)collection;
@@ -134,12 +122,12 @@ namespace Sugar.Language.Analysis.ProjectCreation
                     break;
             }
 
-            INamespaceCollection EvaluateResult(IdentifierNode identifier)
+            INamespaceCollection EvaluateResult(string value)
             {
-                var result = collection.TryFindNameSpace(identifier);
+                var result = collection.TryFindNameSpace(value);
                 if (result == null)
                 {
-                    var created = new CreatedNamespaceNode(identifier.Value);
+                    var created = new CreatedNamespaceNode(value);
                     collection.AddEntity(created);
 
                     return created;
@@ -169,7 +157,7 @@ namespace Sugar.Language.Analysis.ProjectCreation
 
         private void CreateDataType(DataTypeNode dataTypeNode, IDataTypeCollection collection, ReferenceCollection references)
         { 
-            if (collection.TryFindDataType(dataTypeNode.Name) == null)
+            if (collection.TryFindDataType(dataTypeNode.Name.Value) == null)
                 collection.AddEntity(CreateDataType(dataTypeNode, references));
             else
                 projectTree.WithException(new DuplicateDataTypeException(dataTypeNode.Name.Value));

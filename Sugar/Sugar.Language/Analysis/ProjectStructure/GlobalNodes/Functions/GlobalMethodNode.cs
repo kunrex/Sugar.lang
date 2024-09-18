@@ -25,7 +25,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions
         private IGlobalFunctionParent parent;
         public IGlobalFunctionParent Parent { get => parent; }
 
-        public GlobalMethodNode(string _name, Describer _describer, DataType _type, ParseNodeCollection _body) : base(_name, _describer, _body, _type)
+        public GlobalMethodNode(string _name, Describer _describer, DataType _type, ParseNode _body) : base(_name, _describer, _body, _type)
         {
 
         }

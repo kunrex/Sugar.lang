@@ -3,7 +3,7 @@
 namespace Sugar.Language.Analysis.ProjectStructure.Enums
 {
     [Flags]
-    public enum ProjectMemberEnum : byte
+    public enum ProjectMemberEnum : ushort
     {
         Package = 1,
 
@@ -15,8 +15,10 @@ namespace Sugar.Language.Analysis.ProjectStructure.Enums
         Class = 32,
         Struct = 64,
         Interface = 128,
+        
+        InvalidDataType = 256,
 
-        DataTypes = Enum | Class | Struct | Interface,
+        DataTypes = Enum | Class | Struct | Interface | InvalidDataType,
         Namespaces = DefaultNameSpace | CreatedNameSpace | ProjectNamespace,
     }
 }

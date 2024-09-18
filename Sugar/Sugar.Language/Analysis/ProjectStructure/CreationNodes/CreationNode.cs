@@ -26,7 +26,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes
             describer = _describer;
         }
 
-        public bool ValidateDescribers() => describer.ValidateDescription(BaseDescribers);
-        public bool MatchDescriber(Describer tomatch) => tomatch.ValidateDescriber(describer);
+        public bool MatchDescriber(Describer toMatch) => Describer.ValidateDescriber(toMatch, describer);
+        public bool ValidateDescribers() => Describer.ValidateDescription(describer, DescriberEnum.AccessModifiers);
     }
 }

@@ -28,7 +28,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties
 
         public BaseIndexerNode(string _name, Describer _describer, DataType _type) : base(_name, _describer, _type)
         {
-            
+            arguments = new List<FunctionArgument>();
         }
 
         public IIndexer AddArgument(FunctionArgument argument)

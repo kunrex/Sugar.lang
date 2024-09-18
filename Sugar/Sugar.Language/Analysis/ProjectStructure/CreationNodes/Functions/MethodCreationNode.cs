@@ -20,7 +20,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Functions
         protected readonly DataType creationType; 
         public DataType CreationType { get => creationType; }
 
-        public MethodCreationNode(string _name, Describer _describer, ParseNodeCollection _body, DataType _type) : base(_name, _describer, _body)
+        public MethodCreationNode(string _name, Describer _describer, ParseNode _body, DataType _type) : base(_name, _describer, _body)
         {
             creationType = _type;
         }

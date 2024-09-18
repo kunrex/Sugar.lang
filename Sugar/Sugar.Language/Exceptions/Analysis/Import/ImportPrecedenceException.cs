@@ -17,7 +17,7 @@ namespace Sugar.Language.Exceptions.Analysis.Import
         private static int GetIndex(ImportNode importNode) => importNode.BaseName.NodeType switch
         {
             ParseNodeType.Dot => ((IdentifierNode)((DotExpression)importNode.BaseName).LHS).Token.Index,
-            ParseNodeType.Variable => ((IdentifierNode)importNode.BaseName).Token.Index,
+            ParseNodeType.Identifier => ((IdentifierNode)importNode.BaseName).Token.Index,
             _ => -1
         };
     }

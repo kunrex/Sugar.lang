@@ -9,8 +9,9 @@ namespace Sugar.Language.Parsing.Nodes.Enums
         SugarFile,
         ExpressionList,
 
-        Variable,
+        Identifier,
         Constant,
+        LongIdentifier,
 
         This,
         Empty,

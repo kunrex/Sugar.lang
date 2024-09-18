@@ -12,10 +12,24 @@ namespace Sugar.Language.Analysis.ProjectStructure
         {
             value = _value;
         }
-
-        public bool ValidateDescription(DescriberEnum external)
+        
+        private static bool ReadBit(ushort number, byte index)
         {
-            ushort ushortValue = (ushort)value;
+            int bit = 1;
+            for (ushort i = 0; i < index; i++)
+                bit = bit * 2;
+
+            return (number & bit) == bit;
+        }
+        
+        public static bool ValidateDescriber(Describer describer1, Describer describer2)
+        {
+            return ValidateDescription(describer1, describer2.value);
+        }
+        
+        public static bool ValidateDescription(Describer describer, DescriberEnum external)
+        {
+            ushort ushortValue = (ushort)describer.value;
             ushort accessorValue = (ushort)external;
 
             for (byte i = 0; i < 16; i++)
@@ -23,17 +37,6 @@ namespace Sugar.Language.Analysis.ProjectStructure
                     return false;
 
             return true;
-        }
-
-        public bool ValidateDescriber(Describer describer) => ValidateDescription(describer.value);
-
-        private bool ReadBit(ushort number, byte index)
-        {
-            int bit = 1;
-            for (ushort i = 0; i < index; i++)
-                bit = bit * 2;
-
-            return (number & bit) == bit;
         }
     }
 }

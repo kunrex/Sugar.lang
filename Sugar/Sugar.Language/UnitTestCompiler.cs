@@ -18,8 +18,8 @@ namespace Sugar.Language
             if (Lexer.Instance == null)
                 Lexer.CreateInstance();
 
-            if (Lexer.Instance == null)
-                Lexer.CreateInstance();
+            if (Parser.Instance == null)
+                Parser.CreateInstance();
         }
 
         public bool Initialise()

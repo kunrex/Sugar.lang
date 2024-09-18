@@ -40,10 +40,8 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
             return this;
         }
 
-        public virtual DataType TryFindDataType(IdentifierNode identifier)
+        public virtual DataType TryFindDataType(string value)
         {
-            var value = identifier.Value;
-
             foreach (var type in children)
                 if (type.Name == value)
                     return type;

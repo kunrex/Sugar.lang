@@ -13,10 +13,8 @@ using Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions.Structure;
 
 namespace Sugar.Language.Analysis.ProjectStructure.Interfaces.CreationNodes.Functions
 {
-    internal interface IFunction : ICreationNode, ICustomCollection<FunctionArgument>, IScopeParent
+    internal interface IFunction : ICreationNode, ICustomCollection<FunctionArgument>, IScopeParent, IBody
     {
-        public ParseNodeCollection Body { get; }
-
         public Scope Scope { get; }
 
         public IFunction AddArgument(FunctionArgument argument);

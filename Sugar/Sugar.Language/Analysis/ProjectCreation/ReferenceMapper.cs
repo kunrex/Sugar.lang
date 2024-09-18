@@ -6,7 +6,7 @@ using Sugar.Language.Exceptions.Analysis.Import;
 using Sugar.Language.Parsing;
 using Sugar.Language.Parsing.Nodes.Enums;
 using Sugar.Language.Parsing.Nodes.Values;
-using Sugar.Language.Parsing.Nodes.Expressions.Associative;
+using Sugar.Language.Parsing.Nodes.Values.Generics;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -16,6 +16,7 @@ using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes;
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Referencing;
 
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces;
+using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes.Generics;
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes.Structure;
 
 namespace Sugar.Language.Analysis.ProjectCreation
@@ -37,17 +38,16 @@ namespace Sugar.Language.Analysis.ProjectCreation
                 CreateReferences(tree.References);
 
             foreach (var type in projectTree.DefaultNamespace)
-                ReferenceParents(type);
+                SubReferences(type);
 
             foreach (var name in projectTree.ProjectNamespace)
-                ReferenceParents(name);
+                SubReferences(name);
         }
 
         private void CreateReferences(ReferenceCollection references)
         {
             var current = new Queue<IReferencable>();
 
-            //filter imports for repeats
             foreach (var import in references.Imports)
             {
                 current.Clear();
@@ -55,42 +55,22 @@ namespace Sugar.Language.Analysis.ProjectCreation
                 
                 current.Enqueue(projectTree.ProjectNamespace);
 
-                while(node != null)
+                if (node.NodeType == ParseNodeType.Identifier)
+                    EnqeueReferences(((IdentifierNode)node).Value);
+                else
                 {
-                    switch (node.NodeType)
+                    var longIdentifer = (LongIdentiferNode)node;
+
+                    for (int i = 0; i < longIdentifer.SplitLength; i++)
                     {
-                        case ParseNodeType.Dot:
-                            var dot = (DotExpression)node;
-                            EnqeueReferences(((IdentifierNode)dot.LHS).Value);
+                        EnqeueReferences(longIdentifer.NameAt(i));
 
-                            node = ((DotExpression)node).RHS;
+                        if (current.Count == 0)
                             break;
-                        case ParseNodeType.Variable:
-                            EnqeueReferences(((IdentifierNode)node).Value);
-
-                            node = null;
-                            break;
-                    }
-
-                    if (current.Count == 0)
-                        break;
-
-                    void EnqeueReferences(string value)
-                    {
-                        int length = current.Count;
-                        for (int i = 0; i < length; i++)
-                        {
-                            var result = current.Dequeue().GetChildReference(value);
-                            if (result == null)
-                                continue;
-
-                            foreach (var reference in result)
-                                current.Enqueue(reference);
-                        }
                     }
                 }
 
-                if(current.Count == 0)
+                if (current.Count == 0)
                 {
                     projectTree.WithException(new NoReferenceFoundException());
                 }
@@ -116,19 +96,33 @@ namespace Sugar.Language.Analysis.ProjectCreation
                     else
                         projectTree.WithException(new AmbigiousReferenceException());
                 }
+
+                void EnqeueReferences(string value)
+                {
+                    int length = current.Count;
+                    for (int i = 0; i < length; i++)
+                    {
+                        var result = current.Dequeue().GetChildReference(value);
+                        if (result == null)
+                            continue;
+
+                        foreach (var reference in result)
+                            current.Enqueue(reference);
+                    }
+                }
             }
         }
 
-        private void ReferenceParents(CreatedNamespaceNode name)
+        private void SubReferences(CreatedNamespaceNode name)
         {
             foreach (var type in name)
-                ReferenceParents(type);
+                SubReferences(type);
 
             foreach(var nameSpace in name.Namespaces)
-                ReferenceParents(nameSpace);
+                SubReferences(nameSpace);
         }
 
-        private void ReferenceParents(DataType type)
+        private void SubReferences(DataType type)
         {
             IReferencable parent = type.GetParent();
             while (parent != null)
@@ -147,7 +141,23 @@ namespace Sugar.Language.Analysis.ProjectCreation
                 }
             }
 
-            type.ReferenceParent();
+            GenericDeclarationNode declaration = null;
+            switch (type.ProjectMemberType)
+            {
+                case ProjectMemberEnum.Class:
+                    declaration = ((Class)type).ParseSkeleton.Generic;
+                    break;
+                case ProjectMemberEnum.Struct:
+                    declaration = ((Struct)type).ParseSkeleton.Generic;
+                    break;
+                case ProjectMemberEnum.Interface:
+                    declaration = ((Interface)type).ParseSkeleton.Generic;
+                    break;
+            }
+
+            if(declaration != null)
+                foreach(var gen in declaration)
+                    type.ReferenceGeneric(new GenericReference(gen.Variable.Value, gen.Enforcement));
         }
     }
 }

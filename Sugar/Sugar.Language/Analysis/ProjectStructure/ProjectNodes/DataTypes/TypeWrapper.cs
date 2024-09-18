@@ -13,7 +13,7 @@ using Sugar.Language.Analysis.ProjectStructure.Interfaces.CreationNodes.Function
 
 namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes
 {
-    internal abstract class TypeWrapper<Skeleton> : DataType where Skeleton : DataTypeNode
+    internal abstract class TypeWrapper<Skeleton> : ParentableDataType where Skeleton : DataTypeNode
     {
         protected readonly Skeleton skeleton;
         public Skeleton ParseSkeleton { get => skeleton; }

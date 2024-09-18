@@ -23,7 +23,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions
         private IGlobalFunctionParent parent;
         public IGlobalFunctionParent Parent { get => parent; }
 
-        public GlobalVoidNode(string _name, Describer _describer, ParseNodeCollection _body) : base(_name, _describer, _body)
+        public GlobalVoidNode(string _name, Describer _describer, ParseNode _body) : base(_name, _describer, _body)
         {
 
         }
