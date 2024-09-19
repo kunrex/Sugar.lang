@@ -256,7 +256,6 @@
     <Folder Include="Semantics\Analysis\BuiltInTypes\" />
     <Folder Include="Semantics\Analysis\BuiltInTypes\Enums\" />
     <Folder Include="Compilers\" />
-    <Folder Include="WrapperFiles\" />
     <Folder Include="Analysis\" />
     <Folder Include="Analysis\ProjectStructure\" />
     <Folder Include="Analysis\ProjectStructure\Interfaces\" />
@@ -268,7 +267,6 @@
     <Folder Include="Semantics\ActionTrees\Interfaces\Collections\Enumerators\" />
     <Folder Include="Analysis\ProjectStructure\GlobalNodes\Functions\" />
     <Folder Include="Analysis\ProjectStructure\GlobalNodes\Properties\" />
-    <Folder Include="Analysis\ProjectStructure\GlobalNodes\Variables\" />
     <Folder Include="Analysis\ProjectStructure\CreationNodes\" />
     <Folder Include="Analysis\ProjectStructure\Interfaces\CreationNodes\" />
     <Folder Include="Analysis\ProjectStructure\Interfaces\Describers\" />

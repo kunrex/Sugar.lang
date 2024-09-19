@@ -31,15 +31,17 @@ namespace Sugar.Language.Compilers
                     return true;
                 }
 
-                /*SugarFileCollection wrapperTree = CreateSyntaxTree(wrappers);
-                if(!collection.Valid)
+                SugarFileCollection wrapperTree = CreateSyntaxTree(wrappers);
+                if(!wrapperTree.Valid)
                 {
-                    collection.PrintExceptions();
+                    wrapperTree.PrintExceptions();
                     return false;
-                }*/
+                }
+                
+                wrapperTree.SyntaxTree[0].Print();
 
-                ProjectTree tree = SemanticAnalyser.Instance.WithTrees(null, collection.SyntaxTree).Analyse();
-                tree.Print("", true);
+                /*ProjectTree tree = SemanticAnalyser.Instance.WithTrees(null, collection.SyntaxTree).Analyse();
+                tree.Print("", true);*/
 
                 return true;
             }

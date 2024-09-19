@@ -52,8 +52,8 @@ namespace Sugar.Language.Parsing.Parser
         /// </summary>
         private ParseNode ParseExpression(bool readAssignment, SeperatorKind breakOutSeperators)
         {
-            var stack = new List<Token>();
-            var output = new List<ParseNodeCollection>();
+            var stack = new Stack<Operator>();
+            var output = new Stack<ParseNodeCollection>();
             TokenType expected = TokenType.Constant | TokenType.Identifier | TokenType.Seperator | TokenType.UnaryOperator | TokenType.Keyword;
 
             bool breakOut = false, invalid = false;
@@ -71,26 +71,26 @@ namespace Sugar.Language.Parsing.Parser
                             switch (current.SyntaxKind)
                             {
                                 case SyntaxKind.Create:
-                                    output.Add(ParseConstructorCall(true));
+                                    output.Push(ParseConstructorCall(true));
                                     break;
                                 case SyntaxKind.This:
                                     index++;
                                     TryMatchCurrent(Seperator.Dot, true);
-                                    output.Add(new ThisNode(ParseEntity(true, SeperatorKind.None)));
+                                    output.Push(new ThisNode(ParseEntity(true, SeperatorKind.None)));
                                     break;
                                 case SyntaxKind.Input:
-                                    output.Add(ParseInputCall(true));
+                                    output.Push(ParseInputCall(true));
                                     break;
                                 case SyntaxKind.Default:
-                                    output.Add(ParseDefault());
+                                    output.Push(ParseDefault());
                                     break;
                                 case SyntaxKind.AsType:
-                                    output.Add(ParseAsType());
+                                    output.Push(ParseAsType());
                                     break;
                                 default:
                                     if (((Keyword)current).KeywordType == KeywordType.Type)
                                     {
-                                        output.Add(ParseEntity(true, SeperatorKind.None));
+                                        output.Push(ParseEntity(true, SeperatorKind.None));
                                         break;
                                     }
                                     invalid = breakOut = true;
@@ -100,11 +100,11 @@ namespace Sugar.Language.Parsing.Parser
                             expected = TokenType.Seperator | TokenType.Operator;
                             break;
                         case TokenType.Constant:
-                            output.Add(ParseEntity(true, SeperatorKind.None));
+                            output.Push(ParseEntity(true, SeperatorKind.None));
                             expected = TokenType.Seperator | TokenType.BinaryOperator;
                             break;
                         case TokenType.Identifier:
-                            output.Add(ParseEntity(true, SeperatorKind.None));
+                            output.Push(ParseEntity(true, SeperatorKind.None));
                             expected = TokenType.Seperator | TokenType.Operator;
                             break;
                         case TokenType.Seperator:
@@ -116,19 +116,19 @@ namespace Sugar.Language.Parsing.Parser
 
                             if (MatchToken(Seperator.OpenBracket, current, true))
                             {
-                                output.Add(ParseNonEmptyExpression(false, SeperatorKind.CloseBracket));
+                                output.Push(ParseNonEmptyExpression(false, SeperatorKind.CloseBracket));
                                 expected = TokenType.Operator | TokenType.Seperator;
                             }
                             else if (MatchToken(Seperator.Questionmark, current, true))
                             {
-                                output.Add(ParseTernary(output, stack, breakOutSeperators));
+                                output.Push(ParseTernary(output, stack, breakOutSeperators));
                                 expected = TokenType.Seperator | TokenType.Operator;
                             }
                             else
                                 invalid = breakOut = true;
                             break;
                         case TokenType.UnaryOperator:
-                            if (stack.Count > 0 && MatchType(TokenType.UnaryOperator, stack[stack.Count - 1], false))
+                            if (stack.Count > 0 && MatchType(TokenType.UnaryOperator, stack.Peek(), false))
                             {
                                 invalid = breakOut = true;
                                 break;
@@ -154,7 +154,7 @@ namespace Sugar.Language.Parsing.Parser
 
                             void AddPrefix()
                             {
-                                stack.Add(Operator.ConvertUnaryToPrefix((Operator)current));
+                                stack.Push(Operator.ConvertUnaryToPrefix((Operator)current));
                                 expected = TokenType.Identifier | TokenType.Constant;
 
                                 if (LookAhead() == Seperator.OpenBracket)
@@ -162,7 +162,7 @@ namespace Sugar.Language.Parsing.Parser
                             }
                             void AddPostfix()
                             {
-                                stack.Add((Operator)current);
+                                stack.Push((Operator)current);
                                 expected = TokenType.BinaryOperator | TokenType.Seperator;
                             }
                             break;
@@ -183,7 +183,7 @@ namespace Sugar.Language.Parsing.Parser
 
                             while (stack.Count > 0)
                             {
-                                var top = stack[stack.Count - 1];
+                                var top = stack.Peek();
                                 if (top == Seperator.OpenBracket)
                                     break;
 
@@ -191,18 +191,18 @@ namespace Sugar.Language.Parsing.Parser
                                 if (node == null)
                                     break;
 
-                                output.Add(node);
-                                stack.RemoveAt(stack.Count - 1);
+                                output.Push(node);
+                                stack.Pop();
                             }
 
                             if (asOperator == BinaryOperator.AsCastOperator)
                             {
-                                stack.Add(asOperator);
+                                stack.Push(asOperator);
                                 expected = TokenType.Identifier | TokenType.Keyword;
                                 break;
                             }
                             else
-                                stack.Add(asOperator);
+                                stack.Push(asOperator);
 
                             expected = TokenType.Identifier | TokenType.Constant | TokenType.UnaryOperator | TokenType.Seperator;
                             break;
@@ -216,9 +216,9 @@ namespace Sugar.Language.Parsing.Parser
                     if (invalid)
                     {
                         if ((expected & TokenType.Seperator) == TokenType.Seperator)
-                            output.Add(new InvalidExpressionNode(PushExpectedTokenException($"{breakOutSeperators}", current), PanicModeSimple(breakOutSeperators)));
+                            output.Push(new InvalidExpressionNode(PushExpectedTokenException($"{breakOutSeperators}", current), PanicModeSimple(breakOutSeperators)));
                         else
-                            output.Add(new InvalidExpressionNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators)));
+                            output.Push(new InvalidExpressionNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators)));
                     }
 
                     break;
@@ -229,39 +229,33 @@ namespace Sugar.Language.Parsing.Parser
 
             if (breakOut && output.Count == 0)
                 return new EmptyNode();
-            else if (index >= sourceFile.TokenCount)
+            if (index >= sourceFile.TokenCount)
                 PushExpectedCurrentException($"{breakOutSeperators}");
 
-            return output[0];
+            return output.Pop();
         }
 
-        private ParseNodeCollection ParseExpression(Operator top, List<ParseNodeCollection> output)
+        private ParseNodeCollection ParseExpression(Operator top, Stack<ParseNodeCollection> output)
         {
             if (top.Type == TokenType.UnaryOperator)
             {
-                var operhand = output[output.Count - 1];
-
-                output.RemoveAt(output.Count - 1);
-                return new UnaryExpression(top, operhand);
+                return new UnaryExpression(top, output.Pop());
             }
-            else
-            {
-                var lhs = output[output.Count - 2];
-                var rhs = output[output.Count - 1];
-
-                output.RemoveRange(output.Count - 2, 2);
-                if (top == BinaryOperator.DotOperator)
-                    return new DotExpression(lhs, rhs);
-                else if (top == BinaryOperator.AsCastOperator)
-                    return new CastExpression(lhs, (TypeNode)rhs);
-                else
-                    return new BinaryExpression(top, lhs, rhs);
-            }
+            
+            var rhs = output.Pop();
+            var lhs = output.Pop();
+   
+            if (top == BinaryOperator.DotOperator)
+                return new DotExpression(lhs, rhs);
+            if (top == BinaryOperator.AsCastOperator)
+                return new CastExpression(lhs, (TypeNode)rhs);
+            
+            return new BinaryExpression(top, lhs, rhs);
         }
 
-        private ParseNodeCollection ParseExpression(Operator current, List<ParseNodeCollection> output, List<Token> stack)
+        private ParseNodeCollection ParseExpression(Operator current, Stack<ParseNodeCollection> output, Stack<Operator> stack)
         {
-            var top = (Operator)stack[stack.Count - 1];
+            var top = stack.Peek();
             if (current.Precedence < top.Precedence && !(top.Precedence == current.Precedence && current.LeftAssociative))
                 return null;
 
@@ -279,14 +273,14 @@ namespace Sugar.Language.Parsing.Parser
 
             if (expression.NodeType == ParseNodeType.Empty)
                 return new EmptyExpressionNode(PushInvalidCurrentException());
-            else
-                return (ParseNodeCollection)expression;
+            
+            return (ParseNodeCollection)expression;
         }
 
-        private void ClearStack(List<ParseNodeCollection> output, List<Token> stack)
+        private void ClearStack(Stack<ParseNodeCollection> output, Stack<Operator> stack)
         {
             while (stack.Count > 0)
-                output.Add(ParseExpression((Operator)stack.Pop(), output));
+                output.Push(ParseExpression(stack.Pop(), output));
         }
 
         /// <summary>
@@ -307,7 +301,7 @@ namespace Sugar.Language.Parsing.Parser
         /// Parse Ternary (non empty)
         /// <para>• Ends on same index as <paramref name="breakOutSeperators"/></para>
         /// </summary>
-        private TernaryExpression ParseTernary(List<ParseNodeCollection> output, List<Token> stack, SeperatorKind breakOutSeperators)
+        private TernaryExpression ParseTernary(Stack<ParseNodeCollection> output, Stack<Operator> stack, SeperatorKind breakOutSeperators)
         {
             ParseNodeCollection condition;
             if (output.Count == 0)
@@ -343,10 +337,10 @@ namespace Sugar.Language.Parsing.Parser
 
                 if (MatchCurrent(Seperator.Comma, true))
                     continue;
-                else if (MatchCurrent(Seperator.BoxCloseBracket))
+                if (MatchCurrent(Seperator.BoxCloseBracket))
                     return new IndexerExpression(operhand, arguments);
-                else
-                    break;
+                
+                break;
             }
 
             return new InvalidIndexerNode(PushExpectedCurrentException(Seperator.BoxCloseBracket), PanicModeSimple(SeperatorKind.BoxCloseBracket));
@@ -362,8 +356,8 @@ namespace Sugar.Language.Parsing.Parser
 
             if (MatchCurrent(Seperator.Semicolon))
                 return new ReturnKeyword();
-            else
-                return new ReturnKeyword(ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
+           
+            return new ReturnKeyword(ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
         }
 
         /// <summary>
@@ -423,18 +417,16 @@ namespace Sugar.Language.Parsing.Parser
 
                 if (MatchCurrent(Seperator.Comma, true))
                     continue;
-                else if (MatchBreakOutSeperator(Current, finalBreakOut))
+                if (MatchBreakOutSeperator(Current, finalBreakOut))
                 {
                     if (increment)
                         index++;
 
                     break;
                 }
-                else
-                {
-                    nodes.AddChild(new InvalidEntityNode(PushExpectedCurrentException($"{finalBreakOut}"), PanicModeSimple(finalBreakOut)));
-                    break;
-                }
+                
+                nodes.AddChild(new InvalidEntityNode(PushExpectedCurrentException($"{finalBreakOut}"), PanicModeSimple(finalBreakOut)));
+                break;
             }
 
             return nodes;
@@ -446,8 +438,8 @@ namespace Sugar.Language.Parsing.Parser
         /// </summary>
         private ParseNodeCollection ParseEntity(bool inExpression, SeperatorKind breakOutSeperators)
         {
-            var stack = new List<Token>();
-            var output = new List<ParseNodeCollection>();
+            var stack = new Stack<Operator>();
+            var output = new Stack<ParseNodeCollection>();
             TokenType expected = TokenType.Constant | TokenType.Identifier | TokenType.Keyword;
 
             bool breakOut = false, subtract = false;
@@ -464,7 +456,7 @@ namespace Sugar.Language.Parsing.Parser
                             break;
                         }
 
-                        output.Add(new ConstantValueNode((Constant)current));
+                        output.Push(new ConstantValueNode((Constant)current));
                         expected = TokenType.Seperator;
                         break;
                     case TokenType.Identifier:
@@ -480,13 +472,13 @@ namespace Sugar.Language.Parsing.Parser
                             GenericCallNode generic = ParseGenericCall(!inExpression);
 
                             if (generic == null)
-                                output.Add(identifier);
+                                output.Push(identifier);
                             else
-                                output.Add(new CreatedTypeNode(identifier, generic));
+                                output.Push(new CreatedTypeNode(identifier, generic));
                         }
                         else
                         {
-                            output.Add(identifier);
+                            output.Push(identifier);
                         }
 
 
@@ -498,7 +490,7 @@ namespace Sugar.Language.Parsing.Parser
                             breakOut = subtract = true;
                             break;
                         }
-                        else if (MatchBreakOutSeperator(current, breakOutSeperators))
+                        if (MatchBreakOutSeperator(current, breakOutSeperators))
                         {
                             breakOut = true;
                             break;
@@ -507,14 +499,14 @@ namespace Sugar.Language.Parsing.Parser
                         switch (current.SyntaxKind)
                         {
                             case SyntaxKind.Dot:
-                                stack.Add(BinaryOperator.DotOperator);
+                                stack.Push(BinaryOperator.DotOperator);
                                 expected = TokenType.Identifier;
                                 break;
                             case SyntaxKind.BoxOpenBracket:
-                                output.Add(ParseIndexer(output.Pop()));
+                                output.Push(ParseIndexer(output.Pop()));
                                 break;
                             case SyntaxKind.OpenBracket:
-                                output.Add(ParseFunctionCall(inExpression, ParseVariable(output.Pop())));
+                                output.Push(ParseFunctionCall(inExpression, ParseVariable(output.Pop())));
                                 break;
                             default:
                                 breakOut = subtract = true;
@@ -526,20 +518,20 @@ namespace Sugar.Language.Parsing.Parser
                         {
                             breakOut = subtract = true;
                             break;
-                        }
-                        else if (current.SyntaxKind == SyntaxKind.Array)
+                        } 
+                        if (current.SyntaxKind == SyntaxKind.Array)
                         {
                             if (inExpression)
-                                output.Add(new TypeKeywordNode(TypeKeyword.Array));
+                                output.Push(new TypeKeywordNode(TypeKeyword.Array));
                             else
-                                output.Add(new ArrayTypeNode(ParseGenericCall(true)));
+                                output.Push(new ArrayTypeNode(ParseGenericCall(true)));
                         }
 
                         var keyword = (Keyword)current;
 
                         if (keyword.KeywordType == KeywordType.Type)
                         {
-                            output.Add(new TypeKeywordNode(keyword));
+                            output.Push(new TypeKeywordNode(keyword));
                             expected = TokenType.Seperator;
                             break;
                         }
@@ -564,7 +556,7 @@ namespace Sugar.Language.Parsing.Parser
             }
 
             if (output.Count > 0)
-                return output[0];
+                return output.Pop();
             else
                 return new EmptyEntityNode(PushExpectedTokenException(expected, Current), expected);
         }
@@ -779,10 +771,8 @@ namespace Sugar.Language.Parsing.Parser
                     case TokenType.Seperator:
                         if (!MatchType(expected, current) || !MatchToken(Seperator.Comma, current))
                             return new ParseGenericResult(new InvalidTokenException(current));
-                        else
-                            expected = TokenType.Identifier | TokenType.Keyword;
-                        break;
-                    default:
+                        
+                        expected = TokenType.Identifier | TokenType.Keyword;
                         break;
                 }
 
@@ -812,17 +802,14 @@ namespace Sugar.Language.Parsing.Parser
 
                 if (MatchType(toMatch, next) && next != Seperator.OpenBracket)
                     return genericResult.Generic;
-                else
+                
+                index = beforeIndex;
+                if (force)
                 {
-                    index = beforeIndex;
-                    if (force)
-                    {
-                        sourceFile.PushException(genericResult.Exception);
-                        return new InvalidGenericCallNode(genericResult.Exception, PanicModeSimple(SeperatorKind.None));
-                    }
-                    else
-                        return null;
+                    sourceFile.PushException(genericResult.Exception);
+                    return new InvalidGenericCallNode(genericResult.Exception, PanicModeSimple(SeperatorKind.None));
                 }
+                
             }
             else
             {
@@ -833,9 +820,9 @@ namespace Sugar.Language.Parsing.Parser
                     sourceFile.PushException(genericResult.Exception);
                     return new InvalidGenericCallNode(genericResult.Exception, PanicModeSimple(SeperatorKind.None));
                 }
-                else
-                    return null;
             }
+            
+            return null;
         }
 
         /// <summary>
@@ -859,14 +846,13 @@ namespace Sugar.Language.Parsing.Parser
 
                 if (MatchCurrent(Seperator.Semicolon, true))
                     continue;
-                else if (MatchCurrent(BinaryOperator.GreaterThan, true))
+                if (MatchCurrent(BinaryOperator.GreaterThan, true))
                     return generic;
-                else
-                    break;
+                
+                break;
             }
 
             return new InvalidGenericDeclarationNode(PushExpectedCurrentException(BinaryOperator.GreaterThan), PanicModeSimple(SeperatorKind.None));
         }
     }
 }
-

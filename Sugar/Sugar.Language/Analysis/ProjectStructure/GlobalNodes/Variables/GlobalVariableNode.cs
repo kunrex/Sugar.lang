@@ -14,7 +14,7 @@ using Sugar.Language.Analysis.ProjectStructure.Interfaces.Parenting.Variables;
 
 namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Variables
 {
-    internal sealed class GlobalVariableNode : VariableCreationNode, IGlobalNode, IParentableNode<IGlobalVariableParent>
+    internal class GlobalVariableNode : VariableCreationNode, IGlobalNode, IParentableNode<IGlobalVariableParent>
     {
         public override MemberTypeEnum MemberType { get => MemberTypeEnum.Global; }
         public GlobalMemberEnum GlobalMember { get => GlobalMemberEnum.Variable; }

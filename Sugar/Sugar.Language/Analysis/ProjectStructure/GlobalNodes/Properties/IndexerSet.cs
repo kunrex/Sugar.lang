@@ -4,20 +4,19 @@ using Sugar.Language.Analysis.ProjectStructure.Enums;
 
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes;
 
-
 using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties;
 using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties.Structure;
 
 namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Properties
 {
-    internal sealed class PropertySetNode : BasePropertyNode
+    internal sealed class IndexerSet : BaseIndexerNode
     {
-        public override GlobalMemberEnum GlobalMember { get => GlobalMemberEnum.PropertySet; }
+        public override GlobalMemberEnum PropertyType { get => GlobalMemberEnum.PropertyGet; }
 
-        private readonly SetNode set;
-        public SetNode Set { get => set; }
+        private readonly Set set;
+        public Set Set { get => set; }
 
-        public PropertySetNode(string _name, Describer _describer, DataType _type, SetNode _set) : base(_name, _describer, _type)
+        public IndexerSet(Describer _describer, DataType _type, Set _set) : base(_describer, _type)
         {
             set = _set;
         }

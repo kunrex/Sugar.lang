@@ -9,17 +9,17 @@ using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties.Structur
 
 namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Properties
 {
-    internal sealed class IndexerGetSetNode : BaseIndexerNode
+    internal sealed class IndexerGetSet : BaseIndexerNode
     {
         public override GlobalMemberEnum PropertyType { get => GlobalMemberEnum.PropertyGet; }
 
-        private readonly GetNode get;
-        public GetNode Get { get => get; }
+        private readonly Get get;
+        public Get Get { get => get; }
 
-        private readonly SetNode set;
-        public SetNode Set { get => set; }
+        private readonly Set set;
+        public Set Set { get => set; }
 
-        public IndexerGetSetNode(string _name, Describer _describer, DataType _type, GetNode _get, SetNode _set) : base(_name, _describer, _type)
+        public IndexerGetSet(Describer _describer, DataType _type, Get _get, Set _set) : base(_describer, _type)
         {
             get = _get;
             set = _set;

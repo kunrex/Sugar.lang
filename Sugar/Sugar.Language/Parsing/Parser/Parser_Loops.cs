@@ -56,7 +56,7 @@ namespace Sugar.Language.Parsing.Parser
                             index++;
                             return subStatements.Count == 1 ? subStatements[0] : new CompoundStatementNode(subStatements);
                         default:
-                            if(subStatements.Peek().NodeType == ParseNodeType.Invalid)
+                            if(subStatements[subStatements.Count - 1].NodeType == ParseNodeType.Invalid)
                                 return subStatements.Count == 1 ? subStatements[0] : new CompoundStatementNode(subStatements);
 
                             index++;

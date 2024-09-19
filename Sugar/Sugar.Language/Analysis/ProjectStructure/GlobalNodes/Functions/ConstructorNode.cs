@@ -20,7 +20,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions
 
         protected override DescriberEnum BaseDescribers { get => DescriberEnum.ConstructorBaseDescriber; }
 
-        public ConstructorNode(DataType _creationType, Describer _describer, ParseNodeCollection _body) : base(_creationType.Name, _describer, _body, _creationType)
+        public ConstructorNode(DataType _creationType, Describer _describer, ParseNode _body) : base(_creationType.Name, _describer, _body, _creationType)
         {
 
         }

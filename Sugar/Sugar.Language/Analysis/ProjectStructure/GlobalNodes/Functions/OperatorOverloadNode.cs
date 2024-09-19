@@ -25,7 +25,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions
 
         protected override DescriberEnum BaseDescribers { get => DescriberEnum.ConstructorBaseDescriber; }
 
-        public OperatorOverloadNode(Operator _operator, Describer _describer, ParseNodeCollection _body, DataType _type) : base(_operator.Value, _describer, _body, _type)
+        public OperatorOverloadNode(Operator _operator, Describer _describer, ParseNode _body, DataType _type) : base(_operator.Value, _describer, _body, _type)
         {
             baseOperator = _operator;
         }

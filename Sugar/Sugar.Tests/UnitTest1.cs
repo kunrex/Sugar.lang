@@ -14,7 +14,7 @@ namespace Sugar.Tests
         public void InputAndOutput()
         {
             string source = "string: name = input(\"whats your name?\"); print(\"hi \" + name + \"!\");";
-                
+            
             Assert.That(new UnitTestCompiler(source).Compile(), Is.EqualTo(true));
         }
         

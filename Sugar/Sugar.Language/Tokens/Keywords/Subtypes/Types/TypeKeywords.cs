@@ -27,7 +27,7 @@ namespace Sugar.Language.Tokens.Keywords.Subtypes.Types
 
         public static readonly TypeKeyword Bool = new TypeKeyword("bool", SyntaxKind.Bool);
 
-        public static readonly TypeKeyword Array = new TypeKeyword("Array", SyntaxKind.Array);
+        public static readonly TypeKeyword Array = new TypeKeyword("array", SyntaxKind.Array);
         public static readonly TypeKeyword Object = new TypeKeyword("object", SyntaxKind.Object);
     }
 }

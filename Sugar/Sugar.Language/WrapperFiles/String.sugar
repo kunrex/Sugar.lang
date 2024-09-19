@@ -1,6 +1,6 @@
 ﻿class String
 {
-    [private] Array<char>: value;
+    [private] array<char>: value;
 
     [public] int: Length { get => value.Length; }
     [public] bool: Empty { get => value.Length == 0; }
@@ -8,7 +8,7 @@
     [public]
     constructor String(string: defaultValue)
     {
-        value = defaultValue;
+        value = defaultValue.ToCharArray();
     }
 
     [private]
@@ -100,5 +100,5 @@
     {
         Array<char> new = create Array<char>(value.Length - s.Length);
         
-    }*/
+    }
 }

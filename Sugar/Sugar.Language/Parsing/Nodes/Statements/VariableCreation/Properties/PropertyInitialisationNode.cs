@@ -16,7 +16,7 @@ namespace Sugar.Language.Parsing.Nodes.Statements.VariableCreation.Properties
 {
     internal sealed class PropertyInitialisationNode : PropertyDeclarationNode, ICreationNode_Value
     {
-        public override ParseNodeType NodeType { get => ParseNodeType.Declaration; }
+        public override ParseNodeType NodeType { get => ParseNodeType.PropertyInitialise; }
 
         private readonly ParseNodeCollection value;
         public ParseNodeCollection Value { get => value; }

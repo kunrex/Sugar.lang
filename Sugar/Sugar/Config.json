@@ -2,6 +2,6 @@
   "Version": 1,
   "SugarFileExtension": ".sugar",
 
-  "SourceFolder": "/Users/kunalkashyap/Projects/Sugar.Language/Sugar/Sugar/PrimarySource",
-  "WrapperFileLocation": "/Users/kunalkashyap/Projects/Sugar.Language/Sugar/Sugar.Language/WrapperFiles"
+  "SourceFolder": "/Users/kunalkashyap/Projects/C#/Sugar.Language/Sugar/Sugar/PrimarySource",
+  "WrapperFileLocation": "/Users/kunalkashyap/Projects/C#/Sugar.Language/Sugar/Sugar.Language/WrapperFiles"
 }

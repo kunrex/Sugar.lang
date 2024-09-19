@@ -10,9 +10,9 @@ using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes;
 
 namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties.Structure
 {
-    internal sealed class SetNode : AccessoryNode
+    internal sealed class Set : AccessoryNode
     {
-        public SetNode(Describer _describer, ParseNodeCollection _body, DataType _type) : base(_describer, _body)
+        public Set(Describer _describer, ParseNode _body, DataType _type) : base(_describer, _body)
         {
             AddVariable(new LocalVariableNode("value", new Describer(DescriberEnum.Const), _type));
         }

@@ -26,7 +26,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties
 
         public int Length { get => arguments.Count; }
 
-        public BaseIndexerNode(string _name, Describer _describer, DataType _type) : base(_name, _describer, _type)
+        public BaseIndexerNode(Describer _describer, DataType _type) : base(null, _describer, _type)
         {
             arguments = new List<FunctionArgument>();
         }
