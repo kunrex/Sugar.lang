@@ -7,13 +7,15 @@ using Sugar.Language.Tokens.Operators.Binary;
 using Sugar.Language.Tokens.Seperators;
 
 using Sugar.Language.Parsing.Nodes;
-
+using Sugar.Language.Parsing.Nodes.Conditions.IfConditions;
 using Sugar.Language.Parsing.Nodes.DataTypes;
 
 using Sugar.Language.Parsing.Nodes.Describers;
-
+using Sugar.Language.Parsing.Nodes.NodeGroups;
+using Sugar.Language.Parsing.Nodes.Statements;
 using Sugar.Language.Parsing.Nodes.Values;
 using Sugar.Language.Parsing.Nodes.Values.Generics;
+using Sugar.Language.Tokens.Operators.Assignment;
 
 namespace Sugar.Language.Parsing.Parser
 {
@@ -59,10 +61,28 @@ namespace Sugar.Language.Parsing.Parser
             if (MatchCurrent(Seperator.Colon))
                 inherits = ParseInheritanceTypes(SeperatorKind.FlowerOpenBracket);
 
+            var expressionList = new ExpressionListNode();
+            TryMatchCurrent(Seperator.FlowerOpenBracket, true);
+            while (index < sourceFile.TokenCount)
+            {
+                ParseNodeCollection expression = ParseIdentifier(true);
+                if(MatchCurrent(AssignmentOperator.Assignment, true))
+                    expression = new AssignmentNode(expression, ParseNonEmptyExpression(false, SeperatorKind.Comma | SeperatorKind.FlowerCloseBracket));
+
+
+                expressionList.AddChild(expression);
+                if(MatchCurrent(Seperator.Comma, true))
+                    continue;
+
+                break;
+            }
+
+            TryMatchCurrent(Seperator.FlowerCloseBracket);
+            
             if (inherits == null)
-                return new EnumNode(describer, name, ParseExpressionList(SeperatorKind.FlowerCloseBracket));
+                return new EnumNode(describer, name, expressionList);
             else
-                return new EnumNode(describer, name, ParseExpressionList(SeperatorKind.FlowerCloseBracket), inherits);
+                return new EnumNode(describer, name, expressionList, inherits);
         }
 
         private StructNode ParseStructDeclaration(DescriberNode describer, IdentifierNode name)

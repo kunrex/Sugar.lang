@@ -31,15 +31,15 @@ namespace Sugar.Language.Compilers
                     return true;
                 }
 
-                SugarFileCollection wrapperTree = CreateSyntaxTree(wrappers);
+                /*SugarFileCollection wrapperTree = CreateSyntaxTree(wrappers);
                 if(!wrapperTree.Valid)
                 {
                     wrapperTree.PrintExceptions();
                     return false;
-                }
+                }*/
                 
-                wrapperTree.SyntaxTree[0].Print();
-
+                collection.SyntaxTree[1].Print();
+        
                 /*ProjectTree tree = SemanticAnalyser.Instance.WithTrees(null, collection.SyntaxTree).Analyse();
                 tree.Print("", true);*/
 

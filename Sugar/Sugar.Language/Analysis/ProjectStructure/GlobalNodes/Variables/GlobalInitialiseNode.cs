@@ -2,11 +2,13 @@ using System;
 
 using Sugar.Language.Parsing.Nodes;
 
+using Sugar.Language.Analysis.ProjectStructure.Interfaces.Value;
+
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes;
 
 namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Variables;
 
-internal sealed class GlobalInitialiseNode : GlobalVariableNode
+internal sealed class GlobalInitialiseNode : GlobalVariableNode, IValueNode
 {
     private readonly ParseNode value;
     public ParseNode Value { get => value; }

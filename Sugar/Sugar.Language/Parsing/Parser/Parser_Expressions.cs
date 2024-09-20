@@ -433,7 +433,7 @@ namespace Sugar.Language.Parsing.Parser
         }
 
         /// <summary>
-        /// Parse Expression List 
+        /// Parse Entity
         /// <para>• Ends on index of last valid entity or <paramref name="breakOutSeperators"/></para>
         /// </summary>
         private ParseNodeCollection ParseEntity(bool inExpression, SeperatorKind breakOutSeperators)

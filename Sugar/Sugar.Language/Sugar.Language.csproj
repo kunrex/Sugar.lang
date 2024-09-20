@@ -258,7 +258,6 @@
     <Folder Include="Compilers\" />
     <Folder Include="Analysis\" />
     <Folder Include="Analysis\ProjectStructure\" />
-    <Folder Include="Analysis\ProjectStructure\Interfaces\" />
     <Folder Include="Analysis\ProjectStructure\Interfaces\Parenting\" />
     <Folder Include="Analysis\ProjectStructure\Enums\" />
     <Folder Include="Analysis\ProjectStructure\ProjectNodes\" />
@@ -266,7 +265,6 @@
     <Folder Include="Analysis\ProjectStructure\Interfaces\Collections\" />
     <Folder Include="Semantics\ActionTrees\Interfaces\Collections\Enumerators\" />
     <Folder Include="Analysis\ProjectStructure\GlobalNodes\Functions\" />
-    <Folder Include="Analysis\ProjectStructure\GlobalNodes\Properties\" />
     <Folder Include="Analysis\ProjectStructure\CreationNodes\" />
     <Folder Include="Analysis\ProjectStructure\Interfaces\CreationNodes\" />
     <Folder Include="Analysis\ProjectStructure\Interfaces\Describers\" />
@@ -294,7 +292,6 @@
     <Folder Include="Parsing\Nodes\Types\Invalid\" />
     <Folder Include="Parsing\Nodes\Functions\Delegates\" />
     <Folder Include="Analysis\ProjectStructure\LocalNodes\Statements\" />
-    <Folder Include="Analysis\ProjectCreation\" />
     <Folder Include="Exceptions\Analysis\" />
     <Folder Include="Exceptions\Analysis\Processing\" />
     <Folder Include="Exceptions\Analysis\Import\" />
@@ -303,7 +300,6 @@
     <Folder Include="Analysis\ProjectStructure\Interfaces\Referencing\" />
     <Folder Include="Analysis\ProjectStructure\ProjectNodes\DataTypes\Structure\" />
     <Folder Include="Analysis\ProjectCreation\Utilities\" />
-    <Folder Include="Analysis\ProjectStructure\Interfaces\Generics\" />
     <Folder Include="Analysis\ProjectStructure\ProjectNodes\DataTypes\Generics\" />
   </ItemGroup>
   <ItemGroup>

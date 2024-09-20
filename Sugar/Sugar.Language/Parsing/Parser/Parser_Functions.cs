@@ -94,7 +94,8 @@ namespace Sugar.Language.Parsing.Parser
 
                 return set;
             }
-        }
+        } 
+        
         private ParseNodeCollection ParseConstructorCall(bool inExpression)
         {
             ForceMatchCurrent(Keyword.Create, true);

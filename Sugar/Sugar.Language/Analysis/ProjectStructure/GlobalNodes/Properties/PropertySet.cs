@@ -10,7 +10,7 @@ using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties.Structur
 
 namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Properties
 {
-    internal sealed class PropertySet : BasePropertyNode
+    internal class PropertySet : BasePropertyNode
     {
         public override GlobalMemberEnum GlobalMember { get => GlobalMemberEnum.PropertySet; }
 
