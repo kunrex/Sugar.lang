@@ -1,9 +1,13 @@
+using System;
+
+using Sugar.Language.Exceptions.Analysis.Processing;
+
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Collections;
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Referencing;
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes.Generics;
 using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes.Structure;
-using Sugar.Language.Exceptions.Analysis.Processing;
+
 
 namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes;
 
@@ -30,8 +34,8 @@ internal abstract class ParentableDataType : DataType
     {
         foreach (var child in children)
         {
-            child.ReferenceParent(this);
-            child.ReferenceParent();
+            child.Value.ReferenceParent(this);
+            child.Value.ReferenceParent();
         }
     }
 
@@ -40,7 +44,7 @@ internal abstract class ParentableDataType : DataType
         references.WithReference(parentReference);
 
         foreach (var child in children)
-            child.ReferenceParent(parentReference);
+            child.Value.ReferenceParent(parentReference);
     }
     
     public override void SetParent(IDataTypeCollection typeParent)
@@ -51,22 +55,19 @@ internal abstract class ParentableDataType : DataType
         parent = typeParent;
 
         foreach (var child in children)
-            child.SetParent(this);
+            child.Value.SetParent(this);
     }
-    
+
     public override DataType TryFindDataType(string value)
     {
-        foreach (var type in children)
-            if (type.Name == value)
-                return type;
-
-        return null;
+        children.TryGetValue(value, out var val);
+        return val;
     }
     
     public override IDataTypeCollection AddEntity(DataType dataType)
     {
         if (TryFindDataType(dataType.Name) != null)
-            children.Add(dataType);
+            children.Add(dataType.Name, dataType);
 
         return this;
     }
@@ -74,8 +75,8 @@ internal abstract class ParentableDataType : DataType
     public override IReferencable[] GetChildReference(string value)
     {
         foreach (var child in children)
-            if (child.Name == value)
-                return new IReferencable[] { child };
+            if (child.Key == value)
+                return new IReferencable[] { child.Value };
 
         return null;
     }

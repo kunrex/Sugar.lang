@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
-
-using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -12,8 +11,8 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
 {
     internal class CreatedNamespaceNode : BaseNamespaceNode, INamespaceCollection, IReferencable
     {
-        private readonly List<CreatedNamespaceNode> namespaces;
-        public IReadOnlyCollection<CreatedNamespaceNode> Namespaces { get => namespaces; }
+        private readonly Dictionary<string, CreatedNamespaceNode> namespaces;
+        public IReadOnlyCollection<CreatedNamespaceNode> Namespaces { get => namespaces.Values; }
 
         public int NameSpaceCount { get => namespaces.Count; }
 
@@ -21,7 +20,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
 
         public CreatedNamespaceNode(string _name) : base(_name)
         {
-            namespaces = new List<CreatedNamespaceNode>();
+            namespaces = new Dictionary<string, CreatedNamespaceNode>();
         }
 
         public override void SetParent(INamespaceCollection _parent)
@@ -29,23 +28,20 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
             base.SetParent(_parent);
 
             foreach (var child in namespaces)
-                child.SetParent(this);
+                child.Value.SetParent(this);
         }
 
         public INamespaceCollection AddEntity(CreatedNamespaceNode nameSpace)
         {
-            namespaces.Add(nameSpace);
+            namespaces.Add(nameSpace.Name, nameSpace);
 
             return this;
         }
 
         public CreatedNamespaceNode TryFindNameSpace(string value)
         {
-            foreach (var name in namespaces)
-                if (name.Name == value)
-                    return name;
-
-            return null;
+            namespaces.TryGetValue(value, out var val);
+            return val;
         }
 
         public override IReferencable GetParent() { return parent; }
@@ -55,16 +51,16 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
             var set = new List<IReferencable>();
 
             foreach (var child in namespaces)
-                if (child.Name == value)
+                if (child.Key == value)
                 {
-                    set.Add(child);
+                    set.Add(child.Value);
                     break;
                 }
 
             foreach (var child in children)
-                if (child.Name == value)
+                if (child.Key == value)
                 {
-                    set.Add(child);
+                    set.Add(child.Value);
                     break;
                 }
 
@@ -76,10 +72,10 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
         protected override void PrintChildren(string indent)
         {
             for (int i = 0; i < children.Count; i++)
-                children[i].Print(indent, i == children.Count - 1);
+                children.ElementAt(i).Value.Print(indent, i == children.Count - 1);
 
             for (int i = 0; i < namespaces.Count; i++)
-                namespaces[i].Print(indent, i == namespaces.Count - 1);
+                namespaces.ElementAt(i).Value.Print(indent, i == namespaces.Count - 1);
         }
     }
 }

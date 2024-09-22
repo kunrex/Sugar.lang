@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-
-using Sugar.Language.Parsing.Nodes.Values;
+using System.Linq;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -16,7 +14,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
 
         public int NameSpaceCount { get => Length; }
 
-        public override CreatedNamespaceNode this[int index] { get => children[index]; }
+        public override CreatedNamespaceNode this[int index] { get => children.ElementAt(index).Value; }
 
         public ProjectNamespaceNode() : base("project")
         {
@@ -25,16 +23,13 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
 
         public CreatedNamespaceNode TryFindNameSpace(string value)
         {
-            foreach (var child in children)
-                if (child.Name == value)
-                    return child;
-
-            return null;
+            children.TryGetValue(value, out var val);
+            return val;
         }
 
         public INamespaceCollection AddEntity(CreatedNamespaceNode nameSpace)
         {
-            children.Add(nameSpace);
+            children.Add(nameSpace.Name, nameSpace);
 
             return this;
         }
@@ -44,8 +39,8 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
         public IReferencable[] GetChildReference(string value)
         {
             foreach (var child in children)
-                if (child.Name == value)
-                    return new IReferencable[] { child };
+                if (child.Key == value)
+                    return new IReferencable[] { child.Value };
 
             return null;
         }
@@ -55,7 +50,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
         protected override void PrintChildren(string indent)
         {
             for (int i = 0; i < children.Count; i++)
-                children[i].Print(indent, i == children.Count - 1);
+                children.ElementAt(i).Value.Print(indent, i == children.Count - 1);
         }
     }
 }

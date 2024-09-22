@@ -86,7 +86,7 @@ namespace Sugar.Language.Parsing.Parser
                     if (Match(StatementEnum.LambdaStatement))
                         return ParseStatement(false, SeperatorKind.Semicolon);
                     if (Match(StatementEnum.LambdaExpression))
-                        return new LambdaNode(ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
+                        return new LambdaNode(ParseNonEmptyExpression(SeperatorKind.Semicolon));
                     
                     return new InvalidStatementNode(PushInvalidStatementException(), PanicModeSimple(SeperatorKind.None));
                 default:
@@ -284,7 +284,7 @@ namespace Sugar.Language.Parsing.Parser
                     break;
                 case SyntaxKind.Throw:
                     index++;
-                    toReturn = new ThrowExceptionNode(ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
+                    toReturn = new ThrowExceptionNode(ParseNonEmptyExpression(SeperatorKind.Semicolon));
                     break;
                 case SyntaxKind.Var:
                     index++;
@@ -408,8 +408,7 @@ namespace Sugar.Language.Parsing.Parser
                             break;
                         case TokenType.AssignmentOperator:
                             index++;
-                            toReturn = ParseVariableAssignment(variable, next as AssignmentOperator,
-                                breakOutSeperators);
+                            toReturn = ParseVariableAssignment(variable, next as AssignmentOperator, breakOutSeperators);
                             break;
                         default:
                             if (next.SyntaxKind == SyntaxKind.Lambda)
@@ -472,8 +471,7 @@ namespace Sugar.Language.Parsing.Parser
                 if (LookAhead() == AssignmentOperator.Assignment)
                 {
                     index += 2;
-                    return new PropertyInitialisationNode(describer, type, identifier, property,
-                        ParseNonEmptyExpression(false, SeperatorKind.Semicolon));
+                    return new PropertyInitialisationNode(describer, type, identifier, property, ParseNonEmptyExpression(SeperatorKind.Semicolon));
 
                 }
                 
@@ -489,8 +487,7 @@ namespace Sugar.Language.Parsing.Parser
                 if (MatchCurrent(AssignmentOperator.Assignment))
                 {
                     index++;
-                    declarations.Add(new InitializeNode(describer, type, identifier,
-                        ParseNonEmptyExpression(false, SeperatorKind.Semicolon | SeperatorKind.Comma)));
+                    declarations.Add(new InitializeNode(describer, type, identifier, ParseNonEmptyExpression(SeperatorKind.Semicolon | SeperatorKind.Comma)));
                 }
                 else
                     declarations.Add(new DeclarationNode(describer, type, identifier));
@@ -514,29 +511,15 @@ namespace Sugar.Language.Parsing.Parser
         private ParseNodeCollection ParseVariableAssignment(ParseNodeCollection variable, AssignmentOperator assignmentOperator, SeperatorKind breakOutSeperators)
         {
             index++;
+            var expression = ParseNonEmptyExpression(breakOutSeperators);
+            int x = 10;
+            int y = 20;
+            int z = 10;
+            x += y = z;
             if (assignmentOperator.BaseOperator == null)
-                return ParseMultiVariableAssignment(variable, breakOutSeperators);
-            else
-            {
-                var expression = ParseNonEmptyExpression(false, breakOutSeperators);
                 return new AssignmentNode(variable, expression);
-            }
-        }
-
-        private ParseNodeCollection ParseMultiVariableAssignment(ParseNodeCollection variable, SeperatorKind breakOutSeperators)
-        {
-            var expression = ParseNonEmptyExpression(true, breakOutSeperators);
-
-            if (MatchCurrent(AssignmentOperator.Assignment))
-            {
-                if (!CheckVariable(expression))
-                    expression = new InvalidVariableNode(PushExpectedCurrentException("Variable"), expression);
-
-                index++;
-                expression = ParseMultiVariableAssignment(expression, breakOutSeperators);
-            }
-
-            return new AssignmentNode(variable, expression);
+            else
+                return new AssignmentNode(variable, new BinaryExpression(assignmentOperator.BaseOperator, variable, expression));
         }
 
         private ImportNode ParseImportStatement()
@@ -548,24 +531,25 @@ namespace Sugar.Language.Parsing.Parser
             switch (current.SyntaxKind)
             {
                 case SyntaxKind.Enum:
+                    index++;
                     entityType = CreationType.Enum;
                     break;
                 case SyntaxKind.Class:
+                    index++;
                     entityType = CreationType.Class;
                     break;
                 case SyntaxKind.String:
+                    index++;
                     entityType = CreationType.Struct;
                     break;
                 case SyntaxKind.Interface:
+                    index++;
                     entityType = CreationType.Interface;
                     break;
                 default:
                     entityType = CreationType.Namespace;
                     break;
             }
-
-            if (entityType != CreationType.Namespace)
-                index++;
 
             return new ImportNode(entityType, ParseVariable(SeperatorKind.Semicolon));
         }

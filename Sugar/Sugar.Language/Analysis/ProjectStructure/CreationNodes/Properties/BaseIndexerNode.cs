@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
 using Sugar.Language.Services;
 
 using Sugar.Language.Parsing.Nodes.Values;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -12,47 +14,52 @@ using Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes;
 
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.CreationNodes;
 
-using Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions.Structure;
+using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Functions.Structure;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties
 {
     internal abstract class BaseIndexerNode : BasePropertyNode, IIndexer
     {
+        protected readonly FunctionParamatersNode parseArguments;
+        public FunctionParamatersNode ParseArguments { get => parseArguments; }
+        
         public abstract GlobalMemberEnum PropertyType { get; }
         public override GlobalMemberEnum GlobalMember { get => GlobalMemberEnum.Indexer; }
 
-        private readonly List<FunctionArgument> arguments;
-        public FunctionArgument this[int index] { get => arguments[index]; }
+        private readonly Dictionary<string, FunctionParameter> arguments;
+        public FunctionParameter this[int index] { get => arguments.ElementAt(index).Value; }
 
         public int Length { get => arguments.Count; }
 
-        public BaseIndexerNode(Describer _describer, DataType _type) : base(null, _describer, _type)
+        public BaseIndexerNode(Describer _describer, DataType _type, FunctionParamatersNode _arguments) : base(null, _describer, _type)
         {
-            arguments = new List<FunctionArgument>();
+            parseArguments = _arguments;
+            arguments = new Dictionary<string, FunctionParameter>();
         }
 
-        public IIndexer AddArgument(FunctionArgument argument)
+        public IIndexer AddArgument(FunctionParameter _parameter)
         {
-            if (FindArgument(argument.Name) != null)
-                arguments.Add(argument);
+            if (FindArgument(_parameter.Name) != null)
+                arguments.Add(_parameter.Name, _parameter);
 
             return this;
         }
 
-        public FunctionArgument FindArgument(IdentifierNode identifier) => FindArgument(identifier.Value);
+        public FunctionParameter FindArgument(IdentifierNode identifier) => arguments[identifier.Value];
 
-        private FunctionArgument FindArgument(string identifier)
+        private FunctionParameter FindArgument(string identifier)
         {
             foreach (var arg in arguments)
-                if (arg.Name == identifier)
-                    return arg;
+                if (arg.Key == identifier)
+                    return arg.Value;
 
             return null;
         }
 
-        public virtual IEnumerator<FunctionArgument> GetEnumerator()
+        public virtual IEnumerator<FunctionParameter> GetEnumerator()
         {
-            return new GenericEnumeratorService<BaseIndexerNode, FunctionArgument>(this);
+            return new GenericEnumeratorService<BaseIndexerNode, FunctionParameter>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

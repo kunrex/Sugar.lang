@@ -9,14 +9,14 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes
 {
     internal abstract class CollectionProjectNode<Node> : ProjectNode, ICustomCollection<Node> where Node : ProjectNode
     {
-        protected readonly List<Node> children;
+        protected readonly Dictionary<string, Node> children;
         public int Length { get => children.Count; }
 
         public abstract Node this[int index] { get; }
 
         public CollectionProjectNode(string _name) : base(_name)
         {
-            children = new List<Node>();
+            children = new Dictionary<string, Node>();
         }
 
         public IEnumerator<Node> GetEnumerator()

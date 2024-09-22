@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -18,7 +19,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions.Casting
 
         protected override DescriberEnum BaseDescribers { get => DescriberEnum.CastBaseDescriber; }
 
-        public BaseCastNode(DataType _returnType, Describer _describer, ParseNode _body) : base(_returnType.Name, _describer, _body, _returnType)
+        public BaseCastNode(DataType _returnType, Describer _describer, ParseNode _body, FunctionParamatersNode _arguments) : base(_returnType.Name, _describer, _body, _returnType, _arguments)
         {
             
         }

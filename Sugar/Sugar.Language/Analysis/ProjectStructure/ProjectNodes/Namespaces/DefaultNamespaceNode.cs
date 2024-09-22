@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
-
-using Sugar.Language.Parsing.Nodes.Values;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -53,11 +52,8 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
             if (result != null)
                 return result;
 
-            foreach (var child in internalTypes.Values)
-                if (child.Name == value)
-                    return child;
-
-            return null;
+            internalTypes.TryGetValue(value, out var val);
+            return val;
         }
 
         public override IReferencable GetParent() { throw new NotImplementedException(); }
@@ -65,8 +61,8 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
         public override IReferencable[] GetChildReference(string value)
         {
             foreach (var child in children)
-                if (child.Name == value)
-                    return new IReferencable[] { child };
+                if (child.Key == value)
+                    return new IReferencable[] { child.Value };
 
             return null;
         }
@@ -76,7 +72,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
         protected override void PrintChildren(string indent)
         {
             for (int i = 0; i < children.Count; i++)
-                children[i].Print(indent, i == children.Count - 1);
+                children.ElementAt(i).Value.Print(indent, i == children.Count - 1);
         }
     }
 }

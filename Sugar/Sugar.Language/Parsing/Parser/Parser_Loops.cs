@@ -31,7 +31,7 @@ namespace Sugar.Language.Parsing.Parser
             var initialise = ParseStatement(StatementEnum.StandaloneStatement | StatementEnum.EmptyStatement);
    
             index++;
-            var expression = ParseNonEmptyExpression(false, SeperatorKind.Semicolon);
+            var expression = ParseNonEmptyExpression(SeperatorKind.Semicolon);
 
             index++;            
             var increment = ParseMultiLine();
@@ -81,7 +81,7 @@ namespace Sugar.Language.Parsing.Parser
 
             TryMatchCurrent(DescriberKeyword.In, true);
             var collection = ParseEntity(false, SeperatorKind.CloseBracket);
-
+            
             TryMatchCurrent(Seperator.CloseBracket, true);
             var body = ParseStatement(StatementEnum.Scope | StatementEnum.GeneralStatement);
 

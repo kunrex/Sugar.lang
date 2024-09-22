@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-
-using Sugar.Language.Analysis.ProjectStructure.Enums;
+using System.Linq;
 
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Parenting;
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Describers;
@@ -21,7 +19,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes
         public abstract ReferenceCollection References { get; }
 
         public int DataTypeCount { get => Length; }
-        public override DataType this[int index] { get => children[index]; }
+        public override DataType this[int index] { get => children.ElementAt(index).Value; }
 
         protected int genericCount;
         public int GenericCount { get => genericCount; }

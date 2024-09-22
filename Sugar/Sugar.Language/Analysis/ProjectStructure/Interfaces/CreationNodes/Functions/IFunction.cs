@@ -9,15 +9,15 @@ using Sugar.Language.Analysis.ProjectStructure.LocalNodes;
 
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Parenting.Scope;
 
-using Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions.Structure;
+using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Functions.Structure;
 
 namespace Sugar.Language.Analysis.ProjectStructure.Interfaces.CreationNodes.Functions
 {
-    internal interface IFunction : ICreationNode, ICustomCollection<FunctionArgument>, IScopeParent, IBody
+    internal interface IFunction : ICreationNode, ICustomCollection<FunctionParameter>, IScopeParent, IBody
     {
         public Scope Scope { get; }
 
-        public IFunction AddArgument(FunctionArgument argument);
-        public FunctionArgument FindArgument(IdentifierNode identifier);
+        public IFunction AddArgument(FunctionParameter _parameter);
+        public FunctionParameter FindArgument(IdentifierNode identifier);
     }
 }

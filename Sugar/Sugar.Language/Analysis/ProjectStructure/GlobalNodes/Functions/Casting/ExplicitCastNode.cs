@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -14,7 +15,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions.Casting
     {
         public GlobalMemberEnum GlobalMember { get => GlobalMemberEnum.ExplicitCast; }
 
-        public ExplicitCastNode(DataType _returnType, Describer _describer, ParseNode _body) : base(_returnType, _describer, _body)
+        public ExplicitCastNode(DataType _returnType, Describer _describer, ParseNode _body, FunctionParamatersNode _arguments) : base(_returnType, _describer, _body, _arguments)
         {
 
         }

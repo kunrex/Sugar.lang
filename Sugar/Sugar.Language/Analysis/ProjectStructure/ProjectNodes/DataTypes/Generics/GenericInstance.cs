@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
 using Sugar.Language.Parsing.Nodes.DataTypes;
@@ -34,7 +33,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes.Generi
 
         public override IDataTypeCollection AddEntity(DataType dataType)
         {
-            children.Add(dataType);
+            children.Add(dataType.Name, dataType);
 
             return this;
         }

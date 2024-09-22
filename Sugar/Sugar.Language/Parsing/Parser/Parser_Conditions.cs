@@ -186,10 +186,10 @@ namespace Sugar.Language.Parsing.Parser
             ParseNodeCollection ParseWhenStatement(TypeNode typeNode)
             {
                 var variable = ParseIdentifier();
-
+                
                 index++;
                 ForceMatchCurrent(Keyword.When, true);
-                var expression = ParseNonEmptyExpression(false, SeperatorKind.Colon);
+                var expression = ParseNonEmptyExpression(SeperatorKind.Colon);
 
                 return new WhenNode(new DeclarationNode(new DescriberNode().AddChild(new DescriberKeywordNode(DescriberKeyword.Const)), typeNode, variable), expression);
             }

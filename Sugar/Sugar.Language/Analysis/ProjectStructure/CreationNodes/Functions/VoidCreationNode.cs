@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 using Sugar.Language.Services;
 
 using Sugar.Language.Parsing.Nodes;
 using Sugar.Language.Parsing.Nodes.Values;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 using Sugar.Language.Analysis.ProjectStructure.LocalNodes;
 
-using Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions.Structure;
+using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Functions.Structure;
 
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.CreationNodes;
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Parenting.Functions;
@@ -22,46 +23,50 @@ namespace Sugar.Language.Analysis.ProjectStructure.CreationNodes.Functions
         protected readonly ParseNode body;
         public ParseNode Body { get => body; }
 
-        private readonly List<FunctionArgument> arguments;
-        public FunctionArgument this[int index] { get => arguments[index]; }
+        protected readonly FunctionParamatersNode parseArguments;
+        public FunctionParamatersNode ParseArguments { get => parseArguments; }
+
+        private readonly Dictionary<string, FunctionParameter> arguments;
+        public FunctionParameter this[int index] { get => arguments.ElementAt(index).Value; }
 
         public int Length { get => arguments.Count; }
 
         private readonly Scope scope;
         public Scope Scope { get => scope; }
 
-        public VoidCreationNode(string _name, Describer _describer, ParseNode _body) : base(_name, _describer)
+        public VoidCreationNode(string _name, Describer _describer, ParseNode _body, FunctionParamatersNode _arguments) : base(_name, _describer)
         {
             body = _body;
+            parseArguments = _arguments;
 
             scope = new Scope();
             scope.SetParent(this);
 
-            arguments = new List<FunctionArgument>();
+            arguments = new Dictionary<string, FunctionParameter>();
         }
 
-        public IFunction AddArgument(FunctionArgument argument)
+        public IFunction AddArgument(FunctionParameter _parameter)
         {
-            if (FindArgument(argument.Name) != null)
-                arguments.Add(argument);
+            if (FindArgument(_parameter.Name) != null)
+                arguments.Add(_parameter.Name, _parameter);
 
             return this;
         }
 
-        public FunctionArgument FindArgument(IdentifierNode identifier) => FindArgument(identifier.Value);
+        public FunctionParameter FindArgument(IdentifierNode identifier) => arguments[identifier.Value];
 
-        private FunctionArgument FindArgument(string identifier)
+        private FunctionParameter FindArgument(string identifier)
         {
             foreach (var arg in arguments)
-                if (arg.Name == identifier)
-                    return arg;
+                if (arg.Key == identifier)
+                    return arg.Value;
 
             return null;
         }
 
-        public virtual IEnumerator<FunctionArgument> GetEnumerator()
+        public virtual IEnumerator<FunctionParameter> GetEnumerator()
         {
-            return new GenericEnumeratorService<VoidCreationNode<Parent>, FunctionArgument>(this);
+            return new GenericEnumeratorService<VoidCreationNode<Parent>, FunctionParameter>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

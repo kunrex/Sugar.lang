@@ -2,8 +2,6 @@
 
 using Sugar.Language.Exceptions.Analysis.Processing;
 
-using Sugar.Language.Parsing.Nodes.Values;
-
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Parenting;
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Collections;
 using Sugar.Language.Analysis.ProjectStructure.Interfaces.Referencing;
@@ -30,23 +28,20 @@ namespace Sugar.Language.Analysis.ProjectStructure.ProjectNodes.Namespaces
             parent = namespaceParent;
 
             foreach (var child in children)
-                child.SetParent(this);
+                child.Value.SetParent(this);
         }
 
         public IDataTypeCollection AddEntity(DataType dataType)
         {
-            children.Add(dataType);
+            children.Add(dataType.Name, dataType);
 
             return this;
         }
 
         public virtual DataType TryFindDataType(string value)
         {
-            foreach (var type in children)
-                if (type.Name == value)
-                    return type;
-
-            return null;
+            children.TryGetValue(value, out var val);
+            return val;
         }
 
         public abstract IReferencable GetParent();

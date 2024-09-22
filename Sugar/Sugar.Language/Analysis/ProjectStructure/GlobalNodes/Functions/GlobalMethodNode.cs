@@ -3,6 +3,7 @@
 using Sugar.Language.Exceptions.Analysis.Processing;
 
 using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -25,7 +26,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions
         private IGlobalFunctionParent parent;
         public IGlobalFunctionParent Parent { get => parent; }
 
-        public GlobalMethodNode(string _name, Describer _describer, DataType _type, ParseNode _body) : base(_name, _describer, _body, _type)
+        public GlobalMethodNode(string _name, Describer _describer, DataType _type, ParseNode _body, FunctionParamatersNode _arguments) : base(_name, _describer, _body, _type, _arguments)
         {
 
         }

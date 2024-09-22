@@ -98,8 +98,8 @@ namespace Sugar.Language.Parsing.Parser
         
         private ParseNodeCollection ParseConstructorCall(bool inExpression)
         {
-            ForceMatchCurrent(Keyword.Create, true);
-            var name = ParseEntity(inExpression, SeperatorKind.OpenBracket);
+            TryMatchCurrent(Keyword.Create, true);
+            var name = ParseNonGenericType(SeperatorKind.OpenBracket);
 
             var arguments = ParseFunctionArguments();
 
@@ -109,7 +109,7 @@ namespace Sugar.Language.Parsing.Parser
 
             ExpressionListNode expressions = null;
             if (MatchToken(Seperator.FlowerOpenBracket, LookAhead(), true))
-                expressions = ParseExpressionList(SeperatorKind.FlowerCloseBracket);
+                expressions = ParseExpressionList(SeperatorKind.FlowerCloseBracket, true);
 
             if (generic == null)
             {
@@ -165,11 +165,12 @@ namespace Sugar.Language.Parsing.Parser
         {
             IdentifierNode name = ParseIdentifier(true);
             var arguments = ParseFunctionParameters();
-
+            
             GenericDeclarationNode generic = null;            
             if (MatchCurrent(BinaryOperator.LesserThan))
                 generic = ParseGenericDeclaration();
 
+            
             TypeNode extension = null;
             if (MatchCurrent(Seperator.Colon, true))
                 extension = ParseType(SeperatorKind.FlowerOpenBracket | SeperatorKind.Lambda);
@@ -202,7 +203,7 @@ namespace Sugar.Language.Parsing.Parser
                 TryMatchCurrent(Keyword.Parent, true);
                 TryMatchCurrent(Seperator.OpenBracket, true);
 
-                extension = ParseExpressionList(SeperatorKind.CloseBracket, true);
+                extension = ParseExpressionList(SeperatorKind.CloseBracket, true, true);
             }
 
             var body = ParseStatement(StatementEnum.Scope | StatementEnum.LambdaStatement);
@@ -304,21 +305,15 @@ namespace Sugar.Language.Parsing.Parser
 
             while (index < sourceFile.TokenCount)
             {
+                DescriberNode describer;
                 if (MatchCurrent(Seperator.BoxOpenBracket))
-                {
-                    DescriberNode describer = ParseDescribers();
-
-                    arguments.AddChild(new FunctionArgumentNode(describer, ParseNonEmptyExpression(false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
-                }
+                    describer = ParseDescribers();
                 else
-                {
-                    arguments.AddChild(new FunctionArgumentNode(new DescriberNode(), ParseNonEmptyExpression(false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
-                }
-
+                    describer = new DescriberNode();
+                
+                arguments.AddChild(new FunctionArgumentNode(describer, ParseNonEmptyExpression(SeperatorKind.Comma | SeperatorKind.CloseBracket)));
                 if (MatchCurrent(Seperator.CloseBracket))
-                {
                     break;
-                }
 
                 index++;
             }
@@ -355,7 +350,7 @@ namespace Sugar.Language.Parsing.Parser
                 if (LookAhead() == AssignmentOperator.Assignment)
                 {
                     index += 2;
-                    arguments.AddChild(new FunctionParamaterNode(describer, type, variable, ParseNonEmptyExpression(false, SeperatorKind.Comma | SeperatorKind.CloseBracket)));
+                    arguments.AddChild(new FunctionParamaterNode(describer, type, variable, ParseNonEmptyExpression(SeperatorKind.Comma | SeperatorKind.CloseBracket)));
 
                     index--;
                 }
@@ -366,10 +361,10 @@ namespace Sugar.Language.Parsing.Parser
   
                 if (MatchCurrent(Seperator.Comma, true))
                     continue;
-                else if (MatchCurrent(Seperator.CloseBracket))
+                if (MatchCurrent(Seperator.CloseBracket))
                     break;
-                else
-                    index--;
+                
+                index--;
                 break;
             }
 

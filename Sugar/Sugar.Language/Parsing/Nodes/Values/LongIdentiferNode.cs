@@ -17,31 +17,29 @@ namespace Sugar.Language.Parsing.Nodes.Values
         private readonly DotExpression dot;
         public DotExpression Dot { get => dot; }
 
-        private readonly string fullName;
-        public string FullName { get => fullName; }
-
-        private readonly string[] fullSplit;
-        public int SplitLength { get => fullSplit.Length; }
-
+        private readonly IReadOnlyList<string> fullSplit;
+        public int SplitLength { get => fullSplit.Count; }
+        
         public LongIdentiferNode(DotExpression _dot) : base(_dot)
         {
             dot = _dot;
- 
-            var builder = new StringBuilder();
-            var current = dot;
+            DotExpression current = dot;
+
+            var split = new List<string>();
             while (current != null)
             {
-                builder.Append($"{((IdentifierNode)dot.LHS).Value}.");
+                split.Add(((IdentifierNode)dot.LHS).Value);;
 
                 if (dot.RHS.NodeType == ParseNodeType.Dot)
                     current = (DotExpression)dot.RHS;
                 else
-                    current = null;
+                {
+                    split.Add(( (IdentifierNode)dot.RHS).Value);;
+                    break;
+                }
             }
 
-            builder.Remove(builder.Length - 1, 1);
-            fullName = builder.ToString();
-            fullSplit = fullName.Split('.');
+            fullSplit = split.AsReadOnly();
         }
 
         public string NameAt(int index) => fullSplit[index];

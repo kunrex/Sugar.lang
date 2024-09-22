@@ -147,7 +147,7 @@ namespace Sugar.Tests
         [Test]
         public void ForeachLoop()
         {
-            string source = "foreach(var: x in array) print(x);";
+            string source = "foreach(var: x in Array) print(x);";
             Assert.That(new UnitTestCompiler(source).Compile(), Is.EqualTo(true));
         }
 

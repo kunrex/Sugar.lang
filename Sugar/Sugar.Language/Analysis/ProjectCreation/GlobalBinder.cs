@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Sugar.Language.Analysis.ProjectStructure;
 using Sugar.Language.Parsing.Nodes.Enums;
 
 using Sugar.Language.Parsing.Nodes.Types.Enums;
@@ -24,7 +24,10 @@ using Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Properties;
 using Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions.Casting;
 using Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Properties.Initialise;
 using Sugar.Language.Analysis.ProjectStructure.CreationNodes.Properties.Structure;
-
+using Sugar.Language.Analysis.ProjectStructure.Enums;
+using Sugar.Language.Parsing.Nodes.Statements;
+using Sugar.Language.Parsing.Nodes.Values;
+using Sugar.Language.Tokens;
 using Enum = Sugar.Language.Analysis.ProjectStructure.ProjectNodes.DataTypes.Enum;
 
 namespace Sugar.Language.Analysis.ProjectCreation
@@ -43,7 +46,25 @@ namespace Sugar.Language.Analysis.ProjectCreation
 
         private void BindGlobalMembers(Enum dataType)
         {
-            
+            var integer = projectTree.DefaultNamespace.GetInternalDataType(WrapperTypeEnum.Integer);
+            var describer = new Describer(DescriberEnum.EnumModifiers);
+            foreach (var node in dataType.ParseSkeleton)
+            {
+                switch (node.NodeType)
+                {
+                    case ParseNodeType.Identifier:
+                        var identifier = (IdentifierNode)node;
+                        dataType.AddVariable(new GlobalVariableNode(identifier.Value, describer, integer));
+                        break;
+                    case ParseNodeType.Assignment:
+                        var assignment = (AssignmentNode)node;
+                        dataType.AddVariable(new GlobalInitialiseNode(((IdentifierNode)assignment.Value).Value, describer, integer, assignment.To));
+                        break;
+                    default:
+                        //error
+                        break;
+                }
+            }
         }
 
         private void BindGlobalMembers(Struct dataType)
@@ -83,6 +104,7 @@ namespace Sugar.Language.Analysis.ProjectCreation
                         PushOperatorOverloadNode(dataType, (OperatorOverloadFunctionDeclarationNode)node);
                         break;
                     default:
+                        //error
                         break;
                 }
             }
@@ -131,6 +153,7 @@ namespace Sugar.Language.Analysis.ProjectCreation
                         PushOperatorOverloadNode(dataType, (OperatorOverloadFunctionDeclarationNode)node);
                         break;
                     default:
+                        //error
                         break;
                 }
             }
@@ -158,6 +181,7 @@ namespace Sugar.Language.Analysis.ProjectCreation
                         PushFunctionDeclarationNode(dataType, (FunctionDeclarationNode)node);
                         break;
                     default:
+                        //error
                         break;
                 }
             }
@@ -214,14 +238,14 @@ namespace Sugar.Language.Analysis.ProjectCreation
         private void PushFunctionDeclarationNode<T>(T dataType, FunctionDeclarationNode functionDeclaration) where T : DataType, IGlobalFunctionParent
         {
             if (functionDeclaration.Type.Type == TypeNodeEnum.Void)
-                dataType.AddGlobalVoid(new GlobalVoidNode(functionDeclaration.Name.Value, CreateDescriber(functionDeclaration.Describer), functionDeclaration.Body));
+                dataType.AddGlobalVoid(new GlobalVoidNode(functionDeclaration.Name.Value, CreateDescriber(functionDeclaration.Describer), functionDeclaration.Body, functionDeclaration.Arguments));
             else
-                dataType.AddGlobalMethod(new GlobalMethodNode(functionDeclaration.Name.Value, CreateDescriber(functionDeclaration.Describer), FindType(dataType, functionDeclaration.Type), functionDeclaration.Body));
+                dataType.AddGlobalMethod(new GlobalMethodNode(functionDeclaration.Name.Value, CreateDescriber(functionDeclaration.Describer), FindType(dataType, functionDeclaration.Type), functionDeclaration.Body, functionDeclaration.Arguments));
         }
         
         private void PushConstructorDeclarationNode<T>(T dataType, ConstructorDeclarationNode constructor) where T : DataType, IConstructorParent
         {
-            dataType.AddConstructor(new ConstructorNode(dataType, CreateDescriber(constructor.Describer), constructor.Body));
+            dataType.AddConstructor(new ConstructorNode(dataType, CreateDescriber(constructor.Describer), constructor.Body, constructor.Arguments, constructor.ParentOverrideNode));
         }
 
         private void PushIndexerNode<T>(T dataType, IndexerDeclarationNode indexer) where T : DataType, IIndexerParent
@@ -230,32 +254,32 @@ namespace Sugar.Language.Analysis.ProjectCreation
             {
                 case ParseNodeType.PropertyGet:
                     var getNode = (PropertyGetNode)indexer.Property;
-                    dataType.AddProperty(new IndexerGet(CreateDescriber(indexer.Describer), FindType(dataType, indexer.Type), new Get(CreateDescriber(getNode.Get.Describer), getNode.Get.Body)));
+                    dataType.AddProperty(new IndexerGet(CreateDescriber(indexer.Describer), FindType(dataType, indexer.Type), new Get(CreateDescriber(getNode.Get.Describer), getNode.Get.Body), indexer.Arguments));
                     break;
                 case ParseNodeType.PropertySet:
                     var setNode = (PropertySetNode)indexer.Property;
-                    dataType.AddProperty(new IndexerSet(CreateDescriber(indexer.Describer), FindType(dataType, indexer.Type), new Set(CreateDescriber(setNode.Set.Describer), setNode.Set.Body, FindType(dataType, setNode.Type))));
+                    dataType.AddProperty(new IndexerSet(CreateDescriber(indexer.Describer), FindType(dataType, indexer.Type), new Set(CreateDescriber(setNode.Set.Describer), setNode.Set.Body, FindType(dataType, setNode.Type)), indexer.Arguments));
                     break;
                 case ParseNodeType.PropertyGetSet:
                     var getSetNode = (PropertyGetSetNode)indexer.Property;
-                    dataType.AddProperty(new IndexerGetSet(CreateDescriber(indexer.Describer), FindType(dataType, indexer.Type), new Get(CreateDescriber(getSetNode.Get.Describer), getSetNode.Get.Body), new Set(CreateDescriber(getSetNode.Set.Describer), getSetNode.Set.Body, FindType(dataType, getSetNode.Type))));
+                    dataType.AddProperty(new IndexerGetSet(CreateDescriber(indexer.Describer), FindType(dataType, indexer.Type), new Get(CreateDescriber(getSetNode.Get.Describer), getSetNode.Get.Body), new Set(CreateDescriber(getSetNode.Set.Describer), getSetNode.Set.Body, FindType(dataType, getSetNode.Type)), indexer.Arguments));
                     break;
             }
         }
 
         private void PushExplicitCastNode<T>(T dataType, ExplicitCastDeclarationNode explicitCast) where T : DataType, ICastParent
         {
-            dataType.AddExplicitCast(new ExplicitCastNode(FindType(dataType, explicitCast.Type), CreateDescriber(explicitCast.Describer), explicitCast.Body));
+            dataType.AddExplicitCast(new ExplicitCastNode(FindType(dataType, explicitCast.Type), CreateDescriber(explicitCast.Describer), explicitCast.Body, explicitCast.Arguments));
         }
 
         private void PushImplicitCastNode<T>(T dataType, ImplicitCastDeclarationNode implicitCast) where T : DataType, ICastParent
         {
-            dataType.AddImplicitCast(new ImplicitCastNode(FindType(dataType, implicitCast.Type), CreateDescriber(implicitCast.Describer), implicitCast.Body));
+            dataType.AddImplicitCast(new ImplicitCastNode(FindType(dataType, implicitCast.Type), CreateDescriber(implicitCast.Describer), implicitCast.Body, implicitCast.Arguments));
         }
 
         private void PushOperatorOverloadNode<T>(T dataType, OperatorOverloadFunctionDeclarationNode overload) where T : DataType, IOperatorOverloadParent
         {
-            dataType.AddOverload(new OperatorOverloadNode(overload.Operator, CreateDescriber(overload.Describer), overload.Body, FindType(dataType, overload.Type)));
+            dataType.AddOverload(new OperatorOverloadNode(overload.Operator, CreateDescriber(overload.Describer), overload.Body, FindType(dataType, overload.Type), overload.Arguments));
         }
     }
 }

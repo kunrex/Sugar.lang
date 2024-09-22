@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 using Sugar.Language.Exceptions.Analysis.Processing;
 
@@ -23,7 +24,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes.Functions
         private ILocalFunctionParent parent;
         public ILocalFunctionParent Parent { get => parent; }
 
-        public LocalVoidNode(string _name, Describer _describer, ParseNodeCollection _body) : base(_name, _describer, _body)
+        public LocalVoidNode(string _name, Describer _describer, ParseNodeCollection _body, FunctionParamatersNode _arguments) : base(_name, _describer, _body, _arguments)
         {
 
         }

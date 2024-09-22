@@ -3,6 +3,7 @@
 using Sugar.Language.Tokens.Operators;
 
 using Sugar.Language.Parsing.Nodes;
+using Sugar.Language.Parsing.Nodes.Functions.Declarations.Structure;
 
 using Sugar.Language.Analysis.ProjectStructure.Enums;
 
@@ -25,7 +26,7 @@ namespace Sugar.Language.Analysis.ProjectStructure.GlobalNodes.Functions
 
         protected override DescriberEnum BaseDescribers { get => DescriberEnum.ConstructorBaseDescriber; }
 
-        public OperatorOverloadNode(Operator _operator, Describer _describer, ParseNode _body, DataType _type) : base(_operator.Value, _describer, _body, _type)
+        public OperatorOverloadNode(Operator _operator, Describer _describer, ParseNode _body, DataType _type, FunctionParamatersNode _arguments) : base(_operator.Value, _describer, _body, _type, _arguments)
         {
             baseOperator = _operator;
         }

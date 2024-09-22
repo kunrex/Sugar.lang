@@ -187,7 +187,7 @@ namespace Sugar.Language.Parsing.Parser
         /// <summary>
         /// Pushes an exception if the `current seperator` matches a certain expected seperator. Returns weather or not the match was found.
         /// </summary>
-        private bool TryMatchBreakOutSeperator(SeperatorKind breakOutSeperators)
+        private bool TryMatchBreakOutSeperator(SeperatorKind breakOutSeperators, bool increment = false)
         {
             if (index >= sourceFile.TokenCount)
             {
@@ -195,7 +195,7 @@ namespace Sugar.Language.Parsing.Parser
                 return false;
             }
 
-            if (!MatchBreakOutSeperator(Current, breakOutSeperators))
+            if (!MatchBreakOutSeperator(Current, breakOutSeperators, increment))
             {
                 sourceFile.PushException(new TokenExpectedException($"{breakOutSeperators}", Current));
                 return false;
@@ -207,11 +207,14 @@ namespace Sugar.Language.Parsing.Parser
         /// <summary>
         /// Returns weather or a certain token matches a certain seperator was found.
         /// </summary>
-        private bool MatchBreakOutSeperator(Token seperator, SeperatorKind breakOutSeperators)
+        private bool MatchBreakOutSeperator(Token seperator, SeperatorKind breakOutSeperators, bool increment = false)
         {
             if (!MatchType(TokenType.Seperator, seperator))
                 return false;
 
+            if (increment)
+                index++;
+            
             var subType = (SeperatorKind)seperator.SyntaxKind;
             return (subType & breakOutSeperators) == subType;
         }
@@ -267,7 +270,7 @@ namespace Sugar.Language.Parsing.Parser
 
                 if (MatchBreakOutSeperator(current, match))
                 {
-                    if (MatchBreakOutSeperator(current, extra) && !MatchBreakOutSeperator(current, breakOutSeperators))
+                    if (MatchBreakOutSeperator(current, extra) && !MatchBreakOutSeperator(current, breakOutSeperators, false))
                         index--;
 
                     break;
