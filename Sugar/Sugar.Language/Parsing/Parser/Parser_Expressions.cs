@@ -59,7 +59,7 @@ namespace Sugar.Language.Parsing.Parser
             while (index < sourceFile.TokenCount)
             {
                 var current = Current;
-
+                
                 if (!MatchType(expected, current))
                     invalid = breakOut = true;
                 else
@@ -89,7 +89,7 @@ namespace Sugar.Language.Parsing.Parser
                                 default:
                                     if (((Keyword)current).KeywordType == KeywordType.Type)
                                     {
-                                        output.Push(ParseEntity(true, SeperatorKind.None));
+                                        output.Push(ParseType(SeperatorKind.None, true));
                                         break;
                                     }
                                     invalid = breakOut = true;
@@ -189,10 +189,7 @@ namespace Sugar.Language.Parsing.Parser
                             }
 
                             stack.Push(asOperator);
-                            if (asOperator == BinaryOperator.AsCastOperator)
-                                expected = TokenType.Identifier | TokenType.Keyword;
-                            else
-                                expected = TokenType.Identifier | TokenType.Constant | TokenType.UnaryOperator | TokenType.Seperator;
+                            expected = TokenType.Identifier | TokenType.Keyword | TokenType.Constant | TokenType.UnaryOperator | TokenType.Seperator;
                             break;
                     }
                 }
@@ -443,7 +440,7 @@ namespace Sugar.Language.Parsing.Parser
                         if (MatchToken(BinaryOperator.LesserThan, LookAhead()))
                         {
                             GenericCallNode generic = ParseGenericCall(!inExpression);
-
+                            
                             if (generic == null)
                                 output.Push(identifier);
                             else
@@ -489,14 +486,9 @@ namespace Sugar.Language.Parsing.Parser
                             breakOut = subtract = true;
                             break;
                         }
-
+                        
                         if (current.SyntaxKind == SyntaxKind.Array)
-                        {
-                            if (inExpression)
-                                output.Push(new TypeKeywordNode(TypeKeyword.Array));
-                            else
-                                output.Push(new ArrayTypeNode(ParseGenericCall(true)));
-                        }
+                            output.Push(new ArrayTypeNode(ParseGenericCall(true)));
                         else
                         {
                             var keyword = (Keyword)current;
@@ -589,7 +581,8 @@ namespace Sugar.Language.Parsing.Parser
         /// </summary>
         private TypeNode ParseType(SeperatorKind breakOutSeperators, bool force = true)
         {
-            if (MatchCurrent(Keyword.Var, true))
+            var current = Current;
+            if (MatchToken(Keyword.Var,current, true))
             {
                 TryMatchBreakOutSeperator(breakOutSeperators);
                 return new AnonymousTypeNode();
@@ -710,14 +703,14 @@ namespace Sugar.Language.Parsing.Parser
             while (index < sourceFile.TokenCount)
             {
                 var current = Current;
-
+                
                 switch (current.Type)
                 {
                     case TokenType.BinaryOperator:
                         if (!MatchType(expected, current))
                             return new ParseGenericResult(new TokenExpectedException(expected, 0));
 
-                        if(current.SyntaxKind == SyntaxKind.GreaterThan)
+                        if (current.SyntaxKind == SyntaxKind.GreaterThan)
                             return new ParseGenericResult(generic);
 
                         return new ParseGenericResult(new InvalidTokenException(current));
@@ -725,7 +718,7 @@ namespace Sugar.Language.Parsing.Parser
                         if (MatchType(expected, current) && ((Keyword)current).KeywordType == KeywordType.Type)
                         {
                             TypeNode type = ParseType(SeperatorKind.Comma, false);
-
+                            
                             if (type.NodeType != ParseNodeType.Invalid)
                             {
                                 generic.AddChild(type);
@@ -733,7 +726,7 @@ namespace Sugar.Language.Parsing.Parser
                                 break;
                             }
                         }
-
+                        
                         return new ParseGenericResult(new InvalidTokenException(current));
                     case TokenType.Identifier:
                         if (!MatchType(expected, current))
@@ -748,8 +741,8 @@ namespace Sugar.Language.Parsing.Parser
                             generic.AddChild(type);
                             if (MatchCurrent(Seperator.Comma, true))
                                 continue;
-                            else
-                                expected = TokenType.BinaryOperator;
+                            
+                            expected = TokenType.BinaryOperator;
                         }
                         break;
                     case TokenType.Seperator:
@@ -774,17 +767,16 @@ namespace Sugar.Language.Parsing.Parser
         private GenericCallNode ParseGenericCall(bool force)
         {
             int beforeIndex = index;
-
             var genericResult = ParseGenericCall();
- 
+            
             if (genericResult.Success)
             {
                 var next = LookAhead();
                 var toMatch = TokenType.Seperator | TokenType.BinaryOperator;
                 if (force)
                     toMatch |= TokenType.Identifier;
-
-                if (MatchType(toMatch, next) && next != Seperator.OpenBracket)
+                
+                if (next == null || (MatchType(toMatch, next) && next != Seperator.OpenBracket))
                     return genericResult.Generic;
                 
                 index = beforeIndex;
