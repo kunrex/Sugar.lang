@@ -4,52 +4,52 @@ namespace Sugar.Language.Tokens.Enums
 {
     internal enum OperatorKind : byte
     {
-        Addition = 72,
-        Subtraction = 73,
-        Multiplication = 74,
-        Division = 75,
-        Modulus = 76,
+        Addition = 73,
+        Subtraction = 74,
+        Multiplication = 75,
+        Division = 76,
+        Modulus = 77,
 
-        BitwiseAnd = 77,
-        BitwiseOr = 78,
-        BitwiseXor = 79,
-        RightShit = 80,
-        LeftShift = 81,
-        BitwiseNot = 82,
+        BitwiseAnd = 78,
+        BitwiseOr = 79,
+        BitwiseXor = 80,
+        RightShit = 81,
+        LeftShift = 82,
+        BitwiseNot = 83,
 
-        Increment = 83,
-        Decrement = 84,
+        Increment = 84,
+        Decrement = 85,
 
-        Not = 85,
-        Minus = 86,
+        Not = 86,
+        Minus = 87,
 
-        Equals = 87,
-        NotEquals = 88,
-        GreaterThan = 89,
-        LesserThan = 90,
-        GreaterThanEquals = 91,
-        LesserThanEquals = 92,
+        Equals = 88,
+        NotEquals = 89,
+        GreaterThan = 90,
+        LesserThan = 91,
+        GreaterThanEquals = 92,
+        LesserThanEquals = 93,
 
-        Or = 93,
-        And = 94,
+        Or = 94,
+        And = 95,
 
-        Dot = 95,
-        AsCast = 96,
+        Dot = 96,
+        AsCast = 97,
 
-        Assignment = 97,
+        Assignment = 98,
 
-        AssignmentAddition = 98,
-        AssignmentSubtract = 99,
-        AssignmentMultiplication = 100,
-        AssignmentDivision = 101,
-        AssignmentModulus = 102,
+        AssignmentAddition = 99,
+        AssignmentSubtract = 100,
+        AssignmentMultiplication = 101,
+        AssignmentDivision = 102,
+        AssignmentModulus = 103,
 
-        AssignmentBitwiseAnd = 103,
-        AssignmentBitwiseOr = 104,
-        AssignmentBitwiseXor = 105,
-        AssignmentBitwiseRighshift = 106,
-        AssignmentBitwiseLeftShift = 107,
+        AssignmentBitwiseAnd = 104,
+        AssignmentBitwiseOr = 105,
+        AssignmentBitwiseXor = 106,
+        AssignmentBitwiseRighshift = 107,
+        AssignmentBitwiseLeftShift = 108,
 
-        Plus = 113
+        Plus = 114
     }
 }

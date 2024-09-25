@@ -9,7 +9,6 @@ using Sugar.Language.Tokens.Operators;
 using Sugar.Language.Tokens.Seperators;
 using Sugar.Language.Tokens.Operators.Binary;
 using Sugar.Language.Tokens.Operators.Assignment;
-using Sugar.Language.Tokens.Keywords.Subtypes.Types;
 using Sugar.Language.Tokens.Keywords.Subtypes.ControlStatements;
 
 using Sugar.Language.Parsing.Nodes;
@@ -189,15 +188,15 @@ namespace Sugar.Language.Parsing.Parser
                             }
 
                             stack.Push(asOperator);
-                            expected = TokenType.Identifier | TokenType.Keyword | TokenType.Constant | TokenType.UnaryOperator | TokenType.Seperator;
+                            expected = TokenType.Identifier | TokenType.Keyword | TokenType.Constant | TokenType.UnaryOperator;
+                            if (LookAhead() == Seperator.OpenBracket)
+                                expected |= TokenType.Seperator;
                             break;
                     }
                 }
 
                 if (breakOut)
                 {
-                    ClearStack(output, stack);
-
                     if (invalid)
                     {
                         if ((expected & TokenType.Seperator) == TokenType.Seperator)
@@ -205,7 +204,8 @@ namespace Sugar.Language.Parsing.Parser
                         else
                             output.Push(new InvalidExpressionNode(PushInvalidCurrentException(), PanicModeSimple(breakOutSeperators)));
                     }
-
+                    
+                    ClearStack(output, stack);
                     break;
                 }
 
@@ -216,7 +216,7 @@ namespace Sugar.Language.Parsing.Parser
                 return new EmptyNode();
             if (index >= sourceFile.TokenCount)
                 PushExpectedCurrentException($"{breakOutSeperators}");
-
+            
             return output.Pop();
         }
 
@@ -510,9 +510,12 @@ namespace Sugar.Language.Parsing.Parser
 
                 if (breakOut)
                 {
+                    if (output.Count % 2 == stack.Count % 2)
+                        output.Push(new InvalidEntityNode(PushInvalidTokenException(current), new TokenCollection(current)));
+                    
                     if (subtract)
                         index--;
-
+  
                     ClearStack(output, stack);
                     break;
                 }
@@ -520,9 +523,6 @@ namespace Sugar.Language.Parsing.Parser
                 index++;
             }
 
-            while (output.Count > 1)
-                output.Pop().Print("", true);
-            
             if (output.Count == 1)
                 return output.Pop();
             

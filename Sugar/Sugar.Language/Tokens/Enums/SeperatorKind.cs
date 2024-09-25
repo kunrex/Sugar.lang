@@ -7,21 +7,21 @@ namespace Sugar.Language.Tokens.Enums
     {
         None = 0,
 
-        Colon = 2,
-        Semicolon = 4,
+        Colon = 1,
+        Semicolon = 2,
 
-        Dot = 8,
-        Comma = 16,
-        Lambda = 32,
-        QuestionMark = 64,
+        Dot = 4,
+        Comma = 8,
+        Lambda = 16,
+        QuestionMark = 32,
 
-        OpenBracket = 128,
-        CloseBracket = 256,
+        OpenBracket = 64,
+        CloseBracket = 128,
 
-        BoxOpenBracket = 512,
-        BoxCloseBracket = 1024,
+        BoxOpenBracket = 256,
+        BoxCloseBracket = 512,
 
-        FlowerOpenBracket = 2048,
-        FlowerCloseBracket = 5096,
+        FlowerOpenBracket = 1024,
+        FlowerCloseBracket = 2048,
     }
 }

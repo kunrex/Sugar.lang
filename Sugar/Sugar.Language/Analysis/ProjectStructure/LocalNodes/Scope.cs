@@ -31,10 +31,11 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes
         public int Length { get => variables.Count + voids.Count + methods.Count + statements.Count; }
         public ILocalNode this[int index] { get => throw new NotImplementedException(); }
 
-        private readonly List<LocalVariableNode> variables;
+        
+        private readonly Dictionary<string, LocalVariableNode> variables;
 
-        private readonly List<LocalVoidNode> voids;
-        private readonly List<LocalMethodNode> methods;
+        private readonly Dictionary<string, List<LocalVoidNode>> voids;
+        private readonly Dictionary<string, List<LocalMethodNode>> methods;
 
         private readonly List<ILocalNode> statements;
 
@@ -43,10 +44,10 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes
 
         public Scope()
         {
-            variables = new List<LocalVariableNode>();
+            variables = new Dictionary<string, LocalVariableNode>();
 
-            voids = new List<LocalVoidNode>();
-            methods = new List<LocalMethodNode>();
+            voids = new Dictionary<string, List<LocalVoidNode>>();
+            methods = new Dictionary<string, List<LocalMethodNode>>();
 
             statements = new List<ILocalNode>();
         }
@@ -61,7 +62,11 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes
 
         public ILocalFunctionParent AddLocalVoid(LocalVoidNode localVoid)
         {
-            voids.Add(localVoid);
+            voids.TryGetValue(localVoid.Name, out var value);
+            if(value != null)
+                value.Add(localVoid);
+            else
+                voids.Add(localVoid.Name, new List<LocalVoidNode>() { localVoid });
 
             return this;
         }
@@ -70,7 +75,11 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes
 
         public ILocalFunctionParent AddLocalMethod(LocalMethodNode localMethod)
         {
-            methods.Add(localMethod);
+            methods.TryGetValue(localMethod.Name, out var value);
+            if(value != null)
+                value.Add(localMethod);
+            else
+                methods.Add(localMethod.Name, new List<LocalMethodNode>() { localMethod });
 
             return this;
         }
@@ -79,19 +88,15 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes
 
         public ILocalVariableParent AddVariable(LocalVariableNode localVariable)
         {
-            variables.Add(localVariable);
+            variables.Add(localVariable.Name, localVariable);
 
             return this;
         }
 
         public LocalVariableNode TryFindVariable(IdentifierNode identifier)
         {
-            var value = identifier.Value;
-            foreach(var variable in variables)
-                if (variable.Name == value)
-                    return variable;
-
-            return null;
+            variables.TryGetValue(identifier.Value, out LocalVariableNode value);
+            return value;
         }
 
         public IEnumerator<ILocalNode> GetEnumerator()
@@ -104,15 +109,17 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes
             throw new NotImplementedException();
         }
 
-        protected Function FindFunction<Function>(string name, List<Function> collection, FunctionParamatersNode parameters) where Function : IFunction
+        protected Function FindFunction<Function>(string name, Dictionary<string, List<Function>> collection, FunctionParamatersNode parameters) where Function : IFunction
         {
-            foreach (var function in collection)
-                if (function.Name == name)
+            collection.TryGetValue(name, out var value);
+            if (value != null)
+            {
+                foreach (var definition in value)
                 {
                     bool exit = true;
                     foreach (var arg in parameters)
                     {
-                        if (function.FindArgument(arg.Name) == null)
+                        if (definition.FindArgument(arg.Name) == null)
                         {
                             exit = false;
                             break;
@@ -120,8 +127,9 @@ namespace Sugar.Language.Analysis.ProjectStructure.LocalNodes
                     }
 
                     if (exit)
-                        return function;
+                        return definition;
                 }
+            }
 
             return default(Function);
         }

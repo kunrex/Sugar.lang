@@ -8,6 +8,7 @@ using Sugar.Language.Exceptions.Parsing;
 
 using Sugar.Language.Tokens;
 using Sugar.Language.Tokens.Enums;
+using Sugar.Language.Tokens.Seperators;
 
 namespace Sugar.Language.Parsing.Parser
 {
@@ -214,9 +215,9 @@ namespace Sugar.Language.Parsing.Parser
 
             if (increment)
                 index++;
-            
+
             var subType = (SeperatorKind)seperator.SyntaxKind;
-            return (subType & breakOutSeperators) == subType;
+            return (breakOutSeperators & subType) == subType;
         }
         
         //Error Handling
@@ -263,14 +264,14 @@ namespace Sugar.Language.Parsing.Parser
             var invalid = new List<Token>();
             var extra = SeperatorKind.Semicolon | SeperatorKind.FlowerOpenBracket | SeperatorKind.FlowerCloseBracket;
             var match = breakOutSeperators | extra;
-
+            
             while (index < sourceFile.TokenCount)
             {
                 var current = Current;
 
                 if (MatchBreakOutSeperator(current, match))
                 {
-                    if (MatchBreakOutSeperator(current, extra) && !MatchBreakOutSeperator(current, breakOutSeperators, false))
+                    if (MatchBreakOutSeperator(current, extra) && !MatchBreakOutSeperator(current, breakOutSeperators))
                         index--;
 
                     break;
